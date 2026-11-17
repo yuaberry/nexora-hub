@@ -37,12 +37,14 @@ export interface AuthTokens {
  * Desafio de segundo factor.
  *
  * O login com MFA activo **não** devolve tokens: devolve um desafio, que só
- * a rota `/auth/mfa/verify` converte em sessão. O desafio é assinado com uma
- * chave derivada — nunca com a chave dos tokens de acesso.
+ * a rota `/auth/mfa/verify` converte em sessão. O desafio é opaco e assinado
+ * com uma chave derivada — nunca com a chave dos tokens de acesso. Usado como
+ * autorização, tem de falhar (e há teste a provar isso).
  */
 export interface MfaChallenge {
   readonly mfaRequired: true;
-  readonly challengeId: string;
+  /** Token opaco do desafio; o cliente devolve-o tal e qual. */
+  readonly challengeToken: string;
   /** Validade do desafio, em segundos (5 min). */
   readonly expiresIn: number;
 }
@@ -59,7 +61,7 @@ export interface LoginRequest {
 }
 
 export interface MfaVerifyRequest {
-  readonly challengeId: string;
+  readonly challengeToken: string;
   /** Código TOTP de 6 dígitos ou código de resgate. */
   readonly code: string;
 }

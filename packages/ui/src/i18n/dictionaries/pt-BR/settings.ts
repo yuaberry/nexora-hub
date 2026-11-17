@@ -1,0 +1,43 @@
+/** Dicionário PT-BR — configurações, aparência, acessibilidade e armazenamento. */
+export const settings = {
+  'settings.title': 'Configurações',
+  'settings.subtitle': 'Aparência, acessibilidade e armazenamento deste dispositivo.',
+
+  'settings.appearance': 'Aparência',
+  'settings.theme': 'Tema',
+  'settings.theme.light': 'Claro',
+  'settings.theme.dark': 'Escuro',
+  'settings.theme.auto': 'Automático (segue o sistema)',
+  'settings.theme.label': 'Alternador de tema',
+  'settings.language': 'Idioma',
+  'settings.language.pt-BR': 'Português (Brasil)',
+  'settings.language.en': 'Inglês',
+  'settings.scale': 'Escala da interface',
+  'settings.scale.auto': 'Automática',
+  'settings.scale.compact': 'Compacta',
+  'settings.scale.default': 'Padrão',
+  'settings.scale.large': 'Grande',
+  'settings.scale.xlarge': 'Extra grande',
+
+  'settings.accessibility': 'Acessibilidade',
+  'settings.reduceMotion': 'Reduzir movimento',
+  'settings.reduceMotion.hint': 'Desliga transições e animações da interface.',
+  'settings.highContrast': 'Alto contraste',
+  'settings.highContrast.hint': 'Reforça a tinta do texto e as linhas dos componentes.',
+
+  'settings.storage.title': 'Armazenamento do disco',
+  'settings.storage.games': 'Jogos',
+  'settings.storage.other': 'Outros ficheiros',
+  'settings.storage.free': 'Livre',
+  'settings.storage.unknown': 'Capacidade desconhecida',
+  'settings.storage.over': 'O disco está acima da capacidade declarada.',
+  'settings.storage.refresh': 'Atualizar',
+
+  'settings.account': 'Conta',
+  'settings.account.plan': 'Plano',
+  'settings.account.plan.free': 'Gratuito',
+  'settings.account.plan.premium': 'Premium',
+  'settings.hotbars': 'Hotbars',
+  'settings.hotbars.max': 'Máximo de hotbars',
+  'settings.hotbars.unlimited': 'Ilimitado',
+} as const;

@@ -1,0 +1,540 @@
+/**
+ * Tokens de tema do NEXORA HUB.
+ *
+ * Um tema é um conjunto de **tokens de papel**, não um filtro por cima do
+ * outro: `--paper-surface-deepest` é o fundo mais fundo no tema escuro e o
+ * mais claro no tema claro. O componente que escreve
+ * `background: var(--paper-surface-deepest); color: var(--paper-ink-strong)`
+ * desenha correctamente nos dois temas sem uma única variante `dark:`.
+ *
+ * **Nenhum componente tem cor própria**: todas as cores vêm daqui. A
+ * acessibilidade (`reduzir movimento` e `alto contraste`) também vive aqui —
+ * `[data-motion='reduced']` desliga as transições e `[data-contrast='high']`
+ * reforça tinta e linhas.
+ *
+ * A escala da interface é uma variável única (`--paper-scale`) multiplicada
+ * pelo tamanho de fonte da raiz: como o layout é construído em `rem`, um
+ * factor escala tudo — não há componente com tamanho próprio.
+ */
+
+:root {
+  --paper-radius-sm: 4px;
+  --paper-radius: 8px;
+  --paper-radius-lg: 14px;
+  --paper-space-1: 0.25rem;
+  --paper-space-2: 0.5rem;
+  --paper-space-3: 0.75rem;
+  --paper-space-4: 1rem;
+  --paper-space-6: 1.5rem;
+  --paper-space-8: 2rem;
+  --paper-focus-ring: 2px;
+  --paper-line-width: 1px;
+  --paper-scale: 1;
+  --paper-motion: 160ms ease;
+}
+
+html {
+  font-size: calc(16px * var(--paper-scale, 1));
+}
+
+/* Tema escuro — `surface-deepest` é o fundo mais fundo. */
+[data-theme='dark'] {
+  --paper-surface-deepest: #07070b;
+  --paper-surface: #101017;
+  --paper-surface-raised: #17171f;
+  --paper-surface-sunken: #0b0b10;
+  --paper-line: #262634;
+  --paper-ink-strong: #f4f4f8;
+  --paper-ink: #d5d5df;
+  --paper-ink-muted: #9b9bad;
+  --paper-accent: #3b82f6;
+  --paper-accent-soft: #1d3a6b;
+  --paper-accent-ink: #ffffff;
+  --paper-positive: #34d399;
+  --paper-warning: #fbbf24;
+  --paper-danger: #f87171;
+  --paper-neutral: #6b7280;
+  --paper-placeholder-from: #23232e;
+  --paper-placeholder-to: #2f2f3d;
+  --paper-placeholder-ink: #b9b9c9;
+}
+
+/* Tema claro — `surface-deepest` é o fundo mais claro. */
+[data-theme='light'] {
+  --paper-surface-deepest: #ffffff;
+  --paper-surface: #f5f5f8;
+  --paper-surface-raised: #ffffff;
+  --paper-surface-sunken: #ececf2;
+  --paper-line: #d9d9e3;
+  --paper-ink-strong: #0b0b12;
+  --paper-ink: #22222c;
+  --paper-ink-muted: #55556a;
+  --paper-accent: #1d4ed8;
+  --paper-accent-soft: #dbe6ff;
+  --paper-accent-ink: #ffffff;
+  --paper-positive: #047857;
+  --paper-warning: #b45309;
+  --paper-danger: #b91c1c;
+  --paper-neutral: #6b7280;
+  --paper-placeholder-from: #e7e7ef;
+  --paper-placeholder-to: #d7d7e4;
+  --paper-placeholder-ink: #4a4a5c;
+}
+
+/* Alto contraste — tinta mais forte, linhas mais grossas. */
+[data-contrast='high'] {
+  --paper-line-width: 2px;
+  --paper-focus-ring: 3px;
+}
+
+[data-contrast='high'][data-theme='dark'] {
+  --paper-ink: #ffffff;
+  --paper-ink-muted: #cfcfe0;
+  --paper-line: #ffffff;
+}
+
+[data-contrast='high'][data-theme='light'] {
+  --paper-ink: #000000;
+  --paper-ink-muted: #2a2a38;
+  --paper-line: #000000;
+}
+
+/* Reduzir movimento — nenhuma transição, nenhuma animação. */
+[data-motion='reduced'] {
+  --paper-motion: 0ms;
+}
+
+[data-motion='reduced'] *,
+[data-motion='reduced'] *::before,
+[data-motion='reduced'] *::after {
+  transition-duration: 0ms !important;
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --paper-motion: 0ms;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                               */
+/* ------------------------------------------------------------------ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper-surface-deepest);
+  color: var(--paper-ink);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: var(--paper-focus-ring) solid var(--paper-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Componentes — só tokens, nunca cor própria                         */
+/* ------------------------------------------------------------------ */
+
+.nx-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--paper-space-2);
+  min-height: 2.5rem;
+  padding: var(--paper-space-2) var(--paper-space-4);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius);
+  background: var(--paper-surface-raised);
+  color: var(--paper-ink-strong);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--paper-motion), border-color var(--paper-motion),
+    transform var(--paper-motion);
+}
+
+.nx-button:hover:not(:disabled) {
+  background: var(--paper-accent-soft);
+}
+
+.nx-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.nx-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.nx-button--primary {
+  background: var(--paper-accent);
+  border-color: var(--paper-accent);
+  color: var(--paper-accent-ink);
+}
+
+.nx-button--primary:hover:not(:disabled) {
+  background: var(--paper-accent);
+  filter: brightness(1.08);
+}
+
+.nx-button--danger {
+  background: var(--paper-danger);
+  border-color: var(--paper-danger);
+  color: var(--paper-accent-ink);
+}
+
+.nx-button--block {
+  width: 100%;
+}
+
+.nx-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-3);
+  padding: var(--paper-space-4);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  background: var(--paper-surface);
+  min-width: 0;
+}
+
+.nx-card--raised {
+  background: var(--paper-surface-raised);
+}
+
+.nx-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--paper-space-1);
+  padding: 0.1rem var(--paper-space-2);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: 999px;
+  background: var(--paper-surface-raised);
+  color: var(--paper-ink-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.nx-badge--planned {
+  border-color: var(--paper-warning);
+  color: var(--paper-warning);
+}
+
+.nx-badge--positive {
+  border-color: var(--paper-positive);
+  color: var(--paper-positive);
+}
+
+.nx-badge--danger {
+  border-color: var(--paper-danger);
+  color: var(--paper-danger);
+}
+
+.nx-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--paper-space-3);
+  padding: var(--paper-space-3) var(--paper-space-4);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-left: 4px solid var(--paper-warning);
+  border-radius: var(--paper-radius);
+  background: var(--paper-surface);
+  color: var(--paper-ink);
+}
+
+.nx-input,
+.nx-select {
+  min-width: 0;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: var(--paper-space-2) var(--paper-space-3);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius);
+  background: var(--paper-surface-raised);
+  color: var(--paper-ink-strong);
+  font: inherit;
+}
+
+.nx-input::placeholder {
+  color: var(--paper-ink-muted);
+}
+
+.nx-label {
+  display: block;
+  color: var(--paper-ink-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nx-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--paper-space-3);
+}
+
+.nx-row--between {
+  justify-content: space-between;
+}
+
+.nx-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-3);
+  min-width: 0;
+}
+
+.nx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--paper-space-4);
+}
+
+.nx-title {
+  margin: 0;
+  color: var(--paper-ink-strong);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.nx-subtitle {
+  margin: 0;
+  color: var(--paper-ink-muted);
+  font-size: 0.95rem;
+}
+
+.nx-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-2);
+  padding: var(--paper-space-8);
+  border: 1px dashed var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  color: var(--paper-ink-muted);
+  text-align: center;
+}
+
+/* Barra de armazenamento — os tons vêm dos tokens. */
+.nx-storage-bar {
+  display: flex;
+  width: 100%;
+  height: 0.75rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--paper-surface-sunken);
+}
+
+.nx-storage-bar__segment {
+  height: 100%;
+  transition: width var(--paper-motion);
+}
+
+.nx-storage-bar__segment--accent {
+  background: var(--paper-accent);
+}
+
+.nx-storage-bar__segment--neutral {
+  background: var(--paper-neutral);
+}
+
+.nx-storage-bar__segment--warning {
+  background: var(--paper-warning);
+}
+
+/* Capa ausente — placeholder do tema, nunca uma imagem inventada. */
+.nx-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius);
+  background: linear-gradient(
+    145deg,
+    var(--paper-placeholder-from),
+    var(--paper-placeholder-to)
+  );
+  color: var(--paper-placeholder-ink);
+  font-weight: 700;
+  text-align: center;
+  overflow: hidden;
+}
+
+.nx-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nx-game-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-2);
+  padding: var(--paper-space-3);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  background: var(--paper-surface);
+  min-width: 0;
+  text-align: start;
+  cursor: pointer;
+  transition: transform var(--paper-motion), border-color var(--paper-motion);
+}
+
+.nx-game-card:hover {
+  border-color: var(--paper-accent);
+  transform: translateY(-2px);
+}
+
+/* Barra lateral. */
+.nx-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-2);
+  width: 15rem;
+  padding: var(--paper-space-4);
+  border-inline-end: var(--paper-line-width) solid var(--paper-line);
+  background: var(--paper-surface);
+  min-height: 100vh;
+}
+
+.nx-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: var(--paper-space-3);
+  padding: var(--paper-space-2) var(--paper-space-3);
+  border: 0;
+  border-radius: var(--paper-radius);
+  background: transparent;
+  color: var(--paper-ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+
+.nx-sidebar__item:hover {
+  background: var(--paper-surface-raised);
+}
+
+.nx-sidebar__item--active {
+  background: var(--paper-accent-soft);
+  color: var(--paper-ink-strong);
+}
+
+/* Alternador de tema animado (canto superior esquerdo). */
+.nx-theme-switch {
+  position: relative;
+  width: 3.25rem;
+  height: 1.75rem;
+  padding: 0;
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: 999px;
+  background: var(--paper-surface-sunken);
+  cursor: pointer;
+  transition: background var(--paper-motion);
+}
+
+.nx-theme-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 999px;
+  background: var(--paper-accent);
+  color: var(--paper-accent-ink);
+  font-size: 0.75rem;
+  transition: transform var(--paper-motion), background var(--paper-motion);
+}
+
+.nx-theme-switch[aria-checked='true'] .nx-theme-switch__thumb {
+  transform: translateX(1.5rem);
+}
+
+/* Interruptor de acessibilidade. */
+.nx-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--paper-space-3);
+  cursor: pointer;
+}
+
+.nx-toggle__track {
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: 999px;
+  background: var(--paper-surface-sunken);
+  transition: background var(--paper-motion);
+}
+
+.nx-toggle__track[data-checked='true'] {
+  background: var(--paper-accent);
+}
+
+.nx-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 999px;
+  background: var(--paper-ink-strong);
+  transition: transform var(--paper-motion);
+}
+
+.nx-toggle__track[data-checked='true'] .nx-toggle__thumb {
+  transform: translateX(1.25rem);
+}
+
+.nx-skeleton {
+  border-radius: var(--paper-radius);
+  background: linear-gradient(
+    90deg,
+    var(--paper-placeholder-from),
+    var(--paper-placeholder-to),
+    var(--paper-placeholder-from)
+  );
+  animation: nx-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes nx-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.nx-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

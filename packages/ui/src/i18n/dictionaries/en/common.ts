@@ -1,0 +1,22 @@
+/** EN dictionary — common core. Derived from pt-BR (missing keys fail the build). */
+export const common = {
+  'common.app.name': 'NEXORA HUB',
+  'common.app.tagline': 'Your game library, all in one place.',
+  'common.action.play': 'Play',
+  'common.action.cancel': 'Cancel',
+  'common.action.save': 'Save',
+  'common.action.close': 'Close',
+  'common.action.search': 'Search',
+  'common.action.back': 'Back',
+  'common.action.import': 'Import',
+  'common.action.chooseFolder': 'Choose folder',
+  'common.action.logout': 'Sign out',
+  'common.action.login': 'Sign in',
+  'common.action.register': 'Create account',
+  'common.action.retry': 'Try again',
+  'common.loading': 'Loading…',
+  'common.unlimited': 'Unlimited',
+  'common.yes': 'Yes',
+  'common.no': 'No',
+  'common.desktopOnly': 'Available in the desktop app.',
+} as const;

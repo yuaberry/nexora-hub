@@ -1,0 +1,43 @@
+/** EN dictionary — settings, appearance, accessibility and storage. */
+export const settings = {
+  'settings.title': 'Settings',
+  'settings.subtitle': 'Appearance, accessibility and storage of this device.',
+
+  'settings.appearance': 'Appearance',
+  'settings.theme': 'Theme',
+  'settings.theme.light': 'Light',
+  'settings.theme.dark': 'Dark',
+  'settings.theme.auto': 'Automatic (follows the system)',
+  'settings.theme.label': 'Theme switch',
+  'settings.language': 'Language',
+  'settings.language.pt-BR': 'Portuguese (Brazil)',
+  'settings.language.en': 'English',
+  'settings.scale': 'Interface scale',
+  'settings.scale.auto': 'Automatic',
+  'settings.scale.compact': 'Compact',
+  'settings.scale.default': 'Default',
+  'settings.scale.large': 'Large',
+  'settings.scale.xlarge': 'Extra large',
+
+  'settings.accessibility': 'Accessibility',
+  'settings.reduceMotion': 'Reduce motion',
+  'settings.reduceMotion.hint': 'Turns off interface transitions and animations.',
+  'settings.highContrast': 'High contrast',
+  'settings.highContrast.hint': 'Strengthens text ink and component outlines.',
+
+  'settings.storage.title': 'Disk storage',
+  'settings.storage.games': 'Games',
+  'settings.storage.other': 'Other files',
+  'settings.storage.free': 'Free',
+  'settings.storage.unknown': 'Unknown capacity',
+  'settings.storage.over': 'The disk is above its declared capacity.',
+  'settings.storage.refresh': 'Refresh',
+
+  'settings.account': 'Account',
+  'settings.account.plan': 'Plan',
+  'settings.account.plan.free': 'Free',
+  'settings.account.plan.premium': 'Premium',
+  'settings.hotbars': 'Hotbars',
+  'settings.hotbars.max': 'Maximum hotbars',
+  'settings.hotbars.unlimited': 'Unlimited',
+} as const;

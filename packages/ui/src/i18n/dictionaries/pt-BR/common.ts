@@ -1,0 +1,22 @@
+/** Dicionário PT-BR — núcleo comum. É a fonte de verdade da forma. */
+export const common = {
+  'common.app.name': 'NEXORA HUB',
+  'common.app.tagline': 'A sua biblioteca de jogos, num só lugar.',
+  'common.action.play': 'Jogar',
+  'common.action.cancel': 'Cancelar',
+  'common.action.save': 'Guardar',
+  'common.action.close': 'Fechar',
+  'common.action.search': 'Pesquisar',
+  'common.action.back': 'Voltar',
+  'common.action.import': 'Importar',
+  'common.action.chooseFolder': 'Escolher pasta',
+  'common.action.logout': 'Terminar sessão',
+  'common.action.login': 'Entrar',
+  'common.action.register': 'Criar conta',
+  'common.action.retry': 'Tentar novamente',
+  'common.loading': 'A carregar…',
+  'common.unlimited': 'Ilimitado',
+  'common.yes': 'Sim',
+  'common.no': 'Não',
+  'common.desktopOnly': 'Disponível na aplicação de desktop.',
+} as const;

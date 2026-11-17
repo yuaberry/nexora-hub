@@ -1,0 +1,76 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# O CI não publica nada: só `contents: read`, sem tags e sem Release.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.3.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm -r --workspace-concurrency=1 build
+
+  # O SBOM é gerado a partir do lockfile (`--lockfile-only`): não precisa de
+  # instalar dependências e inclui os pacotes opcionais das outras
+  # plataformas, que num runner Linux nunca seriam instalados mas que também
+  # são publicados.
+  sbom:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.3.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pnpm install --lockfile-only
+      - name: SBOM CycloneDX 1.6
+        # 1.6, não 1.7: o Trivy usado no passo seguinte não decodifica a 1.7.
+        run: npx --yes @cyclonedx/cyclonedx-npm@1.19.3 --spec-version 1.6 --output-file sbom.cdx.json --name NEXORA-HUB --packages .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sbom
+          path: sbom.cdx.json
+
+  scan:
+    needs: [verify, sbom]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: sbom
+          path: .
+      - name: Trivy — vulnerabilidades (HIGH/CRITICAL quebram)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          exit-code: 1
+      - name: Trivy — segredos
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scanners: secret
+          exit-code: 1
+          skip-dirs: node_modules

@@ -1,0 +1,9 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# O `electron-builder` corre empacotamento com scripts de pós-instalação de
+# binários nativos (`app-builder-bin`); sem isto o pnpm bloqueia os builds.
+allowBuilds:
+  app-builder-bin: true
+  esbuild: true

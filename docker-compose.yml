@@ -1,0 +1,56 @@
+# NEXORA HUB — ambiente local de contentores.
+#
+# Usa `docker-compose` v1 (podman 4.9.3): `docker compose` v2 não existe neste
+# ambiente. Todas as portas são mapeadas em 127.0.0.1 e as credenciais são de
+# desenvolvimento — nenhum segredo real.
+#
+#   docker-compose up -d
+#
+# A API funciona **sem** estes serviços (modo degradado em memória); os testes
+# de integração com PostgreSQL real só correm quando DATABASE_URL está
+# definido e acessível.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexora-hub-pg
+    environment:
+      POSTGRES_USER: nexora
+      POSTGRES_PASSWORD: nexora_dev
+      POSTGRES_DB: nexora_hub
+    ports:
+      - '127.0.0.1:54340:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U nexora -d nexora_hub']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - nexora-hub-pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexora-hub-redis
+    ports:
+      - '127.0.0.1:54390:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    container_name: nexora-hub-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: nexora
+      MINIO_ROOT_PASSWORD: nexora_dev_secret
+    ports:
+      - '127.0.0.1:54900:9000'
+      - '127.0.0.1:54901:9001'
+    volumes:
+      - nexora-hub-miniodata:/data
+
+volumes:
+  nexora-hub-pgdata:
+  nexora-hub-miniodata:

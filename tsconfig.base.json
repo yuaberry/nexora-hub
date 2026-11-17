@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
+    "types": ["node"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@nexora/core": ["packages/core/src/index.ts"],
+      "@nexora/protocol": ["packages/protocol/src/index.ts"],
+      "@nexora/download": ["packages/download/src/index.ts"],
+      "@nexora/runner": ["packages/runner/src/index.ts"],
+      "@nexora/cloud": ["packages/cloud/src/index.ts"],
+      "@nexora/ui": ["packages/ui/src/index.ts"]
+    }
+  }
+}

@@ -1,7 +1,16 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { readPreferences, writePreferences, type InterfacePreferences } from '../theme/preferences.js';
 import {
   appliedTheme,
+  scaleFactor,
   toggleTheme,
   type AppliedTheme,
   type Locale,
@@ -163,4 +172,40 @@ export function applyScale(rootFontScale: number, element?: HTMLElement): void {
   }
   const target = element ?? document.documentElement;
   target.style.setProperty('--paper-scale', String(rootFontScale));
+}
+
+/** Largura da janela (0 quando não há DOM — os testes correm sem ele). */
+function windowWidth(): number {
+  return typeof globalThis.innerWidth === 'number' ? globalThis.innerWidth : 1280;
+}
+
+/**
+ * Aplica as preferências ao documento — tema, contraste, movimento, idioma e
+ * escala.
+ *
+ * Acontece em `useLayoutEffect`, **antes do primeiro desenho**, para que a
+ * interface não salte ao carregar. Não há *script inline*: a CSP do executável
+ * de desktop proíbe `unsafe-inline`, e a mesma disciplina vale no browser.
+ */
+export function useDocumentPreferences(): void {
+  const { preferences, scale } = useInterface();
+
+  useLayoutEffect(() => {
+    applyPreferencesToDocument(preferences);
+    applyScale(scaleFactor(scale, windowWidth()));
+  }, [preferences, scale]);
+
+  // O modo `auto` responde à largura do ecrã e recalcula quando a janela muda.
+  useLayoutEffect(() => {
+    if (scale !== 'auto' || typeof globalThis.addEventListener !== 'function') {
+      return;
+    }
+    const onResize = (): void => {
+      applyScale(scaleFactor('auto', windowWidth()));
+    };
+    globalThis.addEventListener('resize', onResize);
+    return () => {
+      globalThis.removeEventListener('resize', onResize);
+    };
+  }, [scale]);
 }

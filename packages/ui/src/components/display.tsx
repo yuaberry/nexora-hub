@@ -48,14 +48,17 @@ export function Card({ children, raised = false, className }: CardProps): ReactN
 export interface EmptyStateProps {
   readonly title: string;
   readonly hint?: string;
+  /** Acção opcional (um botão, uma ligação) — nunca um pedido de desculpas. */
+  readonly children?: ReactNode;
 }
 
 /** Estado vazio explica o que falta e o que fazer — nunca uma tela muda. */
-export function EmptyState({ title, hint }: EmptyStateProps): ReactNode {
+export function EmptyState({ title, hint, children }: EmptyStateProps): ReactNode {
   return (
     <div className="nx-empty">
       <strong>{title}</strong>
       {hint === undefined ? null : <span>{hint}</span>}
+      {children}
     </div>
   );
 }

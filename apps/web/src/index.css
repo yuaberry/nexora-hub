@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+@import '@nexora/ui/theme.css';
+
+/**
+ * Estilos da web.
+ *
+ * O tema vem dos tokens de papel (`@nexora/ui/theme.css`) — nenhum
+ * componente escreve cor própria. O Tailwind fica com o *layout*
+ * (espaçamento, grelhas, tamanhos), nunca com a cor.
+ */
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* A grelha da biblioteca usa `minmax(0, …)`: sem isso, uma coluna não encolhe
+   abaixo do conteúdo e a página transborda. */
+.hub-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+}
+
+.hub-shell {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+@media (max-width: 48rem) {
+  .hub-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Nenhum texto provoca scroll horizontal: caminhos de ficheiro e URLs não
+   têm espaços onde quebrar. */
+.hub-break {
+  overflow-wrap: anywhere;
+}

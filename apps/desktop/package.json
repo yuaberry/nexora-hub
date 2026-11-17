@@ -1,0 +1,40 @@
+{
+  "name": "@nexora/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "NEXORA HUB — launcher de jogos (Electron): biblioteca local, importação e runner.",
+  "author": {
+    "name": "Yua Devs",
+    "email": "dev@nexora.local"
+  },
+  "license": "UNLICENSED",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build:renderer": "vite build",
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "dev": "pnpm --filter @nexora/web build && pnpm --filter @nexora/desktop build && electron .",
+    "package": "electron-builder --linux --publish never",
+    "package:all": "electron-builder --publish never"
+  },
+  "dependencies": {
+    "@nexora/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "electron": "42.11.18",
+    "electron-builder": "26.18.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "vitest": "4.1.12"
+  },
+  "desktopName": "NEXORA HUB",
+  "homepage": "https://github.com/yuaberry/nexora-hub"
+}

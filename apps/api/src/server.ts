@@ -32,8 +32,13 @@ export async function startServer(): Promise<{ url: string; close: () => Promise
   };
 }
 
-/** Ponto de entrada do processo. */
-if (import.meta.url === `file://${process.argv[1]}`) {
+/**
+ * Ponto de entrada directo (`node dist/server.js`).
+ *
+ * O ponto de entrada do pacote é o `index.ts`, que chama `startServer()`;
+ * este guardServe para correr o servidor a partir do ficheiro compilado.
+ */
+if (process.argv[1] !== undefined && import.meta.url === `file://${process.argv[1]}`) {
   startServer().catch((error: unknown) => {
     console.error('[nexora-hub] falha ao arrancar a API', error);
     process.exit(1);

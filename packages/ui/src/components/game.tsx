@@ -18,6 +18,8 @@ export interface GameCardProps {
   readonly favorite: boolean;
   readonly onSelect: (gameId: string) => void;
   readonly onPlay?: (gameId: string) => void;
+  /** Alterna o favorito (omitido quando a vista é apenas de leitura). */
+  readonly onToggleFavorite?: (gameId: string) => void;
   /** Texto do botão "Jogar". */
   readonly playLabel: string;
   /** Texto de "Favorito" (para o leitor de ecrã). */
@@ -43,6 +45,7 @@ export function GameCard({
   favorite,
   onSelect,
   onPlay,
+  onToggleFavorite,
   playLabel,
   favoriteLabel,
 }: GameCardProps): ReactNode {
@@ -68,17 +71,31 @@ export function GameCard({
       </div>
       <div className="nx-row nx-row--between">
         {favorite ? <span className="nx-badge">{favoriteLabel}</span> : <span className="nx-subtitle">{playTimeLabel}</span>}
-        {onPlay === undefined ? null : (
-          <button
-            type="button"
-            className="nx-button nx-button--primary"
-            onClick={() => {
-              onPlay(game.id);
-            }}
-          >
-            {playLabel}
-          </button>
-        )}
+        <div className="nx-row">
+          {onToggleFavorite === undefined ? null : (
+            <button
+              type="button"
+              className="nx-button"
+              aria-pressed={favorite}
+              onClick={() => {
+                onToggleFavorite(game.id);
+              }}
+            >
+              {favoriteLabel}
+            </button>
+          )}
+          {onPlay === undefined ? null : (
+            <button
+              type="button"
+              className="nx-button nx-button--primary"
+              onClick={() => {
+                onPlay(game.id);
+              }}
+            >
+              {playLabel}
+            </button>
+          )}
+        </div>
       </div>
     </article>
   );

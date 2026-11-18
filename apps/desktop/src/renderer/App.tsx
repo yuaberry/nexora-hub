@@ -3,6 +3,7 @@ import { InterfaceProvider, useDocumentPreferences } from '@nexora/ui';
 import { AppShell } from './components/AppShell.js';
 import { LibraryPage } from './pages/LibraryPage.js';
 import { GameDetailPage } from './pages/GameDetailPage.js';
+import { DownloadsPage } from './pages/DownloadsPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
 import { PlannedPage } from './pages/PlannedPage.js';
 
@@ -21,6 +22,7 @@ export type PlannedModule = 'downloads' | 'cloudSaves' | 'friends';
 export type Route =
   | { readonly name: 'library' }
   | { readonly name: 'details'; readonly gameId: string }
+  | { readonly name: 'downloads' }
   | { readonly name: 'settings' }
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
@@ -39,6 +41,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
           />
         ) : null}
         {route.name === 'details' ? <GameDetailPage gameId={route.gameId} onBack={() => setRoute({ name: 'library' })} /> : null}
+        {route.name === 'downloads' ? <DownloadsPage /> : null}
         {route.name === 'settings' ? <SettingsPage /> : null}
         {route.name === 'planned' ? <PlannedPage module={route.module} /> : null}
       </AppShell>

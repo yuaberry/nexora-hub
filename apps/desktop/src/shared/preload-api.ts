@@ -87,6 +87,61 @@ export type LibraryGames = readonly DesktopGameView[];
 export type DetectedFolders = readonly DetectedFolderView[];
 export type RunningSessions = readonly SessionSummaryView[];
 
+/** Uma fonte instalada (vista do renderer). */
+export interface SourceView {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly origin: string;
+  readonly installedAt: string;
+  readonly legal: {
+    readonly basis: string;
+    readonly attestedBy: string;
+    readonly attestedAt: string;
+  };
+  readonly games: number;
+}
+
+/** Um resultado da pesquisa no catálogo unificado. */
+export interface SourceSearchHit {
+  readonly id: string;
+  readonly title: string;
+  readonly score: number;
+  readonly match:
+    | 'alias-exact'
+    | 'title-exact'
+    | 'prefix'
+    | 'syllable'
+    | 'consonant-prefix'
+    | 'fuzzy';
+  /** `false` quando o jogo só existe por torrent (transporte planeado). */
+  readonly available: boolean;
+}
+
+/** Uma tarefa de download (vista do renderer). */
+export interface DownloadTaskView {
+  readonly taskId: string;
+  readonly gameId: string;
+  readonly url: string;
+  readonly destinationPath: string;
+  readonly state: 'queued' | 'downloading' | 'paused' | 'verifying' | 'completed' | 'failed';
+  readonly receivedBytes: number;
+  readonly totalBytes: number | null;
+  readonly bytesPerSecond: number;
+  readonly attempts: number;
+  readonly error: string | null;
+  readonly verified: boolean;
+}
+
+/** Resultado de uma operação de fonte/download. */
+export interface SourceOperationResult {
+  readonly ok: boolean;
+  readonly code?: string;
+  readonly message?: string;
+  readonly sourceId?: string;
+  readonly taskIds?: readonly string[];
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -105,6 +160,22 @@ export interface DesktopApi {
   };
   readonly storage: {
     readonly usage: () => Promise<DiskUsageView>;
+  };
+  readonly sources: {
+    /** Instala um manifesto `.json` escolhido pelo utilizador. */
+    readonly installFile: () => Promise<SourceOperationResult>;
+    /** Instala um manifesto de um caminho conhecido (automação/CI). */
+    readonly installPath: (manifestPath: string) => Promise<SourceOperationResult>;
+    readonly list: () => Promise<readonly SourceView[]>;
+    readonly search: (query: string, limit?: number) => Promise<readonly SourceSearchHit[]>;
+    readonly remove: (sourceId: string) => Promise<boolean>;
+  };
+  readonly downloads: {
+    readonly list: () => Promise<readonly DownloadTaskView[]>;
+    readonly add: (unifiedId: string, destinationRoot: string) => Promise<SourceOperationResult>;
+    readonly pause: (taskId: string) => Promise<boolean>;
+    readonly resume: (taskId: string) => Promise<boolean>;
+    readonly cancel: (taskId: string) => Promise<boolean>;
   };
 }
 

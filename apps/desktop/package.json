@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "NEXORA HUB — launcher de jogos (Electron): biblioteca local, importação e runner.",
+  "description": "NEXORA HUB \u2014 launcher de jogos (Electron): biblioteca local, importa\u00e7\u00e3o e runner.",
   "author": {
     "name": "Yua Devs",
     "email": "dev@nexora.local"
@@ -21,8 +21,10 @@
   },
   "dependencies": {
     "@nexora/core": "workspace:*",
+    "@nexora/download": "workspace:*",
     "@nexora/protocol": "workspace:*",
     "@nexora/runner": "workspace:*",
+    "@nexora/sources": "workspace:*",
     "@nexora/ui": "workspace:*"
   },
   "devDependencies": {

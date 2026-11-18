@@ -14,7 +14,8 @@ fases, sem nunca anunciar o que não existe.
 | App de desktop (Electron 42) | **Funcional**: biblioteca local, importação de pastas, pesquisa dinâmica, início de jogos com medição, configurações de dispositivo |
 | API (Fastify + PostgreSQL) | **Funcional**: autenticação completa (senha + MFA + refresh rotativo), biblioteca, pesquisa, sessões |
 | Web (React) | **Funcional**: leitura da biblioteca, login, admin esqueleto — PT-BR/EN |
-| Downloads na nuvem, amigos, loja, overlay, Remote Play | **Planejados** — só interface/tipos + selo "Planeado" |
+| Biblioteca local, Downloads (HTTP verificado), pesquisa, medição | **Funcional** |
+| Saves na nuvem, amigos, loja, overlay, Remote Play, torrent | **Planejados** — só interface/tipos + selo "Planeado" |
 
 > **Nada aqui finge funcionar.** Um módulo que ainda não existe aparece com o
 > selo "Planeado" e a explicação do que falta. **A NEXORA não hospeda nem
@@ -26,7 +27,7 @@ fases, sem nunca anunciar o que não existe.
 | Verificação | Resultado |
 | --- | --- |
 | `pnpm typecheck` | limpo nos 10 projetos |
-| `pnpm test` | **220 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
+| `pnpm test` | **236 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
 | `pnpm build` | packages, API, web e desktop compilados |
 | Empacotamento | `nexora-hub-0.1.0-x86_64.AppImage` e `nexora-hub-0.1.0-amd64.deb` construídos (`--publish never`) |
 | App real (Electron no DISPLAY=:0) | janela abre, biblioteca semeada aparece, pesquisa viva funciona, jogo lançado e tempo gravado — ver abaixo |

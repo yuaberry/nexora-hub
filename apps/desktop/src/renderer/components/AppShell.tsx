@@ -25,8 +25,8 @@ export function AppShell({
 
   const items: readonly SidebarItem[] = [
     { id: 'library', label: t('nav.library') },
+    { id: 'downloads', label: t('nav.downloads') },
     { id: 'settings', label: t('nav.settings') },
-    { id: 'downloads', label: t('nav.downloads'), planned: true },
     { id: 'cloudSaves', label: t('nav.cloudSaves'), planned: true },
     { id: 'friends', label: t('nav.friends'), planned: true },
   ];
@@ -34,11 +34,11 @@ export function AppShell({
   const activeId = route.name === 'details' ? 'library' : route.name === 'planned' ? route.module : route.name;
 
   function onSelect(id: string): void {
-    if (id === 'library' || id === 'settings') {
+    if (id === 'library' || id === 'settings' || id === 'downloads') {
       onNavigate({ name: id });
       return;
     }
-    if (id === 'downloads' || id === 'cloudSaves' || id === 'friends') {
+    if (id === 'cloudSaves' || id === 'friends') {
       onNavigate({ name: 'planned', module: id satisfies PlannedModule });
     }
   }

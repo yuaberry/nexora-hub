@@ -5,6 +5,7 @@ export const planned = {
   'planned.hint': 'Nothing here pretends to work: once the capability exists, the badge goes away.',
 
   'planned.downloads': 'Download engine: only the interface exists in this phase.',
+  'planned.torrent': 'Torrent client: not implemented in this phase — HTTP only.',
   'planned.cloud-saves': 'Cloud saves: Nexora Cloud integration is a future phase.',
   'planned.overlay': 'Overlay: not implemented in this phase.',
   'planned.fps-counter': 'FPS counter: not implemented in this phase.',

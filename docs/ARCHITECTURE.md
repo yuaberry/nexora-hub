@@ -109,3 +109,33 @@ prova real, não uma preferência:
   nome, e o nome por omissão é o do `package.json` (`@nexora/desktop`) — sem
   isto a base local do executável empacotado ficaria em `~/.config/@nexora`,
   um directório com `@` e o nome do pacote em vez do nome do produto.
+## D17 — O manifesto é declarativo, e a attestation é obrigatória
+
+Uma fonte de downloads é um **ficheiro JSON** que descreve o que transferir:
+URLs, caminhos, checksums, executáveis declarados e uma declaração de base
+legal (`legal.basis`, `attestedBy`, `attestedAt`). Sem attestation, a
+instalação é recusada — pelo pacote, não pela interface. A NEXORA não hospeda
+nem distribui conteúdo: quem instala o manifesto declara a sua base legal e
+responde por ela (`docs/LEGAL.md`).
+
+## D18 — A API serve o catálogo; quem transfere é o cliente
+
+Os ficheiros aterram no disco do utilizador. Por isso o motor
+(`@nexora/download`) corre no **processo principal do launcher**, e a API
+expõe apenas fontes e pesquisa. Um canal remoto de transferência (Nexora
+Cloud) é fase futura, e entra com a sua própria arquitectura.
+
+## D19 — O jogo transferido entra na biblioteca sozinho
+
+Quando as tarefas de um jogo terminam, o executável é escolhido entre os que
+o **manifesto declara** (nunca adivinhado), recebe permissão de execução, e a
+entrada nasce na biblioteca local. Se nenhum executável declarado existir, o
+jogo não entra — antes honestidade do que um lançador que arranca a coisa
+errada.
+
+## D20 — Um limite anunciado é aplicado na fila
+
+Espaço em disco verificado **antes** do primeiro byte, checksum verificado
+**antes** do rename, e torrent recusado com motivo enquanto o cliente não
+existir (`planned`). Torrent e Wine/Proton são Fase 2b: são dependência
+nativa e decisão de handoff, não texto de marketing.

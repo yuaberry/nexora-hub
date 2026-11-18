@@ -5,6 +5,7 @@ export const planned = {
   'planned.hint': 'Nada aqui finge funcionar: quando a capacidade existir, o selo desaparece.',
 
   'planned.downloads': 'Motor de downloads: só a interface existe nesta fase.',
+  'planned.torrent': 'Cliente de torrent: não implementado nesta fase — só HTTP.',
   'planned.cloud-saves': 'Saves na nuvem: integração com o Nexora Cloud é fase futura.',
   'planned.overlay': 'Overlay: não implementado nesta fase.',
   'planned.fps-counter': 'Contador de FPS: não implementado nesta fase.',

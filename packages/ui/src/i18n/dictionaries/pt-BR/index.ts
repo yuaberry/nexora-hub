@@ -2,6 +2,7 @@ import { common } from './common.js';
 import { library } from './library.js';
 import { settings } from './settings.js';
 import { planned } from './planned.js';
+import { downloads } from './downloads.js';
 import { pages } from './pages.js';
 
 /**
@@ -17,5 +18,6 @@ export const ptBR = {
   ...library,
   ...settings,
   ...planned,
+  ...downloads,
   ...pages,
 } as const;

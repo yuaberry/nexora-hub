@@ -14,6 +14,7 @@ export const common = {
   'common.action.login': 'Sign in',
   'common.action.register': 'Create account',
   'common.action.retry': 'Try again',
+  'common.action.remove': 'Remove',
   'common.loading': 'Loading…',
   'common.unlimited': 'Unlimited',
   'common.yes': 'Yes',

@@ -9,7 +9,8 @@
 | Fase | Entrega | Estado | Critério de conclusão |
 | --- | --- | --- | --- |
 | 1 | Fundação, domínio (busca/planos/armazenamento), API (auth/biblioteca/sessões), web e **desktop jogável** (biblioteca local, pesquisa dinâmica, início com medição, configurações) | ✅ Concluída | 215 testes verdes + AppImage/deb construídos + app real provada (pesquisa "l"→League, jogo lançado e tempo gravado) |
-| 2 | **Downloads**: motor HTTP multi-conexão + torrent, manifestos de fonte, verificação por checksum, fila; runner com Wine/Proton e handoff para launcher oficial | ⏳ Planejada | downloads reais com verificação, pause/resume; "baixar e jogar" sem passo manual |
+| 2 | **Downloads**: motor HTTP multi-conexão com verificação, manifestos de fonte, fila com prioridade, instalação na biblioteca; API de fontes unificada | ✅ Concluída (HTTP) | ciclo completo provado (manifesto → pesquisa → download verificado → biblioteca → jogo lançado → tempo gravado); **torrent e Wine/Proton ficam planeados** |
+| 2b | **Torrent e Wine/Proton** | ⏳ Planejada | cliente torrent real (decisão de dependência nativa) + handoff para launcher oficial |
 | 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | ⏳ Planejada | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
 | 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ⏳ Planejada | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
@@ -78,6 +79,65 @@
   Java"), lendo a base local de `~/.config/NEXORA HUB`.
 
 ### Fora do escopo da Fase 1 (deliberadamente)
+
+Downloads, saves na nuvem, amigos, chat, loja, overlay, FPS, otimizador de
+SO, controles, IA, Remote Play — entregues em fases próprias. Nenhum contorno
+de protecções (Denuvo) ou anticheat, em nenhuma fase (`docs/LEGAL.md`).
+
+## Fase 2 — Downloads e fontes (concluída em 2026-11-18)
+
+### Entregue
+
+- [x] **`packages/download`** — motor HTTP multi-conexão com retoma por partes
+      independentes, concatenação por ordem, verificação por checksum antes do
+      rename, fila com prioridade, espaço verificado antes, pausa/retoma.
+      **Torrent continua `planned`**: é dependência nativa com decisão própria
+      (biblioteca, licença, build) — a interface e a API dizem-no.
+- [x] **`packages/sources`** — manifesto declarativo validado em Zod com
+      **attestation legal obrigatória** (sem ela, a instalação é recusada),
+      registro de fontes e catálogo unificado pesquisável pelo mesmo motor da
+      biblioteca (`searchGames`).
+- [x] **`apps/api`** — `POST/GET/DELETE /api/v1/sources` (instalar exige papel
+      `admin`), `GET /api/v1/sources/search` e `GET /api/v1/sources/:id`.
+      A API serve o catálogo; quem transfere é o cliente (os ficheiros aterram
+      no disco do utilizador).
+- [x] **`apps/desktop`** — aba **Downloads** real: instalar manifesto `.json`
+      (diálogo ou caminho), fontes instaladas com a attestation visível,
+      pesquisa no catálogo unificado, fila com progresso medido, pausa/retoma/
+      cancelar, e **instalação automática na biblioteca** quando as tarefas
+      do jogo terminam (executável dos que o manifesto declara, com `chmod`).
+- [x] **`docs/LEGAL.md`** — a fronteira: a NEXORA não hospeda nem redistribui;
+      cada manifesto declara a sua base legal e quem o instalou responde por
+      ela.
+
+### Prova de execução real (2026-11-18)
+
+- `pnpm typecheck` limpo nos 12 projetos; **236 testes verdes** (2 ignorados =
+  PostgreSQL), incluindo o motor com servidor HTTP local (multi-conexão,
+  checksum, resume) e a fila (prioridade, pausa/retoma, cancelamento).
+- **Ciclo completo, ao vivo, dentro da app** (Electron, com servidor HTTP de
+  prova e um manifesto próprio):
+  1. `sources.installPath` → manifesto instalado;
+  2. `sources.search("jogo e2e")` → resultado `title-exact` (motor da
+     biblioteca sobre o catálogo unificado);
+  3. `downloads.add` → tarefa na fila;
+  4. fila final: `completed`, `verified: true` (checksum verificado);
+  5. o jogo **entrou na biblioteca local** com o executável detectado
+     (ficheiro com permissão de execução);
+  6. `runner.launch` → sessão real; **tempo jogado gravado: 1 s**.
+- Bugs encontrados e corrigidos na prova: bomba da fila a relançar a mesma
+  tarefa infinitamente, evento de estado tipado como `progress`, corrida de
+  gerações na pausa/retoma (a execução abortada sobrescrevia o estado),
+  id unificado ambíguo (`fonte/jogo` com barra no jogo) e manifesto sem
+  attestation a entrar no registro.
+
+### Fora do escopo desta fase (deliberadamente)
+
+Cliente de torrent (dependência nativa por decidir), Wine/Proton (Fase 2b),
+scrapers de sites de terceiros e qualquer contorno de protecções — ver
+`docs/LEGAL.md`. Os manifestos das fontes que o operador queira usar são
+escritos e instalados por ele, com a base legal declarada no próprio
+manifesto; a NEXORA não os distribui.
 
 Downloads por torrent, saves na nuvem, amigos, chat, loja, overlay, FPS,
 otimizador de SO, controles, IA, Remote Play — apenas tipos e selos

@@ -77,6 +77,22 @@ export function useLibrary(): AsyncState<readonly DesktopGameView[]> & {
     [api],
   );
 
+  // A biblioteca muda fora do React: um jogo instalado por Downloads entra na
+  // base local sem a página saber. Recarregar quando a janela volta a ter
+  // foco é o momento honesto de o fazer — sem polling a cada segundo.
+  useEffect(() => {
+    if (typeof globalThis.addEventListener !== 'function') {
+      return;
+    }
+    const onFocus = (): void => {
+      state.reload();
+    };
+    globalThis.addEventListener('focus', onFocus);
+    return () => {
+      globalThis.removeEventListener('focus', onFocus);
+    };
+  }, [state.reload]);
+
   const importFolder = useCallback(async () => {
     if (api === null) {
       return null;

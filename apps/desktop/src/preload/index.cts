@@ -9,6 +9,10 @@ import type {
   LibraryGames,
   RunningSessions,
   SessionSummaryView,
+  SourceOperationResult,
+  SourceSearchHit,
+  SourceView,
+  DownloadTaskView,
 } from '../shared/preload-api.js';
 
 /**
@@ -41,6 +45,20 @@ const api: DesktopApi = {
   },
   storage: {
     usage: () => ipcRenderer.invoke('storage:usage') as Promise<DiskUsageView>,
+  },
+  sources: {
+    installFile: () => ipcRenderer.invoke('sources:installFile') as Promise<SourceOperationResult>,
+    installPath: (manifestPath) => ipcRenderer.invoke('sources:installPath', manifestPath) as Promise<SourceOperationResult>,
+    list: () => ipcRenderer.invoke('sources:list') as Promise<readonly SourceView[]>,
+    search: (query, limit) => ipcRenderer.invoke('sources:search', query, limit) as Promise<readonly SourceSearchHit[]>,
+    remove: (sourceId) => ipcRenderer.invoke('sources:remove', sourceId) as Promise<boolean>,
+  },
+  downloads: {
+    list: () => ipcRenderer.invoke('downloads:list') as Promise<readonly DownloadTaskView[]>,
+    add: (unifiedId, destinationRoot) => ipcRenderer.invoke('downloads:add', unifiedId, destinationRoot) as Promise<SourceOperationResult>,
+    pause: (taskId) => ipcRenderer.invoke('downloads:pause', taskId) as Promise<boolean>,
+    resume: (taskId) => ipcRenderer.invoke('downloads:resume', taskId) as Promise<boolean>,
+    cancel: (taskId) => ipcRenderer.invoke('downloads:cancel', taskId) as Promise<boolean>,
   },
 };
 

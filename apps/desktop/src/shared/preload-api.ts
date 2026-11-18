@@ -142,6 +142,16 @@ export interface SourceOperationResult {
   readonly taskIds?: readonly string[];
 }
 
+/** Um snapshot de saves (vista do renderer). */
+export interface SaveSnapshotView {
+  readonly id: string;
+  readonly label: string;
+  readonly createdAt: string;
+  readonly sizeBytes: number;
+  readonly revision: number;
+  readonly checksum: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -169,6 +179,13 @@ export interface DesktopApi {
     readonly list: () => Promise<readonly SourceView[]>;
     readonly search: (query: string, limit?: number) => Promise<readonly SourceSearchHit[]>;
     readonly remove: (sourceId: string) => Promise<boolean>;
+  };
+  readonly saves: {
+    /** Cria um snapshot da pasta de saves de um jogo. */
+    readonly create: (gameKey: string, savePath: string, label: string) => Promise<SourceOperationResult>;
+    readonly list: (gameKey: string) => Promise<readonly SaveSnapshotView[]>;
+    readonly restore: (snapshotId: string, savePath: string) => Promise<SourceOperationResult>;
+    readonly remove: (gameKey: string, snapshotId: string) => Promise<boolean>;
   };
   readonly downloads: {
     readonly list: () => Promise<readonly DownloadTaskView[]>;

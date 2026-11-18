@@ -3,6 +3,7 @@ import { library } from './library.js';
 import { settings } from './settings.js';
 import { planned } from './planned.js';
 import { downloads } from './downloads.js';
+import { saves } from './saves.js';
 import { pages } from './pages.js';
 
 /**
@@ -17,5 +18,6 @@ export const en = {
   ...settings,
   ...planned,
   ...downloads,
+  ...saves,
   ...pages,
 };

@@ -8,6 +8,7 @@ import type {
   LaunchResultView,
   LibraryGames,
   RunningSessions,
+  SaveSnapshotView,
   SessionSummaryView,
   SourceOperationResult,
   SourceSearchHit,
@@ -52,6 +53,12 @@ const api: DesktopApi = {
     list: () => ipcRenderer.invoke('sources:list') as Promise<readonly SourceView[]>,
     search: (query, limit) => ipcRenderer.invoke('sources:search', query, limit) as Promise<readonly SourceSearchHit[]>,
     remove: (sourceId) => ipcRenderer.invoke('sources:remove', sourceId) as Promise<boolean>,
+  },
+  saves: {
+    create: (gameKey, savePath, label) => ipcRenderer.invoke('saves:create', gameKey, savePath, label) as Promise<SourceOperationResult>,
+    list: (gameKey) => ipcRenderer.invoke('saves:list', gameKey) as Promise<readonly SaveSnapshotView[]>,
+    restore: (snapshotId, savePath) => ipcRenderer.invoke('saves:restore', snapshotId, savePath) as Promise<SourceOperationResult>,
+    remove: (gameKey, snapshotId) => ipcRenderer.invoke('saves:remove', gameKey, snapshotId) as Promise<boolean>,
   },
   downloads: {
     list: () => ipcRenderer.invoke('downloads:list') as Promise<readonly DownloadTaskView[]>,

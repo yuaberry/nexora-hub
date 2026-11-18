@@ -1,7 +1,8 @@
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
+import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
 /**
  * Detalhes do jogo.
@@ -116,11 +117,109 @@ export function GameDetailPage({
 
       <Card>
         <div className="nx-stack">
-          <strong>{t('planned.title')}</strong>
-          <span className="nx-subtitle">{t('planned.cloudSync')}</span>
-          <Badge tone="planned">{t('planned.badge')}</Badge>
+          <strong>{t('saves.title')}</strong>
+          <p className="nx-subtitle">{t('saves.subtitle')}</p>
+          <p className="nx-subtitle hub-break">
+            {t('saves.folder')}: {game.installPath}
+          </p>
+          <SavesList
+            gameKey={game.externalKey}
+            savePath={game.installPath}
+            onMessage={setMessage}
+          />
+          <p className="nx-subtitle">{t('planned.cloudSync')}</p>
         </div>
       </Card>
+    </div>
+  );
+}
+
+/**
+ * Lista de snapshots de um jogo.
+ *
+ * A pasta de saves é, nesta fase, a pasta de instalação — dita na interface,
+ * não escondida: pastas configuráveis por jogo são a fase seguinte. Criar um
+ * snapshot copia essa pasta; restaurar substitui o conteúdo dela.
+ */
+function SavesList({
+  gameKey,
+  savePath,
+  onMessage,
+}: {
+  readonly gameKey: string;
+  readonly savePath: string;
+  readonly onMessage: (message: string) => void;
+}): ReactNode {
+  const { t, locale } = useInterface();
+  const [snapshots, setSnapshots] = useState<readonly SaveSnapshotView[] | null>(null);
+
+  const reload = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    setSnapshots(await api.saves.list(gameKey));
+  }, [gameKey]);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const onCreate = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    await api.saves.create(gameKey, savePath, t('saves.defaultLabel'));
+    onMessage(t('saves.created'));
+    await reload();
+  }, [gameKey, savePath, t, onMessage, reload]);
+
+  const onRestore = useCallback(
+    async (snapshotId: string) => {
+      const api = globalThis.window?.nexora;
+      if (api === undefined) {
+        return;
+      }
+      const result = await api.saves.restore(snapshotId, savePath);
+      onMessage(result.ok ? t('saves.restored') : t('saves.restoreFailed'));
+    },
+    [savePath, onMessage, t],
+  );
+
+  return (
+    <div className="nx-stack">
+      <div className="hub-row">
+        <Button variant="primary" onClick={() => void onCreate()}>
+          {t('saves.create')}
+        </Button>
+        <Badge tone="planned">{t('planned.badge')}</Badge>
+      </div>
+
+      {snapshots === null ? (
+        <p className="nx-subtitle">{t('common.loading')}</p>
+      ) : snapshots.length === 0 ? (
+        <p className="nx-subtitle">{t('saves.empty')}</p>
+      ) : (
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.5rem' }}>
+          {snapshots.map((snapshot) => (
+            <li key={snapshot.id} className="nx-row nx-row--between">
+              <span className="nx-stack">
+                <strong>
+                  #{snapshot.revision} · {snapshot.label}
+                </strong>
+                <span className="nx-subtitle">
+                  {new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(snapshot.createdAt))} ·{' '}
+                  {new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(snapshot.sizeBytes / 1_000_000)} MB
+                </span>
+              </span>
+              <div className="nx-row">
+                <Button onClick={() => void onRestore(snapshot.id)}>{t('saves.restore')}</Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

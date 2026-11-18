@@ -67,3 +67,19 @@ export function createNexoraCloudClient(): CloudSavesClient {
 
 /** Cliente pronto a usar (o launcher consome esta instância). */
 export const nexoraCloudClient: CloudSavesClient = createNexoraCloudClient();
+export {
+  decideSync,
+  nextRevision,
+  snapshotsFor,
+  type SaveSnapshotRecord,
+  type SnapshotMeta,
+  type SnapshotSource,
+  type SyncDecision,
+} from './snapshots.js';
+export {
+  SnapshotStore,
+  checksumOfFolder,
+  createSnapshotStore,
+  folderSize,
+  MAX_CONTENT_BYTES_PER_FILE,
+} from './snapshot-store.js';

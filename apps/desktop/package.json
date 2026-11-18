@@ -20,6 +20,7 @@
     "package:all": "electron-builder --publish never"
   },
   "dependencies": {
+    "@nexora/cloud": "workspace:*",
     "@nexora/core": "workspace:*",
     "@nexora/download": "workspace:*",
     "@nexora/protocol": "workspace:*",

@@ -15,6 +15,7 @@ import { registerNexoraProtocol } from './protocol.js';
 import { createMainWindow } from './window.js';
 import { registerIpc } from './library-ipc.js';
 import { registerDownloadsIpc } from './downloads-ipc.js';
+import { registerSavesIpc } from './saves-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
 /**
@@ -96,6 +97,9 @@ function bootstrap(): void {
 
   // Fontes e downloads: registro + fila, criados a partir da biblioteca local.
   registerDownloadsIpc(library);
+
+  // Saves: snapshots versionados, com o índice na base local.
+  registerSavesIpc(library);
 
   mainWindow = createMainWindow(config);
 }

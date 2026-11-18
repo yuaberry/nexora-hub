@@ -139,3 +139,25 @@ Espaço em disco verificado **antes** do primeiro byte, checksum verificado
 **antes** do rename, e torrent recusado com motivo enquanto o cliente não
 existir (`planned`). Torrent e Wine/Proton são Fase 2b: são dependência
 nativa e decisão de handoff, não texto de marketing.
+
+## D21 — Snapshot é imutável, e a revisão nunca é reutilizada
+
+Um snapshot de save é uma **versão**: cria-se outro, nunca se edita o
+existente. A revisão é `max + 1` por jogo — dois snapshots nunca partilham
+número, e a decisão de sincronização (`decideSync`) fica estável. A restauração
+substitui o conteúdo da pasta de destino, e a interface oferece criar um
+snapshot antes: quem quer guardar o estado actual não o perde por engano.
+
+## D22 — A pasta de saves é dita, não adivinhada
+
+Nesta fase a pasta de saves é a pasta de instalação — **mostrada na
+interface**, não escondida. Pastas configuráveis por jogo (e detecção por
+motor de jogo) são a fase seguinte: adivinhar o caminho e restaurar no sítio
+errado seria corromper o progresso de quem joga.
+
+## D23 — O checksum agregado tem limite declarado
+
+O checksum de uma pasta de saves lê o conteúdo dos ficheiros até 8 MB cada
+(`MAX_CONTENT_BYTES_PER_FILE`); acima disso, compara caminho + tamanho. O
+limite é declarado no código e na interface, não silencioso: um save grande
+não pode ser lido inteiro a cada sessão, e fingir seria mentir.

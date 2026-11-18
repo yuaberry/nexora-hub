@@ -64,6 +64,17 @@ export class LocalLibrary {
         created_at text not null,
         updated_at text not null
       );
+
+      create table if not exists save_snapshots (
+        id text primary key,
+        game_key text not null,
+        label text not null,
+        created_at text not null,
+        path text not null,
+        size_bytes integer not null default 0,
+        checksum text not null,
+        revision integer not null
+      );
     `);
   }
 
@@ -149,6 +160,83 @@ export class LocalLibrary {
   close(): void {
     this.db.close();
   }
+
+  // ---- Snapshots de saves ---------------------------------------------
+
+  /** Regista um snapshot (o índice persistido; a cópia vive no disco). */
+  addSnapshot(record: {
+    readonly id: string;
+    readonly gameKey: string;
+    readonly label: string;
+    readonly createdAt: string;
+    readonly path: string;
+    readonly sizeBytes: number;
+    readonly checksum: string;
+    readonly revision: number;
+  }): void {
+    this.db
+      .prepare(
+        `insert into save_snapshots (id, game_key, label, created_at, path, size_bytes, checksum, revision)
+         values (?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        record.id,
+        record.gameKey,
+        record.label,
+        record.createdAt,
+        record.path,
+        record.sizeBytes,
+        record.checksum,
+        record.revision,
+      );
+  }
+
+  /** Lista os snapshots de um jogo (do mais recente para o mais antigo). */
+  listSnapshots(gameKey: string): readonly SaveSnapshotRow[] {
+    return this.db
+      .prepare('select * from save_snapshots where game_key = ? order by created_at desc')
+      .all(gameKey)
+      .map((row) => toSnapshotRow(row as Record<string, unknown>));
+  }
+
+  /** Todos os snapshots (para reconstruir o índice no arranque). */
+  allSnapshots(): readonly SaveSnapshotRow[] {
+    return this.db
+      .prepare('select * from save_snapshots order by created_at desc')
+      .all()
+      .map((row) => toSnapshotRow(row as Record<string, unknown>));
+  }
+
+  /** Remove um snapshot do índice. */
+  removeSnapshot(id: string): boolean {
+    return Number(this.db.prepare('delete from save_snapshots where id = ?').run(id).changes) > 0;
+  }
+}
+
+/** Uma linha de snapshot da base local. */
+export interface SaveSnapshotRow {
+  readonly id: string;
+  readonly gameKey: string;
+  readonly label: string;
+  readonly createdAt: string;
+  readonly path: string;
+  readonly sizeBytes: number;
+  readonly checksum: string;
+  readonly revision: number;
+}
+
+/** Converte uma linha do SQLite no registo de snapshot. */
+function toSnapshotRow(row: Record<string, unknown>): SaveSnapshotRow {
+  return {
+    id: String(row['id']),
+    gameKey: String(row['game_key']),
+    label: String(row['label']),
+    createdAt: String(row['created_at']),
+    path: String(row['path']),
+    sizeBytes: Number(row['size_bytes'] ?? 0),
+    checksum: String(row['checksum']),
+    revision: Number(row['revision']),
+  };
 }
 
 /** Converte uma linha do SQLite no registo do domínio. */

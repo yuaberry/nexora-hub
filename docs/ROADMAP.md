@@ -156,3 +156,37 @@ fase (`docs/LEGAL.md`).
   Linux corre sob Wine com prefixo **por jogo** (detecção no `PATH`, sem
   instalar nada); sem Wine, o arranque é recusado com motivo explícito
   (`no-runner`). Testes cobrem nativo, Wine, recusa e prefixos distintos.
+
+
+## Fase 3 — Saves (iniciada em 2026-11-18)
+
+### Entregue
+
+- [x] **`packages/cloud`** — motor de snapshots (`SnapshotStore`): cópia
+      recursiva, checksum agregado do **conteúdo** (com limite declarado por
+      ficheiro), revisão monotónica nunca reutilizada, restaurar que devolve
+      o conteúdo exacto, e `decideSync` (in-sync / local-ahead / remote-ahead
+      / **diverged**) — a função pura que a nuvem vai usar quando existir.
+- [x] **`apps/desktop`** — índice dos snapshots na base local (tabela
+      `save_snapshots`), canais IPC `saves:create/list/restore/remove` e
+      secção **Saves** nos detalhes do jogo (criar, listar, restaurar — com a
+      pasta de saves dita na interface, não escondida).
+
+### Prova de execução real (2026-11-18)
+
+- `pnpm typecheck` limpo nos 12 projectos; **261 testes verdes** (2 ignorados
+  = PostgreSQL).
+- Ciclo completo dentro da app: snapshot #1 ("Antes do boss") → o jogador
+  progride (`save.dat` → `nivel-7-mundo-4`) → snapshot #2 → restaurar #1 →
+  **`save.dat` volta a `nivel-5-mundo-3`** (conteúdo exacto).
+- Persistência: depois de fechar e reabrir o launcher, os snapshots 1 e 2
+  continuam listados e o próximo snapshot é **#3** — a revisão nunca é
+  reutilizada.
+- A **nuvem continua `planned`**: o stub do Nexora Cloud recusa com motivo, e
+  a interface diz "sincronizar com a conta é fase futura".
+
+### Fora do escopo desta fase (deliberadamente)
+
+Upload/download real para o Nexora Cloud (integração é lote próprio, D7),
+pastas de saves configuráveis por jogo, perfis animados, Família e importação
+oficial de bibliotecas — fases próprias.

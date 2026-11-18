@@ -208,6 +208,25 @@ export function DownloadsPage(): ReactNode {
                     >
                       {t('downloads.action')}
                     </Button>
+                    <Button
+                      disabled={destination.trim() === ''}
+                      onClick={() => {
+                        if (api === undefined) {
+                          return;
+                        }
+                        // A verificação recalcula os checksums no disco: a
+                        // segurança não vem da fonte, vem do ficheiro.
+                        void api.downloads.verify(hit.id, destination).then((result) => {
+                          setMessage(
+                            result.ok
+                              ? `${t('downloads.verify')}: ${result.message ?? ''}`
+                              : `${t('downloads.verify.failed')}: ${result.message ?? ''}`,
+                          );
+                        });
+                      }}
+                    >
+                      {t('downloads.verify.action')}
+                    </Button>
                   </div>
                 </li>
               ))}

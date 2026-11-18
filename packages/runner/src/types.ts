@@ -11,8 +11,16 @@ export interface LaunchRequest {
   readonly gameId: string;
   /** Caminho absoluto do executável. */
   readonly executablePath: string;
+  /**
+   * Comando efectivo — quando existe uma camada de compatibilidade
+   * (Wine/Proton), o comando é o *wrapper*, e o executável vai nos
+   * argumentos. Por omissão, é o próprio executável.
+   */
+  readonly command?: string;
   /** Argumentos de linha de comandos. */
   readonly args?: readonly string[];
+  /** Variáveis de ambiente a injectar (prefixo Wine, etc.). */
+  readonly env?: Readonly<Record<string, string>>;
   /** Directório de trabalho. */
   readonly cwd?: string;
 }

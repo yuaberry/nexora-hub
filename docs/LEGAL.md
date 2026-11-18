@@ -45,7 +45,22 @@ Civil) e registo de quem publica cada manifesto.
 - Retenção e direito de remoção: política própria quando a conta entrar
   (Fase 3), espelhando `docs/DATA_RETENTION.md` do Nexora Cloud.
 
-## 5. Marcas
+## 5. Manifestos e verificação (o que a plataforma faz e não faz)
+
+O launcher aceita **manifestos** (`.json`) que descrevem o que transferir.
+Cada manifesto declara a sua base legal e quem o instalou responde por ela;
+sem essa declaração, a instalação é recusada pelo software. A NEXORA não
+distribui, hospeda nem selecciona manifestos: os que existirem na máquina de
+um utilizador foram instalados por ele ou pelo operador do seu ambiente.
+
+O que a plataforma garante, para **qualquer** fonte: verificação SHA-256
+antes de instalar e verificação dos ficheiros no disco a qualquer momento
+(`downloads.verify`). Um ficheiro alterado, substituído ou em falta é
+reportado — a medida de segurança é do ficheiro, não da confiança na origem.
+Isso não legitima conteúdo sem licença: apenas diz a verdade sobre o que
+está no disco.
+
+## 6. Marcas
 
 "NEXORA" e "NEXORA HUB" são marcas da empresa. Nenhum nome, logótipo ou marca
 de terceiros (Steam, Epic, GOG, Ubisoft, Battle.net, Nintendo, Discord,

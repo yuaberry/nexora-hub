@@ -56,6 +56,7 @@ const api: DesktopApi = {
   downloads: {
     list: () => ipcRenderer.invoke('downloads:list') as Promise<readonly DownloadTaskView[]>,
     add: (unifiedId, destinationRoot) => ipcRenderer.invoke('downloads:add', unifiedId, destinationRoot) as Promise<SourceOperationResult>,
+    verify: (unifiedId, installFolder) => ipcRenderer.invoke('downloads:verify', unifiedId, installFolder) as Promise<SourceOperationResult>,
     pause: (taskId) => ipcRenderer.invoke('downloads:pause', taskId) as Promise<boolean>,
     resume: (taskId) => ipcRenderer.invoke('downloads:resume', taskId) as Promise<boolean>,
     cancel: (taskId) => ipcRenderer.invoke('downloads:cancel', taskId) as Promise<boolean>,

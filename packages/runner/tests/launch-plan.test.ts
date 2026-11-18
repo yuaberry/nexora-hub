@@ -1,0 +1,90 @@
+import { describe, expect, it } from 'vitest';
+import { resolveLaunchPlan, type LaunchContext } from '../src/index.js';
+import type { LaunchRequest } from '../src/index.js';
+
+/**
+ * Plano de arranque.
+ *
+ * O que estes testes travam: um `.exe` no Linux **exige** Wine (e sem Wine é
+ * recusado com motivo, não fingido), o prefixo é por jogo, e um executável
+ * nativo não é envolvido em camada nenhuma.
+ */
+
+/** Pedido base. */
+function request(overrides: Partial<LaunchRequest> = {}): LaunchRequest {
+  return { gameId: 'meu-jogo', executablePath: '/jogos/meu-jogo/jogo', ...overrides };
+}
+
+/** Contexto Linux com Wine. */
+const linuxWithWine: LaunchContext = { platform: 'linux', winePath: '/usr/bin/wine', winePrefixRoot: '/prefixos' };
+
+/** Contexto Linux sem Wine. */
+const linuxWithoutWine: LaunchContext = { platform: 'linux', winePath: null, winePrefixRoot: '/prefixos' };
+
+describe('resolveLaunchPlan', () => {
+  it('um executável nativo é invocado directamente', () => {
+    const plan = resolveLaunchPlan(request({ executablePath: '/jogos/x/jogo' }), linuxWithWine);
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) {
+      return;
+    }
+    expect(plan.layer).toBe('native');
+    expect(plan.command).toBe('/jogos/x/jogo');
+    expect(plan.args).toEqual([]);
+    expect(plan.env).toEqual({});
+  });
+
+  it('um .exe no Linux é envolvido pelo Wine', () => {
+    const plan = resolveLaunchPlan(request({ executablePath: '/jogos/x/jogo.exe' }), linuxWithWine);
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) {
+      return;
+    }
+    expect(plan.layer).toBe('wine');
+    expect(plan.command).toBe('/usr/bin/wine');
+    expect(plan.args[0]).toBe('/jogos/x/jogo.exe');
+    expect(plan.env['WINEPREFIX']).toBe('/prefixos/meu-jogo');
+  });
+
+  it('um .exe no Linux sem Wine é recusado com motivo', () => {
+    const plan = resolveLaunchPlan(request({ executablePath: '/jogos/x/jogo.exe' }), linuxWithoutWine);
+    expect(plan.ok).toBe(false);
+    if (plan.ok) {
+      return;
+    }
+    expect(plan.reasonKey).toBe('no-runner');
+    expect(plan.reason).toContain('Wine não encontrado');
+  });
+
+  it('um .exe no Windows corre directo (não há camada)', () => {
+    const plan = resolveLaunchPlan(
+      request({ executablePath: 'C:/Jogos/x/jogo.exe' }),
+      { platform: 'win32', winePath: null, winePrefixRoot: 'C:/prefixos' },
+    );
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) {
+      return;
+    }
+    expect(plan.layer).toBe('native');
+  });
+
+  it('o prefixo Wine é por jogo (dois jogos, dois prefixos)', () => {
+    const first = resolveLaunchPlan(request({ gameId: 'jogo-a', executablePath: '/j/a.exe' }), linuxWithWine);
+    const second = resolveLaunchPlan(request({ gameId: 'jogo-b', executablePath: '/j/b.exe' }), linuxWithWine);
+    if (!first.ok || !second.ok) {
+      throw new Error('planos deveriam ser válidos');
+    }
+    expect(first.env['WINEPREFIX']).not.toBe(second.env['WINEPREFIX']);
+  });
+
+  it('preserva os argumentos do pedido', () => {
+    const plan = resolveLaunchPlan(
+      request({ executablePath: '/jogos/x/jogo', args: ['--janela', '--cheats'] }),
+      linuxWithWine,
+    );
+    if (!plan.ok) {
+      throw new Error('plano deveria ser válido');
+    }
+    expect(plan.args).toEqual(['--janela', '--cheats']);
+  });
+});

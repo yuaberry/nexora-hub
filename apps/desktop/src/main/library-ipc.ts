@@ -8,8 +8,10 @@
  */
 
 import { existsSync } from 'node:fs';
-import { ipcMain } from 'electron';
-import { LocalGameRunner } from '@nexora/runner';
+import { accessSync, constants } from 'node:fs';
+import { join } from 'node:path';
+import { app, ipcMain } from 'electron';
+import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
 import type {
   AppInfoView,
   DesktopGameView,
@@ -131,9 +133,24 @@ export function registerIpc(dependencies: IpcDependencies): void {
       return { ok: false, reasonKey: 'not-found' };
     }
 
+    // O plano de arranque decide a camada (nativo ou Wine/Proton) — e sem
+    // Wine no sistema, a recusa é explícita, não um processo que morre.
+    const plan = resolveLaunchPlan(
+      { gameId: game.externalKey, executablePath: game.executablePath },
+      launchContext(),
+    );
+    if (!plan.ok) {
+      return { ok: false, reasonKey: plan.reasonKey };
+    }
+
     const outcome = await runner.launch({
       gameId: game.externalKey,
+      // O executável real (a verificação de existência e a identidade da
+      // sessão usam-no); o `command` é a camada por cima, quando existe.
       executablePath: game.executablePath,
+      command: plan.command,
+      args: plan.args,
+      env: plan.env,
       cwd: game.installPath,
     });
     if (!outcome.ok) {
@@ -184,4 +201,34 @@ export function registerIpc(dependencies: IpcDependencies): void {
 /** `true` quando um caminho existe (diagnóstico de arranque). */
 export function executableExists(path: string): boolean {
   return existsSync(path);
+}
+
+/**
+ * Contexto de arranque do sistema.
+ *
+ * O Wine é procurado no `PATH` (sem instalar nada, sem privilégios): se
+ * existir, jogos Windows correm no Linux com prefixo **por jogo**, dentro do
+ * `userData`. Se não existir, o plano recusa com motivo honesto.
+ */
+export function launchContext(): LaunchContext {
+  return {
+    platform: process.platform,
+    winePath: findInPath('wine') ?? findInPath('wine64'),
+    winePrefixRoot: join(app.getPath('userData'), 'wine-prefixes'),
+  };
+}
+
+/** Procura um executável no `PATH` (ou `null`). */
+function findInPath(name: string): string | null {
+  const paths = (process.env['PATH'] ?? '').split(':').filter((entry) => entry !== '');
+  for (const dir of paths) {
+    const candidate = join(dir, name);
+    try {
+      accessSync(candidate, constants.X_OK);
+      return candidate;
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }

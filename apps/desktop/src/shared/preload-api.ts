@@ -173,6 +173,8 @@ export interface DesktopApi {
   readonly downloads: {
     readonly list: () => Promise<readonly DownloadTaskView[]>;
     readonly add: (unifiedId: string, destinationRoot: string) => Promise<SourceOperationResult>;
+    /** Verifica os ficheiros instalados contra o checksum do manifesto. */
+    readonly verify: (unifiedId: string, destinationRoot: string) => Promise<SourceOperationResult>;
     readonly pause: (taskId: string) => Promise<boolean>;
     readonly resume: (taskId: string) => Promise<boolean>;
     readonly cancel: (taskId: string) => Promise<boolean>;

@@ -54,10 +54,11 @@ export class LocalGameRunner {
     }
 
     const startedAt = new Date();
-    const child = spawn(request.executablePath, [...(request.args ?? [])], {
+    const child = spawn(request.command ?? request.executablePath, [...(request.args ?? [])], {
       cwd: request.cwd,
       stdio: 'ignore',
       detached: false,
+      env: request.env === undefined ? process.env : { ...process.env, ...request.env },
     });
 
     const sessionId = randomUUID();

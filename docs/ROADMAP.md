@@ -143,3 +143,16 @@ Downloads por torrent, saves na nuvem, amigos, chat, loja, overlay, FPS,
 otimizador de SO, controles, IA, Remote Play — apenas tipos e selos
 "Planeado". Nenhum contorno de proteções (Denuvo) ou anticheat, em nenhuma
 fase (`docs/LEGAL.md`).
+
+### Segurança por verificação (2026-11-18)
+
+- **Verificação de integridade instalada** (`@nexora/download/verify` + aba
+  Downloads): recalcula o SHA-256 de cada ficheiro que o manifesto declara e
+  compara com o declarado. Provado ao vivo: instalação intacta → `verified`;
+  ficheiro alterado → `mismatch` (0 verificados); ficheiro removido →
+  `mismatch`. A medida de segurança não depende da fonte — depende do
+  ficheiro.
+- **Wine/Proton no runner** (`packages/runner/launch-plan`): um `.exe` no
+  Linux corre sob Wine com prefixo **por jogo** (detecção no `PATH`, sem
+  instalar nada); sem Wine, o arranque é recusado com motivo explícito
+  (`no-runner`). Testes cobrem nativo, Wine, recusa e prefixos distintos.

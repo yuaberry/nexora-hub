@@ -21,4 +21,8 @@ export const downloads = {
   'downloads.pause': 'Pausar',
   'downloads.resume': 'Retomar',
   'downloads.cancel': 'Cancelar',
+
+  'downloads.verify': 'Verificação de ficheiros',
+  'downloads.verify.action': 'Verificar',
+  'downloads.verify.failed': 'Verificação falhou',
 } as const;

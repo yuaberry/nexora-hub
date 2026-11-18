@@ -15,7 +15,7 @@ import { existsSync } from 'node:fs';
 import { chmodSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { DownloadQueue, type DownloadEvent } from '@nexora/download';
+import { DownloadQueue, verifyInstall, type DownloadEvent } from '@nexora/download';
 import { createSourceRegistry, type SourceRegistry, type UnifiedGame } from '@nexora/sources';
 import type { LocalLibrary } from './db.js';
 import { externalKeyFor } from './naming.js';
@@ -189,6 +189,64 @@ function registerCompletedTask(
     executablePath: executable,
     tags: [`fonte:${unifiedId.split('/')[0]}`],
   });
+}
+
+/** Resultado da verificação de uma instalação (contrato com o renderer). */
+export interface InstallVerificationView {
+  readonly ok: boolean;
+  readonly verifiedCount: number;
+  readonly files: readonly {
+    readonly path: string;
+    readonly status: 'verified' | 'mismatch' | 'missing' | 'unknown';
+    readonly actual: string | null;
+    readonly expected: string | null;
+  }[];
+}
+
+/**
+ * Verifica os ficheiros instalados de um jogo contra o manifesto.
+ *
+ * A medida de segurança que o launcher oferece — para **qualquer** fonte — é
+ * poder recalcular o que está no disco e comparar com o que o manifesto
+ * declarou. A origem não entra na conta: entra o ficheiro.
+ */
+export async function verifyInstalledGame(
+  state: DownloadState,
+  unifiedId: string,
+  destinationRoot: string,
+): Promise<{ ok: true; verification: InstallVerificationView } | { ok: false; code: string; message: string }> {
+  const game = state.registry.game(unifiedId);
+  if (game === null) {
+    return { ok: false, code: 'game-not-found', message: `Jogo não encontrado: ${unifiedId}` };
+  }
+  const source = state.registry.get(game.sourceId);
+  const manifestGame = source?.manifest.games.find((entry) => `${source.manifest.id}/${entry.id}` === unifiedId);
+  if (source === null || manifestGame === undefined) {
+    return { ok: false, code: 'game-not-found', message: `Jogo não encontrado: ${unifiedId}` };
+  }
+
+  // A pasta do jogo é `<raiz>/<slug do título>` — a mesma que a instalação
+  // usou, para a verificação olhar para o sítio certo.
+  const installFolder = join(destinationRoot, slug(game.title));
+
+  const verification = await verifyInstall(
+    manifestGame.files.map((file) => ({ path: file.path, sha256: file.sha256 })),
+    installFolder,
+  );
+
+  return {
+    ok: true,
+    verification: {
+      ok: verification.ok,
+      verifiedCount: verification.verifiedCount,
+      files: verification.files.map((file) => ({
+        path: file.path,
+        status: file.status,
+        actual: file.actual,
+        expected: file.expected,
+      })),
+    },
+  };
 }
 
 /** Nome de pasta seguro a partir de um título (`:` e `\` não sobrevivem). */

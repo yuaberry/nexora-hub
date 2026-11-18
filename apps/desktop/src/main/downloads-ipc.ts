@@ -12,6 +12,7 @@ import {
   createDownloadState,
   installManifestFile,
   queueGame,
+  verifyInstalledGame,
   type DownloadState,
 } from './download-state.js';
 import type { LocalLibrary } from './db.js';
@@ -99,6 +100,27 @@ export function registerDownloadsIpc(library: LocalLibrary): DownloadState {
   // ---- Downloads ------------------------------------------------------
 
   ipcMain.handle('downloads:list', () => state.queue.list());
+
+  // Verificação de integridade dos ficheiros no disco (qualquer fonte).
+  ipcMain.handle(
+    'downloads:verify',
+    async (_event, unifiedId: unknown, installFolder: unknown): Promise<SourceOperationResult> => {
+      if (typeof unifiedId !== 'string' || typeof installFolder !== 'string') {
+        return { ok: false, code: 'invalid', message: 'Identificador ou pasta em falta.' };
+      }
+      // (`installFolder` é a raiz do destino; a pasta do jogo é resolvida a
+      // partir do título do manifesto, dentro do estado.)
+      const result = await verifyInstalledGame(state, unifiedId, installFolder);
+      if (!result.ok) {
+        return { ok: false, code: result.code, message: result.message };
+      }
+      return {
+        ok: true,
+        code: result.verification.ok ? 'verified' : 'mismatch',
+        message: `${result.verification.verifiedCount} ficheiro(s) verificado(s).`,
+      };
+    },
+  );
 
   ipcMain.handle('downloads:add', async (_event, unifiedId: unknown, destinationRoot: unknown): Promise<SourceOperationResult> => {
     if (typeof unifiedId !== 'string' || unifiedId === '') {

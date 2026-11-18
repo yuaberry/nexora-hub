@@ -9,7 +9,7 @@
     "email": "dev@nexora.local"
   },
   "license": "UNLICENSED",
-  "main": "dist/main/main.js",
+  "main": "dist/main/index.js",
   "scripts": {
     "build:renderer": "vite build",
     "build": "tsc -p tsconfig.build.json && vite build",
@@ -20,6 +20,9 @@
     "package:all": "electron-builder --publish never"
   },
   "dependencies": {
+    "@nexora/core": "workspace:*",
+    "@nexora/protocol": "workspace:*",
+    "@nexora/runner": "workspace:*",
     "@nexora/ui": "workspace:*"
   },
   "devDependencies": {

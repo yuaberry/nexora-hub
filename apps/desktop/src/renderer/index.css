@@ -1,0 +1,78 @@
+@import '@nexora/ui/theme.css';
+
+/**
+ * Estilos do renderer do desktop.
+ *
+ * O tema vem dos tokens de papel (`@nexora/ui/theme.css`) — nenhum componente
+ * escreve cor própria. Este ficheiro só traz o *layout*: a grelha da
+ * biblioteca e o shell do launcher, com `minmax(0, …)` para nenhum texto
+ * provocar scroll horizontal.
+ */
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.hub-shell {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+@media (max-width: 48rem) {
+  .hub-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.hub-main {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+}
+
+.hub-content {
+  padding: 1.25rem;
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.hub-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+}
+
+.hub-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.hub-break {
+  overflow-wrap: anywhere;
+}
+
+.hub-cover-large {
+  aspect-ratio: 3 / 4;
+  max-width: 15rem;
+}
+
+.hub-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}

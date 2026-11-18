@@ -1,8 +1,16 @@
 node_modules/
 dist/
 release/
+dist-package/
 *.tsbuildinfo
 .env
 .env.local
 .DS_Store
 coverage/
+
+# Base de dados local de desenvolvimento do launcher (nunca versionada).
+.dev-data/
+
+# Artefactos de empacotamento do Electron.
+*.AppImage
+*.deb

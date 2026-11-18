@@ -1,0 +1,59 @@
+# Empacotamento do NEXORA HUB (electron-builder).
+#
+# O executável leva o processo principal, o preload e o renderer compilados —
+# nada de fonte nem de node_modules no pacote. A publicação é feita por GitHub
+# Release (`--publish never` aqui): uma tag exige pedido explícito.
+
+appId: local.nexora.hub
+productName: NEXORA HUB
+copyright: Copyright © 2026 NEXORA
+
+# Nome do binário e dos artefactos: o nome do pacote (`@nexora/desktop`) não é
+# seguro para caminhos de ficheiro — o electron-builder recusa o `@` e o `fpm`
+# do `.deb` não cria o directório `@nexora`.
+executableName: nexora-hub
+artifactName: nexora-hub-${version}-${arch}.${ext}
+
+directories:
+  output: dist-package
+
+files:
+  - dist/**/*
+  - package.json
+
+asar: true
+
+# O renderer viaja como recurso (fora do asar): o esquema interno
+# `nexora://` lê-o do disco em `resourcesPath/renderer` — ler de dentro do
+# asar a cada pedido seria lento e frágil.
+extraResources:
+  - from: dist/renderer
+    to: renderer
+
+linux:
+  # Sem isto o `.deb` não é construído: o `fpm` exige maintainer e descrição.
+  maintainer: 'Yua Devs <dev@nexora.local>'
+  synopsis: Launcher de jogos NEXORA HUB
+  description: >-
+    Launcher de jogos da NEXORA: biblioteca local, pesquisa por sílabas,
+    medição de tempo jogado e preferências de dispositivo. A NEXORA não
+    distribui jogos — o launcher lê o que o utilizador já tem instalado.
+  syncDesktopName: true
+  category: Game
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  desktop:
+    entry:
+      Name: NEXORA HUB
+      Comment: A sua biblioteca de jogos, num só lugar.
+      Categories: Game;
+
+# A publicação é feita pelo GitHub (tag + Release) e **não** pelo
+# electron-builder: `--publish never` é obrigatório para que nada seja
+# enviado para um servidor de release sem autorização.
+publish: null

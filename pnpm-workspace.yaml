@@ -4,6 +4,9 @@ packages:
 
 # O `electron-builder` corre empacotamento com scripts de pós-instalação de
 # binários nativos (`app-builder-bin`); sem isto o pnpm bloqueia os builds.
+# A lista é explícita: só estes pacotes correm scripts de instalação.
 allowBuilds:
   app-builder-bin: true
+  electron: true
+  electron-winstaller: true
   esbuild: true

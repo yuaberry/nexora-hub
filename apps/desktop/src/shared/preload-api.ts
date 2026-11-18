@@ -1,0 +1,122 @@
+/**
+ * Contrato entre o renderer e o processo principal.
+ *
+ * Este ficheiro é a **fronteira**: o renderer nunca toca em Node, em ficheiros
+ * nem em processos — fala com `window.nexora`, e o preload expõe exactamente
+ * o que está aqui. O processo principal valida cada argumento: o que vem do
+ * renderer é tratado como entrada externa, não como código de confiança.
+ *
+ * Nenhum método promete o que não existe: não há downloads, saves na nuvem,
+ * amigos ou overlay nesta fase — esses são só tipos.
+ */
+
+/** Uma entrada da biblioteca local (vista do renderer). */
+export interface DesktopGameView {
+  readonly id: string;
+  /** Caminho normalizado da pasta instalada (identificador estável do jogo). */
+  readonly externalKey: string;
+  readonly title: string;
+  readonly cover: string | null;
+  readonly installPath: string;
+  readonly executablePath: string;
+  readonly tags: readonly string[];
+  readonly favorite: boolean;
+  /** ISO-8601 UTC da última sessão, ou `null`. */
+  readonly lastPlayedAt: string | null;
+  /** Tempo jogado total, em segundos. */
+  readonly totalSeconds: number;
+}
+
+/** Uso de disco do volume onde os jogos estão. */
+export interface DiskUsageView {
+  /** Capacidade total do volume, em bytes (0 = desconhecida). */
+  readonly totalBytes: number;
+  /** Espaço livre, em bytes. */
+  readonly freeBytes: number;
+  /** Espaço ocupado pelas pastas de jogo da biblioteca, em bytes. */
+  readonly gamesBytes: number;
+}
+
+/** Resultado de um pedido de arranque. */
+export type LaunchResultView =
+  | { readonly ok: true; readonly sessionId: string; readonly gameId: string; readonly startedAt: string }
+  | { readonly ok: false; readonly reasonKey: LaunchRefusalKey };
+
+/** Motivos de recusa de arranque — chaves de tradução, não texto solto. */
+export type LaunchRefusalKey = 'missing-executable' | 'already-running' | 'not-found' | 'no-runner';
+
+/** Resumo de uma sessão em curso. */
+export interface SessionSummaryView {
+  readonly sessionId: string;
+  readonly gameId: string;
+  readonly startedAt: string;
+  readonly durationSeconds: number;
+  readonly crashed: boolean;
+}
+
+/** Resultado de uma importação de pasta. */
+export interface ImportResultView {
+  /** Títulos importados ou actualizados. */
+  readonly imported: readonly string[];
+  /** Pastas ignoradas, com o motivo. */
+  readonly skipped: readonly { readonly path: string; readonly reasonKey: 'no-executable' | 'cancelled' | 'unreadable' }[];
+}
+
+/** Pastas candidatas detectadas automaticamente. */
+export interface DetectedFolderView {
+  readonly path: string;
+  /** Nome legível da pasta (para exibir antes de importar). */
+  readonly label: string;
+}
+
+/** Informações do executável (diagnóstico honesto, nunca fingido). */
+export interface AppInfoView {
+  readonly platform: string;
+  readonly versions: {
+    readonly app: string;
+    readonly electron: string;
+    readonly chrome: string;
+    readonly node: string;
+  };
+  /** `true` no executável, `false` no browser. */
+  readonly desktop: boolean;
+}
+
+/** Alias de listas devolvidas pelo IPC (usados nos dois lados da fronteira). */
+export type LibraryGames = readonly DesktopGameView[];
+export type DetectedFolders = readonly DetectedFolderView[];
+export type RunningSessions = readonly SessionSummaryView[];
+
+/** A API exposta pelo preload em `window.nexora`. */
+export interface DesktopApi {
+  /** Diagnóstico do executável (assíncrono: a versão vive no main). */
+  readonly app: () => Promise<AppInfoView>;
+  readonly library: {
+    readonly list: () => Promise<readonly DesktopGameView[]>;
+    readonly importFolder: () => Promise<ImportResultView>;
+    readonly detectFolders: () => Promise<readonly DetectedFolderView[]>;
+    readonly toggleFavorite: (id: string) => Promise<DesktopGameView | null>;
+    readonly remove: (id: string) => Promise<boolean>;
+  };
+  readonly runner: {
+    readonly launch: (id: string) => Promise<LaunchResultView>;
+    readonly running: () => Promise<readonly SessionSummaryView[]>;
+    readonly stop: (sessionId: string) => Promise<SessionSummaryView | null>;
+  };
+  readonly storage: {
+    readonly usage: () => Promise<DiskUsageView>;
+  };
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  interface Window {
+    /** Ausente no browser (a web não tem acesso local). */
+    readonly nexora?: DesktopApi;
+  }
+}
+
+/** `true` quando o código corre dentro do executável de desktop. */
+export function isDesktopRuntime(): boolean {
+  return typeof globalThis !== 'undefined' && globalThis.window?.nexora !== undefined;
+}

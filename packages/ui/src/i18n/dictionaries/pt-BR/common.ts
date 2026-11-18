@@ -19,4 +19,10 @@ export const common = {
   'common.yes': 'Sim',
   'common.no': 'Não',
   'common.desktopOnly': 'Disponível na aplicação de desktop.',
+  'common.desktopBadge': 'Desktop',
+  'common.time.minutes': '{minutes} min',
+  'common.time.hours': '{hours} h',
+  'common.units.gb': '{value} GB',
+  'planned.account': 'Conta NEXORA: entrar e sincronizar é fase futura.',
+  'planned.cloudSync': 'Sincronizar o tempo jogado com a conta é fase futura — nesta fase a medida é local.',
 } as const;

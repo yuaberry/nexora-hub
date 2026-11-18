@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "noEmit": false,
+    "jsx": "react-jsx",
+    "paths": {}
+  },
+  "include": ["src/main", "src/preload", "src/shared"]
+}

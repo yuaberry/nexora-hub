@@ -1,25 +1,30 @@
-import { useState, type ReactNode } from 'react';
-import { InterfaceProvider, useDocumentPreferences } from '@nexora/ui';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { InterfaceProvider, useDocumentPreferences, useInterface, type Translator } from '@nexora/ui';
 import { AppShell } from './components/AppShell.js';
+import { HomePage } from './pages/HomePage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
 import { GameDetailPage } from './pages/GameDetailPage.js';
 import { DownloadsPage } from './pages/DownloadsPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
 import { PlannedPage } from './pages/PlannedPage.js';
+import { useLibrary, useRunner } from './state/desktop.js';
+import type { DesktopGameView } from '../shared/preload-api.js';
 
 /**
  * Aplicação do launcher.
  *
  * A navegação é um estado simples — o esquema interno serve o `index.html`
- * para qualquer caminho (fallback SPA), e nenhuma rota depende do histórico
- * do browser. Módulos que ainda não existem aparecem com selo "Planeado".
+ * para qualquer caminho (*fallback* SPA) — mas com **histórico real**: o botão
+ * de voltar do cabeçalho desfaz a navegação, como em qualquer launcher. Módulos
+ * que ainda não existem aparecem com selo "Planeado".
  */
 
 /** Módulos planeados (só tipos nesta fase). */
-export type PlannedModule = 'downloads' | 'cloudSaves' | 'friends';
+export type PlannedModule = 'cloudSaves' | 'friends';
 
 /** Rota activa. */
 export type Route =
+  | { readonly name: 'home' }
   | { readonly name: 'library' }
   | { readonly name: 'details'; readonly gameId: string }
   | { readonly name: 'downloads' }
@@ -27,24 +32,42 @@ export type Route =
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
 export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en' } = {}): ReactNode {
-  const [route, setRoute] = useState<Route>({ name: 'library' });
+  const [route, setRoute] = useState<Route>({ name: 'home' });
+  const [history, setHistory] = useState<readonly Route[]>([]);
+  const [search, setSearch] = useState('');
+
+  /** Navega empurrando a rota actual para o histórico. */
+  const navigate = useCallback(
+    (next: Route) => {
+      setRoute((current) => {
+        setHistory((entries) => [...entries, current]);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const goBack = useCallback(() => {
+    setHistory((entries) => {
+      const previous = entries[entries.length - 1];
+      if (previous !== undefined) {
+        setRoute(previous);
+      }
+      return entries.slice(0, -1);
+    });
+  }, []);
+
+  const onNavigate = useCallback(
+    (target: 'home' | 'library' | 'downloads' | 'settings') => {
+      navigate({ name: target });
+    },
+    [navigate],
+  );
 
   return (
     <InterfaceProvider initialLocale={initialLocale}>
       <Preferences />
-      <AppShell route={route} onNavigate={setRoute}>
-        {route.name === 'library' ? (
-          <LibraryPage
-            onOpenGame={(gameId) => {
-              setRoute({ name: 'details', gameId });
-            }}
-          />
-        ) : null}
-        {route.name === 'details' ? <GameDetailPage gameId={route.gameId} onBack={() => setRoute({ name: 'library' })} /> : null}
-        {route.name === 'downloads' ? <DownloadsPage /> : null}
-        {route.name === 'settings' ? <SettingsPage /> : null}
-        {route.name === 'planned' ? <PlannedPage module={route.module} /> : null}
-      </AppShell>
+      <Shell route={route} history={history} search={search} setSearch={setSearch} navigate={navigate} goBack={goBack} onNavigate={onNavigate} />
     </InterfaceProvider>
   );
 }
@@ -53,4 +76,114 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
 function Preferences(): ReactNode {
   useDocumentPreferences();
   return null;
+}
+
+/** A estrutura com o conteúdo da rota actual. */
+function Shell({
+  route,
+  history,
+  search,
+  setSearch,
+  navigate,
+  goBack,
+  onNavigate,
+}: {
+  readonly route: Route;
+  readonly history: readonly Route[];
+  readonly search: string;
+  readonly setSearch: (value: string) => void;
+  readonly navigate: (route: Route) => void;
+  readonly goBack: () => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings') => void;
+}): ReactNode {
+  const { t } = useInterface();
+  const library = useLibraryForSearch();
+
+  const title = routeTitle(route, t);
+  const onSelectGame = useCallback((gameId: string) => navigate({ name: 'details', gameId }), [navigate]);
+
+  const onPlay = useCallback(
+    async (gameId: string) => {
+      const target = (library.value ?? []).find((game) => game.externalKey === gameId);
+      if (target === undefined) {
+        return;
+      }
+      const result = await library.launch(target.id);
+      void result;
+    },
+    [library],
+  );
+
+  const onToggleFavorite = useCallback(
+    (gameId: string) => {
+      const target = (library.value ?? []).find((game) => game.externalKey === gameId);
+      if (target !== undefined) {
+        void library.toggleFavorite(target.id);
+      }
+    },
+    [library],
+  );
+
+  return (
+    <AppShell
+      route={route}
+      title={title}
+      canGoBack={history.length > 0}
+      search={search}
+      onSearch={setSearch}
+      onBack={goBack}
+      onNavigate={onNavigate}
+      onSelectGame={onSelectGame}
+    >
+      {route.name === 'home' ? (
+        <HomePage onOpenGame={onSelectGame} onPlay={onPlay} onToggleFavorite={onToggleFavorite} />
+      ) : null}
+      {route.name === 'library' ? (
+        <LibraryPage search={search} onOpenGame={onSelectGame} onPlay={onPlay} onToggleFavorite={onToggleFavorite} />
+      ) : null}
+      {route.name === 'details' ? <GameDetailPage gameId={route.gameId} onBack={goBack} /> : null}
+      {route.name === 'downloads' ? <DownloadsPage /> : null}
+      {route.name === 'settings' ? <SettingsPage /> : null}
+      {route.name === 'planned' ? <PlannedPage module={route.module} /> : null}
+    </AppShell>
+  );
+}
+
+/** Título da página actual (traduzido). */
+function routeTitle(route: Route, t: Translator): string {
+  switch (route.name) {
+    case 'home':
+      return t('nav.home');
+    case 'library':
+      return t('nav.library');
+    case 'details':
+      return t('details.title');
+    case 'downloads':
+      return t('nav.downloads');
+    case 'settings':
+      return t('nav.settings');
+    default:
+      return t('planned.title');
+  }
+}
+
+/**
+ * Ponte de pesquisa: a página de biblioteca filtra pelo mesmo texto do
+ * cabeçalho — uma pesquisa, um sítio.
+ */
+function useLibraryForSearch(): {
+  readonly value: readonly DesktopGameView[] | null;
+  readonly toggleFavorite: (id: string) => Promise<void>;
+  readonly launch: (id: string) => Promise<{ ok: boolean; reasonKey?: string }>;
+} {
+  const library = useLibrary();
+  const runner = useRunner();
+  return useMemo(
+    () => ({
+      value: library.value,
+      toggleFavorite: library.toggleFavorite,
+      launch: runner.launch,
+    }),
+    [library.value, library.toggleFavorite, runner.launch],
+  );
 }

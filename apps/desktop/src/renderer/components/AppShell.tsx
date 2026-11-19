@@ -1,78 +1,89 @@
 import type { ReactNode } from 'react';
-import { Badge, ThemeSwitch, useInterface } from '@nexora/ui';
-import { useIsDesktop } from '../state/desktop.js';
+import { Button, ThemeSwitch, useInterface } from '@nexora/ui';
+import { Sidebar } from './Sidebar.js';
 import type { Route } from '../App.js';
 
 /**
- * Estrutura do launcher — barra superior, estilo launcher de jogos.
+ * Estrutura do launcher — barra lateral + cabeçalho.
  *
- * A marca à esquerda, a navegação ao centro, o alternador de tema animado e o
- * selo do executável à direita. O alternador fica visível em qualquer página,
- * e a animação respeita "reduzir movimento" (o CSS encarrega-se disso).
+ * Inspirada no gesto dos launchers modernos (biblioteca sempre ao alcance,
+ * pesquisa no topo), mas com a identidade da NEXORA: marca própria, tokens de
+ * papel, e o botão de voltar que funciona de verdade (histórico real de
+ * navegação, não um adorno).
  *
- * Os módulos que ainda não existem aparecem numa linha "Em breve" dentro da
- * biblioteca — não ocupam a navegação principal como se existissem.
+ * O alternador de tema animado vive no cabeçalho, à direita da pesquisa.
  */
 export function AppShell({
   route,
+  title,
+  canGoBack,
+  search,
+  onSearch,
+  onBack,
   onNavigate,
+  onSelectGame,
   children,
 }: {
   readonly route: Route;
-  readonly onNavigate: (route: Route) => void;
+  /** Título da página actual (traduzido pelo chamador). */
+  readonly title: string;
+  readonly canGoBack: boolean;
+  readonly search: string;
+  readonly onSearch: (value: string) => void;
+  readonly onBack: () => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings') => void;
+  readonly onSelectGame: (gameId: string) => void;
   readonly children: ReactNode;
 }): ReactNode {
   const { t, appliedTheme, toggleTheme } = useInterface();
-  const isDesktop = useIsDesktop();
 
-  const items: readonly { readonly id: 'library' | 'downloads' | 'settings'; readonly label: string }[] = [
-    { id: 'library', label: t('nav.library') },
-    { id: 'downloads', label: t('nav.downloads') },
-    { id: 'settings', label: t('nav.settings') },
-  ];
-
-  const activeId = route.name === 'details' ? 'library' : route.name;
+  const activeGameId = route.name === 'details' ? route.gameId : null;
+  const shellRoute = route.name === 'details' ? 'library' : route.name;
 
   return (
-    <div>
-      <header className="hub-topbar">
-        <div className="hub-brand">
-          <span className="hub-brand__mark" aria-hidden="true">NX</span>
-          <span className="hub-brand__name">{t('common.app.name')}</span>
-        </div>
+    <div className="hub-shell">
+      <Sidebar
+        route={shellRoute}
+        activeGameId={activeGameId}
+        onNavigate={onNavigate}
+        onSelectGame={onSelectGame}
+      />
 
-        <nav className="hub-nav" aria-label={t('common.app.name')}>
-          {items.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`hub-nav__item${item.id === activeId ? ' hub-nav__item--active' : ''}`}
-              aria-current={item.id === activeId ? 'page' : undefined}
-              onClick={() => {
-                if (item.id === 'library' || item.id === 'downloads' || item.id === 'settings') {
-                  onNavigate({ name: item.id });
-                }
-              }}
+      <div className="hub-content">
+        <header className="hub-header">
+          <div className="hub-header__left">
+            <Button
+              onClick={onBack}
+              disabled={!canGoBack}
+              aria-label={t('common.action.back')}
+              title={t('common.action.back')}
             >
-              {item.label}
-            </button>
-          ))}
-        </nav>
+              ← {t('common.action.back')}
+            </Button>
+            <h1 className="hub-header__title">{title}</h1>
+          </div>
+          <div className="hub-header__left" style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <input
+              className="nx-input hub-header__search"
+              value={search}
+              placeholder={t('header.search')}
+              aria-label={t('header.search')}
+              onChange={(event) => {
+                onSearch(event.target.value);
+              }}
+            />
+            <ThemeSwitch
+              theme={appliedTheme}
+              onToggle={toggleTheme}
+              label={t('settings.theme.label')}
+              lightLabel={t('settings.theme.light')}
+              darkLabel={t('settings.theme.dark')}
+            />
+          </div>
+        </header>
 
-        <div className="hub-topbar__right">
-          <span className="nx-subtitle">{t('common.app.tagline')}</span>
-          <ThemeSwitch
-            theme={appliedTheme}
-            onToggle={toggleTheme}
-            label={t('settings.theme.label')}
-            lightLabel={t('settings.theme.light')}
-            darkLabel={t('settings.theme.dark')}
-          />
-          <Badge>{isDesktop ? t('common.desktopBadge') : t('common.desktopOnly')}</Badge>
-        </div>
-      </header>
-
-      <main className="hub-content">{children}</main>
+        {children}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,133 @@
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useInterface } from '@nexora/ui';
+import { useLibrary } from '../state/desktop.js';
+import { initials } from './GameTile.js';
+import type { DownloadTaskView } from '../../shared/preload-api.js';
+
+/**
+ * Barra lateral do launcher — marca, navegação, biblioteca e estado.
+ *
+ * A biblioteca fica **ao alcance de um clique**: a lista filtra enquanto se
+ * escreve e abre os detalhes do jogo. O rodapé diz o que a fila de downloads
+ * está a fazer — com o número real de tarefas activas, nunca um texto fixo.
+ */
+export function Sidebar({
+  route,
+  activeGameId,
+  onNavigate,
+  onSelectGame,
+}: {
+  readonly route: string;
+  /** Jogo em detalhe (para marcar na lista), ou `null`. */
+  readonly activeGameId: string | null;
+  readonly onNavigate: (route: 'home' | 'library' | 'downloads' | 'settings') => void;
+  readonly onSelectGame: (gameId: string) => void;
+}): ReactNode {
+  const { t } = useInterface();
+  const library = useLibrary();
+  const [filter, setFilter] = useState('');
+  const [active, setActive] = useState<readonly DownloadTaskView[]>([]);
+
+  const games = library.value ?? [];
+
+  const loadActive = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    const tasks = await api.downloads.list();
+    setActive(tasks.filter((task) => task.state === 'downloading' || task.state === 'queued' || task.state === 'paused'));
+  }, []);
+
+  useEffect(() => {
+    void loadActive();
+    const timer = setInterval(() => {
+      void loadActive();
+    }, 3_000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [loadActive]);
+
+  const filtered = useMemo(() => {
+    if (filter.trim() === '') {
+      return games;
+    }
+    const needle = filter.trim().toLowerCase();
+    return games.filter((game) => game.title.toLowerCase().includes(needle));
+  }, [games, filter]);
+
+  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings'; readonly label: string }[] = [
+    { id: 'home', label: t('nav.home') },
+    { id: 'library', label: t('nav.library') },
+    { id: 'downloads', label: t('nav.downloads') },
+    { id: 'settings', label: t('nav.settings') },
+  ];
+
+  return (
+    <aside className="hub-sidebar">
+      <div className="hub-sidebar__brand">
+        <span className="hub-brand__mark" aria-hidden="true">NX</span>
+        <span className="hub-brand__name">{t('common.app.name')}</span>
+      </div>
+
+      <nav className="hub-sidebar__nav" aria-label={t('common.app.name')}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`hub-sidebar__item${item.id === route ? ' hub-sidebar__item--active' : ''}`}
+            aria-current={item.id === route ? 'page' : undefined}
+            onClick={() => {
+              onNavigate(item.id);
+            }}
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      <section className="hub-sidebar__section">
+        <span className="hub-sidebar__label">{t('sidebar.library')}</span>
+        <input
+          className="nx-input"
+          value={filter}
+          placeholder={t('sidebar.filter')}
+          aria-label={t('sidebar.filter')}
+          onChange={(event) => {
+            setFilter(event.target.value);
+          }}
+        />
+        <div className="hub-lib-list">
+          {filtered.length === 0 ? (
+            <span className="nx-subtitle">{t('sidebar.library.empty')}</span>
+          ) : (
+            filtered.map((game) => (
+              <button
+                key={game.externalKey}
+                type="button"
+                className={`hub-lib-item${game.externalKey === activeGameId ? ' hub-lib-item--active' : ''}`}
+                onClick={() => {
+                  onSelectGame(game.externalKey);
+                }}
+              >
+                <span className="hub-lib-item__thumb">
+                  {game.cover === null ? (
+                    <span aria-hidden="true">{initials(game.title)}</span>
+                  ) : (
+                    <img src={game.cover} alt="" loading="lazy" />
+                  )}
+                </span>
+                <span className="hub-lib-item__title">{game.title}</span>
+              </button>
+            ))
+          )}
+        </div>
+      </section>
+
+      <div className="hub-sidebar__footer">
+        {active.length === 0 ? t('sidebar.noDownloads') : t('sidebar.downloadsActive', { count: active.length })}
+      </div>
+    </aside>
+  );
+}

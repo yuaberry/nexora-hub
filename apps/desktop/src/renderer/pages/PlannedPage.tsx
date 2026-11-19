@@ -13,10 +13,6 @@ export function PlannedPage({ module }: { readonly module: PlannedModule }): Rea
   const { t } = useInterface();
 
   switch (module) {
-    case 'downloads':
-      return (
-        <PlannedNotice badge={t('planned.badge')} title={t('nav.downloads')} hint={t('planned.downloads')} />
-      );
     case 'cloudSaves':
       return (
         <PlannedNotice badge={t('planned.badge')} title={t('nav.cloudSaves')} hint={t('planned.cloud-saves')} />

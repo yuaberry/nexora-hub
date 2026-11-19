@@ -232,6 +232,33 @@ pastas de saves configuráveis por jogo, perfis animados, Família e importaçã
 oficial de bibliotecas — fases próprias.
 
 
+
+## Interface — layout de launcher (2026-11-19)
+
+### Entregue
+
+- [x] **Barra lateral** — marca, navegação (Início, Biblioteca, Downloads,
+      Configurações), secção **MINHA BIBLIOTECA** com filtro vivo e lista de
+      jogos (miniatura + título), e rodapé com o estado real da fila de
+      downloads (contagem de tarefas activas, não um texto fixo).
+- [x] **Cabeçalho** — botão de voltar com **histórico real** de navegação,
+      título da página, pesquisa partilhada (cabeçalho → Biblioteca) e
+      alternador de tema.
+- [x] **Início** — herói DESTAQUE com o jogo da última sessão (Jogar +
+      Detalhes), separadores com dados reais (**Quentes** = mais jogados,
+      **Jogados recentemente**, **Para descobrir** = nunca jogados) e
+      **Surpreenda-me** (escolhe um jogo ao calhas entre os existentes).
+- [x] Herói e linhas saíram da Biblioteca (que passa a ser a grelha completa).
+
+### Prova de execução real (2026-11-19)
+
+- App real: barra lateral com 4 jogos listados e filtro, cabeçalho com voltar
+  e pesquisa, DESTAQUE com o jogo da última sessão, três separadores, e
+  rodapé «Sem downloads em curso» — capturas do renderer em docs/.
+- **Sem medição semanal, sem separador semanal**: «Top da semana» não existe
+  sem dados semanais — o separador honesto é «Quentes» (mais jogados).
+- typecheck limpo; **269 testes verdes**.
+
 ## Fase 5 — Comunidade (iniciada em 2026-11-18)
 
 ### Entregue

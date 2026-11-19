@@ -14,8 +14,8 @@ fases, sem nunca anunciar o que não existe.
 | App de desktop (Electron 42) | **Funcional**: biblioteca local, importação de pastas, pesquisa dinâmica, início de jogos com medição, configurações de dispositivo |
 | API (Fastify + PostgreSQL) | **Funcional**: autenticação completa (senha + MFA + refresh rotativo), biblioteca, pesquisa, sessões |
 | Web (React) | **Funcional**: leitura da biblioteca, login, admin esqueleto — PT-BR/EN |
-| Biblioteca local, Downloads (HTTP verificado), pesquisa, medição | **Funcional** |
-| Saves na nuvem, amigos, loja, overlay, Remote Play, torrent | **Planejados** — só interface/tipos + selo "Planeado" |
+| Biblioteca local, Downloads (HTTP verificado), pesquisa, medição, snapshots de saves, interface estilo launcher | **Funcional** |
+| Saves na nuvem (Nexora Cloud — adiada pelo responsável), amigos, loja, overlay, Remote Play, torrent | **Planejados** — só interface/tipos + selo "Planeado" |
 
 > **Nada aqui finge funcionar.** Um módulo que ainda não existe aparece com o
 > selo "Planeado" e a explicação do que falta. **A NEXORA não hospeda nem
@@ -27,10 +27,10 @@ fases, sem nunca anunciar o que não existe.
 | Verificação | Resultado |
 | --- | --- |
 | `pnpm typecheck` | limpo nos 10 projetos |
-| `pnpm test` | **236 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
+| `pnpm test` | **261 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
 | `pnpm build` | packages, API, web e desktop compilados |
 | Empacotamento | `nexora-hub-0.1.0-x86_64.AppImage` e `nexora-hub-0.1.0-amd64.deb` construídos (`--publish never`) |
-| App real (Electron no DISPLAY=:0) | janela abre, biblioteca semeada aparece, pesquisa viva funciona, jogo lançado e tempo gravado — ver abaixo |
+| App real (Electron no DISPLAY=:0) | barra superior estilo launcher, herói com a última sessão, "Continuar a jogar", Downloads com barras de progresso — ver abaixo |
 | Pesquisa viva | escrever **"l"** sugere **"League Of Legends"** (motor `searchGames` de `@nexora/core`) |
 | Ciclo completo | `launch` via preload → IPC → `LocalGameRunner` spawn → fim natural → **tempo gravado** na base local (acumulado entre sessões) |
 | Executável empacotado | AppImage abre com a interface completa e a biblioteca local (BD em `~/.config/NEXORA HUB`) |

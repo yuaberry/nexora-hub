@@ -45,6 +45,7 @@ export function SettingsPage(): ReactNode {
         <p className="nx-subtitle">{t('settings.subtitle')}</p>
       </div>
 
+      <div className="hub-settings-grid">
       <Card>
         <div className="nx-stack">
           <strong>{t('settings.appearance')}</strong>
@@ -164,6 +165,7 @@ export function SettingsPage(): ReactNode {
           </div>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

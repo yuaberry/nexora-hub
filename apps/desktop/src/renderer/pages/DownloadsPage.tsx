@@ -254,6 +254,24 @@ export function DownloadsPage(): ReactNode {
                       {task.verified ? <Badge tone="positive">sha256 ✓</Badge> : null}
                     </div>
                   </div>
+                  <div
+                    className={`hub-progress${
+                      task.state === 'completed' ? ' hub-progress--done' : task.state === 'failed' ? ' hub-progress--failed' : ''
+                    }`}
+                    role="progressbar"
+                    aria-valuenow={task.totalBytes === null ? undefined : Math.round((task.receivedBytes / task.totalBytes) * 100)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <span
+                      className="hub-progress__fill"
+                      style={{
+                        width: task.totalBytes === null || task.totalBytes === 0
+                          ? '0%'
+                          : `${Math.min(100, (task.receivedBytes / task.totalBytes) * 100).toFixed(2)}%`,
+                      }}
+                    />
+                  </div>
                   <span className="nx-subtitle">{progressLabel(task)}</span>
                   <div className="nx-row">
                     {task.state === 'downloading' || task.state === 'queued' ? (

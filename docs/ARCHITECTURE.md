@@ -161,3 +161,18 @@ O checksum de uma pasta de saves lê o conteúdo dos ficheiros até 8 MB cada
 (`MAX_CONTENT_BYTES_PER_FILE`); acima disso, compara caminho + tamanho. O
 limite é declarado no código e na interface, não silencioso: um save grande
 não pode ser lido inteiro a cada sessão, e fingir seria mentir.
+
+## D24 — A interface é a pele do produto
+
+Barra superior (não sidebar), herói com a última sessão, "Continuar a jogar",
+grelha de cartões com overlay de jogar, barras de progresso reais. Nada de cor
+própria: só tokens de papel. Nada de animação que ignore "reduzir movimento"
+(o CSS usa `--paper-motion`, que é 0 ms nesse modo). O módulo planeado não
+entra na navegação principal — fica numa linha "Em breve".
+
+## D7 (revista, 2026-11-18) — Nexora Cloud adiada
+
+O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.
+A costura técnica mantém-se fechada (`packages/cloud` com `decideSync` e o
+cliente *stub* que recusa com motivo) — nada na interface anuncia a nuvem como
+existente.

@@ -1,15 +1,17 @@
 import type { ReactNode } from 'react';
-import { Sidebar, ThemeSwitch, useInterface, type SidebarItem } from '@nexora/ui';
+import { Badge, ThemeSwitch, useInterface } from '@nexora/ui';
 import { useIsDesktop } from '../state/desktop.js';
-import type { PlannedModule, Route } from '../App.js';
+import type { Route } from '../App.js';
 
 /**
- * Estrutura do launcher — barra lateral e alternador de tema no canto
- * superior esquerdo (a animação vive no CSS e respeita "reduzir movimento").
+ * Estrutura do launcher — barra superior, estilo launcher de jogos.
  *
- * Os módulos que ainda não existem aparecem na barra com o selo "Planeado":
- * clicar leva a uma página que explica o que falta, nunca a um botão que
- * finge funcionar.
+ * A marca à esquerda, a navegação ao centro, o alternador de tema animado e o
+ * selo do executável à direita. O alternador fica visível em qualquer página,
+ * e a animação respeita "reduzir movimento" (o CSS encarrega-se disso).
+ *
+ * Os módulos que ainda não existem aparecem numa linha "Em breve" dentro da
+ * biblioteca — não ocupam a navegação principal como se existissem.
  */
 export function AppShell({
   route,
@@ -23,62 +25,54 @@ export function AppShell({
   const { t, appliedTheme, toggleTheme } = useInterface();
   const isDesktop = useIsDesktop();
 
-  const items: readonly SidebarItem[] = [
+  const items: readonly { readonly id: 'library' | 'downloads' | 'settings'; readonly label: string }[] = [
     { id: 'library', label: t('nav.library') },
     { id: 'downloads', label: t('nav.downloads') },
     { id: 'settings', label: t('nav.settings') },
-    { id: 'cloudSaves', label: t('nav.cloudSaves'), planned: true },
-    { id: 'friends', label: t('nav.friends'), planned: true },
   ];
 
-  const activeId = route.name === 'details' ? 'library' : route.name === 'planned' ? route.module : route.name;
-
-  function onSelect(id: string): void {
-    if (id === 'library' || id === 'settings' || id === 'downloads') {
-      onNavigate({ name: id });
-      return;
-    }
-    if (id === 'cloudSaves' || id === 'friends') {
-      onNavigate({ name: 'planned', module: id satisfies PlannedModule });
-    }
-  }
+  const activeId = route.name === 'details' ? 'library' : route.name;
 
   return (
-    <div className="hub-shell">
-      <Sidebar
-        title={t('common.app.name')}
-        items={items}
-        activeId={activeId}
-        onSelect={onSelect}
-        plannedLabel={t('planned.badge')}
-        footer={
-          <span className="nx-subtitle hub-break">
-            {isDesktop ? t('common.desktopBadge') : t('common.desktopOnly')}
-          </span>
-        }
-      />
-      <div className="hub-main">
-        <header
-          className="nx-row nx-row--between"
-          style={{
-            padding: '0.75rem 1.25rem',
-            borderBottom: '1px solid var(--paper-line)',
-            background: 'var(--paper-surface)',
-          }}
-        >
-          <div className="nx-row">
-            <ThemeSwitch
-              theme={appliedTheme}
-              onToggle={toggleTheme}
-              label={t('settings.theme.label')}
-              lightLabel={t('settings.theme.light')}
-              darkLabel={t('settings.theme.dark')}
-            />
-            <strong className="hub-break">{t('common.app.tagline')}</strong>
-          </div>
-        </header>
-        <main className="hub-content">{children}</main>
-      </div>
+    <div>
+      <header className="hub-topbar">
+        <div className="hub-brand">
+          <span className="hub-brand__mark" aria-hidden="true">NX</span>
+          <span className="hub-brand__name">{t('common.app.name')}</span>
+        </div>
+
+        <nav className="hub-nav" aria-label={t('common.app.name')}>
+          {items.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`hub-nav__item${item.id === activeId ? ' hub-nav__item--active' : ''}`}
+              aria-current={item.id === activeId ? 'page' : undefined}
+              onClick={() => {
+                if (item.id === 'library' || item.id === 'downloads' || item.id === 'settings') {
+                  onNavigate({ name: item.id });
+                }
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="hub-topbar__right">
+          <span className="nx-subtitle">{t('common.app.tagline')}</span>
+          <ThemeSwitch
+            theme={appliedTheme}
+            onToggle={toggleTheme}
+            label={t('settings.theme.label')}
+            lightLabel={t('settings.theme.light')}
+            darkLabel={t('settings.theme.dark')}
+          />
+          <Badge>{isDesktop ? t('common.desktopBadge') : t('common.desktopOnly')}</Badge>
+        </div>
+      </header>
+
+      <main className="hub-content">{children}</main>
     </div>
   );
 }

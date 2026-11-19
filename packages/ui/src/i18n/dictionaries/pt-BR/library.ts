@@ -15,6 +15,12 @@ export const library = {
   'library.filters.all': 'Todos',
   'library.filters.favorites': 'Favoritos',
 
+
+  'library.hero.label': 'Última sessão',
+  'library.continue': 'Continuar a jogar',
+  'library.all': 'Todos os jogos',
+  'library.count': '{count} jogos na biblioteca',
+  'library.comingSoon': 'Em breve',
   'import.title': 'Importar jogos locais',
   'import.hint': 'A NEXORA não distribui jogos: escolha as pastas que já tem instaladas.',
   'import.detect': 'Detetar pastas comuns',

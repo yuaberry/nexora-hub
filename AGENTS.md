@@ -89,3 +89,7 @@ Para desenvolver o desktop com o renderer: `pnpm --filter @nexora/desktop dev`
 8. Nenhum segredo no repositório (`.env.example` com placeholders).
 9. Uma task só está concluída com `pnpm typecheck`, `pnpm test`, build e
    **prova de execução real** registada em `docs/ROADMAP.md`.
+10. **Mexer num `packages/*` obriga a reconstruí-lo** (`pnpm --filter
+    @nexora/ui build`) antes de provar o desktop: o renderer consome o `dist`,
+    e uma chave nova só no `src` faz o `translate` falhar e a árvore React
+    desaparecer (ecrã branco sem erro visível).

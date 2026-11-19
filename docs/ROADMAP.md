@@ -158,6 +158,46 @@ fase (`docs/LEGAL.md`).
   (`no-runner`). Testes cobrem nativo, Wine, recusa e prefixos distintos.
 
 
+
+## Fase 4 — Interface Profissional (concluída em 2026-11-18)
+
+### Entregue
+
+- [x] **Barra superior estilo launcher** — marca, navegação (Biblioteca,
+      Downloads, Configurações), alternador de tema animado e selo do
+      executável; a sidebar deu lugar a uma barra que não rouba altura.
+- [x] **Biblioteca em pele de launcher** — herói com a última sessão (jogar +
+      detalhes), linha "Continuar a jogar", grelha de cartões com capa,
+      overlay de jogar ao pairar **e** ao focar pelo teclado, estrela de
+      favorito, pesquisa viva com sugestões, e linha "Em breve" para os
+      módulos planeados (honestidade sem ocupar a navegação principal).
+- [x] **Downloads com barras de progresso** reais (`role="progressbar"`,
+      `aria-valuenow`), estados com cor do papel (concluído/falhou) e selo
+      `sha256 ✓`.
+- [x] **Configurações em grelha** de cartões (aparência, acessibilidade,
+      armazenamento, conta, diagnóstico do executável).
+- [x] **CSS de aplicação** (`apps/desktop/src/renderer/index.css`) — tudo em
+      tokens de papel, transições em `--paper-motion` (0 ms com "reduzir
+      movimento"), foco visível, `overflow-wrap` em toda a parte.
+
+### Prova de execução real (2026-11-18)
+
+- App real: barra superior com os três itens, herói a mostrar o jogo da última
+  sessão, "Continuar a jogar" com cartões, Downloads com barras de progresso e
+  estados, Configurações em grelha — capturas do renderer em `docs/`.
+- **Bug real encontrado na prova**: o renderer consome o `dist` do
+  `@nexora/ui`; uma chave nova no `src` sem reconstruir o pacote faz o
+  `translate` falhar (`template.replace` de `undefined`) e a árvore React
+  inteira desaparece — ecrã branco. Regra nova no AGENTS.md: **mexer num
+  package obriga a reconstruí-lo antes de provar o desktop**.
+- `pnpm typecheck` limpo nos 12 projectos; **261 testes verdes**.
+
+### Decisão do operador (2026-11-18)
+
+A **integração com o Nexora Cloud foi adiada pelo responsável** — o launcher
+segue sozinho, e a costura técnica (cliente de saves, `decideSync`) fica fechada
+até haver decisão. Nada na interface a anuncia como existente.
+
 ## Fase 3 — Saves (iniciada em 2026-11-18)
 
 ### Entregue

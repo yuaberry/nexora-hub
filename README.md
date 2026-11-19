@@ -27,7 +27,7 @@ fases, sem nunca anunciar o que não existe.
 | Verificação | Resultado |
 | --- | --- |
 | `pnpm typecheck` | limpo nos 10 projetos |
-| `pnpm test` | **261 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
+| `pnpm test` | **274 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
 | `pnpm build` | packages, API, web e desktop compilados |
 | Empacotamento | `nexora-hub-0.1.0-x86_64.AppImage` e `nexora-hub-0.1.0-amd64.deb` construídos (`--publish never`) |
 | App real (Electron no DISPLAY=:0) | barra superior estilo launcher, herói com a última sessão, "Continuar a jogar", Downloads com barras de progresso — ver abaixo |
@@ -68,6 +68,7 @@ Requer **Node >= 24** e **pnpm 12**.
 apps/api          # autenticação, biblioteca, pesquisa, sessões
 apps/web          # interface web (leitura)
 apps/desktop      # launcher Electron (shell, importação local, runner)
+apps/site         # site: landing, descargas e documentação
 packages/core     # domínio puro — testável sem infraestrutura
 packages/protocol # contrato HTTP/WS
 packages/runner   # interface + runner local (spawn + medição real)

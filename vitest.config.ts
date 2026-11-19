@@ -20,6 +20,7 @@ export default defineConfig({
       'apps/api',
       'apps/web',
       'apps/desktop',
+      'apps/site',
     ],
   },
 });

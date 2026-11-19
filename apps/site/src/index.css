@@ -1,0 +1,197 @@
+@import '@nexora/ui/theme.css';
+
+/**
+ * Estilos do site — a camada de aplicação.
+ *
+ * O tema vem dos tokens de papel (`@nexora/ui/theme.css`): nenhuma cor aqui é
+ * escolhida, só o papel. A animação usa `--paper-motion`, que é 0 ms quando o
+ * visitante pede movimento reduzido.
+ */
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper-surface-deepest);
+  color: var(--paper-ink);
+}
+
+.site {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+.site-main {
+  display: grid;
+  gap: 4rem;
+  align-content: start;
+  padding: 3rem 1.5rem 5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ---------- Cabeçalho ------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--paper-line);
+  background: var(--paper-surface);
+}
+
+.site-header__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+/* ---------- Herói ----------------------------------------------------- */
+
+.site-hero {
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
+}
+
+.site-hero__title {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+  margin: 0;
+  max-width: 22ch;
+  overflow-wrap: anywhere;
+}
+
+.site-hero__subtitle {
+  font-size: 1.1rem;
+  color: var(--paper-ink-muted);
+  max-width: 60ch;
+  margin: 0;
+}
+
+.site-hero__note {
+  color: var(--paper-ink-muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Grelhas --------------------------------------------------- */
+
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+}
+
+.site-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.site-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+  counter-reset: step;
+}
+
+.site-step {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  background: var(--paper-surface);
+}
+
+.site-step__num {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--paper-accent);
+  color: var(--paper-accent-ink);
+  font-weight: 700;
+}
+
+/* ---------- Documentação ---------------------------------------------- */
+
+.site-docs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .site-docs {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+}
+
+.site-docs__nav {
+  display: grid;
+  gap: 0.25rem;
+  position: sticky;
+  top: 5rem;
+}
+
+.site-article {
+  display: grid;
+  gap: 1rem;
+}
+
+.site-article h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.site-article h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.site-article p,
+.site-article li {
+  color: var(--paper-ink);
+  line-height: 1.65;
+}
+
+.site-article code {
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--paper-radius-sm);
+  background: var(--paper-surface-sunken);
+  font-size: 0.9em;
+}
+
+/* ---------- Rodapé ---------------------------------------------------- */
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--paper-line);
+  background: var(--paper-surface);
+}
+
+.site-footer .hub-row {
+  gap: 1.25rem;
+}

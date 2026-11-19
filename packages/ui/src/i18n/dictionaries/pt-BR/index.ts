@@ -4,6 +4,7 @@ import { settings } from './settings.js';
 import { planned } from './planned.js';
 import { downloads } from './downloads.js';
 import { saves } from './saves.js';
+import { community } from './community.js';
 import { pages } from './pages.js';
 
 /**
@@ -21,5 +22,6 @@ export const ptBR = {
   ...planned,
   ...downloads,
   ...saves,
+  ...community,
   ...pages,
 } as const;

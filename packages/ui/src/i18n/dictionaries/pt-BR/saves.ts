@@ -1,4 +1,4 @@
-/** Dicionário PT-BR — saves e snapshots. */
+/** Dicionário PT-BR — saves, snapshots e comunidade. */
 export const saves = {
   'saves.title': 'Saves do jogo',
   'saves.subtitle': 'Snapshots versionados no seu computador. Um save não se pode perder.',

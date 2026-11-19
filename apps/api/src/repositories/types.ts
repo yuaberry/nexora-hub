@@ -230,6 +230,8 @@ export interface AuditRepository {
 
 /** Todas as dependências de persistência da API. */
 export interface Repositories {
+  readonly comments: CommentRepository;
+  readonly reviews: ReviewRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -239,4 +241,79 @@ export interface Repositories {
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;
+}
+
+/** Um comentário num jogo. */
+export interface CommentRecord {
+  readonly id: string;
+  readonly gameId: string;
+  readonly userId: string;
+  readonly body: string;
+  readonly createdAt: Date;
+}
+
+/** Entrada de um novo comentário. */
+export interface NewCommentInput {
+  readonly gameId: string;
+  readonly userId: string;
+  readonly body: string;
+}
+
+export interface CommentRepository {
+  /** Cria um comentário (o dono é quem criou). */
+  readonly create: (input: NewCommentInput) => Promise<CommentRecord>;
+  /** Lista comentários de um jogo, do mais recente para o mais antigo. */
+  readonly listByGame: (gameId: string, limit: number, offset: number) => Promise<readonly CommentRecord[]>;
+  /** Apaga um comentário **do dono** (devolve `false` se não for dele). */
+  readonly deleteOwned: (commentId: string, userId: string) => Promise<boolean>;
+}
+
+/** Uma review de um jogo (uma por utilizador). */
+export interface ReviewRecord {
+  readonly id: string;
+  readonly gameId: string;
+  readonly userId: string;
+  readonly rating: number;
+  readonly story: number | null;
+  readonly gameplay: number | null;
+  readonly graphics: number | null;
+  readonly sound: number | null;
+  readonly body: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+/** Entrada/actualização de uma review (upsert pelo dono). */
+export interface UpsertReviewInput {
+  readonly gameId: string;
+  readonly userId: string;
+  readonly rating: number;
+  readonly story: number | null;
+  readonly gameplay: number | null;
+  readonly graphics: number | null;
+  readonly sound: number | null;
+  readonly body: string;
+}
+
+export interface ReviewRepository {
+  /** Cria ou actualiza a review do utilizador no jogo. */
+  readonly upsert: (input: UpsertReviewInput) => Promise<ReviewRecord>;
+  /** Lista reviews de um jogo, da mais recente para a mais antiga. */
+  readonly listByGame: (gameId: string, limit: number, offset: number) => Promise<readonly ReviewRecord[]>;
+  /** Agregado de notas de um jogo (médias e contagem). */
+  readonly aggregate: (gameId: string) => Promise<ReviewAggregate>;
+  /** Apaga a review do dono. */
+  readonly deleteOwned: (reviewId: string, userId: string) => Promise<boolean>;
+}
+
+/** Agregado de reviews de um jogo. */
+export interface ReviewAggregate {
+  readonly count: number;
+  /** Média da nota global (0 quando não há reviews). */
+  readonly averageRating: number;
+  /** Médias por categoria (`null` quando não há votos nessa categoria). */
+  readonly averageStory: number | null;
+  readonly averageGameplay: number | null;
+  readonly averageGraphics: number | null;
+  readonly averageSound: number | null;
 }

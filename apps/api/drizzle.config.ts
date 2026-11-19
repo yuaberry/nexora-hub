@@ -17,6 +17,7 @@ export default defineConfig({
     './src/db/library-schema.ts',
     './src/db/sessions-schema.ts',
     './src/db/audit-schema.ts',
+    './src/db/community-schema.ts',
   ],
   out: './drizzle',
   dbCredentials: {

@@ -5,9 +5,11 @@ import {
   MemoryUserRepository,
 } from './memory-users.js';
 import { MemoryAuthSessionRepository, MemoryMfaRepository } from './memory-auth.js';
+import { MemoryCommentRepository, MemoryReviewRepository } from './memory-community.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
 import { PostgresAuthSessionRepository, PostgresMfaRepository } from './postgres-auth.js';
+import { PostgresCommentRepository, PostgresReviewRepository } from './postgres-community.js';
 import { PostgresLibraryRepository, PostgresPlaySessionRepository } from './postgres-game.js';
 import type { Repositories } from './types.js';
 
@@ -27,6 +29,8 @@ export function createMemoryRepositories(): Repositories {
     users: new MemoryUserRepository(),
     authSessions: new MemoryAuthSessionRepository(),
     mfa: new MemoryMfaRepository(),
+    comments: new MemoryCommentRepository(),
+    reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
     sessions: new MemoryPlaySessionRepository(),
     audit: new MemoryAuditRepository(),
@@ -53,6 +57,8 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     users: new PostgresUserRepository(database.db),
     authSessions: new PostgresAuthSessionRepository(database.db),
     mfa: new PostgresMfaRepository(database.db),
+    comments: new PostgresCommentRepository(database.db),
+    reviews: new PostgresReviewRepository(database.db),
     library: new PostgresLibraryRepository(database.db),
     sessions: new PostgresPlaySessionRepository(database.db),
     audit: new PostgresAuditRepository(database.db),

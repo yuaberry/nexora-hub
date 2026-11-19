@@ -230,3 +230,34 @@ até haver decisão. Nada na interface a anuncia como existente.
 Upload/download real para o Nexora Cloud (integração é lote próprio, D7),
 pastas de saves configuráveis por jogo, perfis animados, Família e importação
 oficial de bibliotecas — fases próprias.
+
+
+## Fase 5 — Comunidade (iniciada em 2026-11-18)
+
+### Entregue
+
+- [x] **API** — comentários e reviews por jogo (`/api/v1/games/:gameId/comments`,
+      `/api/v1/games/:gameId/reviews`, `PUT .../reviews/me`): comentar exige
+      sessão, apagar filtra pelo dono (404 para o dos outros, nunca 403), a
+      review é **uma por utilizador e jogo** (upsert com índice único) e o
+      agregado é honesto (média real; `null` quando ninguém votou na
+      categoria). Repositórios em memória **e** PostgreSQL.
+- [x] **Web** — página `/jogo/:gameId` com comentários (criar/apagar os
+      próprios), formulário de review (nota global + categorias opcionais),
+      agregado com `—` para categoria sem votos, e remoção da review própria.
+- [x] **Desktop** — comunidade nos detalhes do jogo com selo honesto:
+      comentar/reviewar exige conta NEXORA no launcher, que é fase futura.
+
+### Prova de execução real (2026-11-18)
+
+- `pnpm typecheck` limpo; **269 testes verdes** (39 ficheiros), incluindo os
+  novos de comunidade: Apagar o comentário de outro devolve **404**, review
+  substitui (não duplica), nota 11 devolve **400**, `averageSound` é
+  `null` quando ninguém votou em som.
+- App real: detalhes do jogo com a nova pele (capa, metadados em
+  chave/valor, acções, cartão de saves) — capturas do renderer em `docs/`.
+
+### Fora do escopo desta fase (deliberadamente)
+
+Conta NEXORA dentro do launcher (necessária para comentar/reviewar no
+desktop), chat, fóruns, clãs — fases próprias.

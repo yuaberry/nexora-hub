@@ -1,4 +1,4 @@
-/** EN dictionary — saves and snapshots. */
+/** EN dictionary — saves, snapshots and community. */
 export const saves = {
   'saves.title': 'Game saves',
   'saves.subtitle': 'Versioned snapshots on your computer. A save cannot be lost.',

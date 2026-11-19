@@ -340,3 +340,13 @@ body {
 .hub-icon-btn:hover {
   border-color: var(--paper-accent);
 }
+
+.hub-cover-large {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  max-width: 18rem;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  overflow: hidden;
+  font-size: 2rem;
+}

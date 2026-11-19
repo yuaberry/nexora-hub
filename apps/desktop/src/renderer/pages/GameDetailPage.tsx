@@ -5,11 +5,12 @@ import { formatDate, formatPlayTime } from '../lib/format.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
 /**
- * Detalhes do jogo.
+ * Detalhes do jogo — a segunda pele do launcher.
  *
- * A capa é o ficheiro local; sem ficheiro, o placeholder do tema (nunca uma
- * imagem inventada). O tempo jogado é medido localmente — sincronizar com a
- * conta é fase futura, e a interface diz-o.
+ * Capa grande, acções à vista, metadados em pares chave/valor, e os saves
+ * por baixo. A capa é o ficheiro local; sem ficheiro, o placeholder do tema
+ * (nunca uma imagem inventada). O tempo jogado é medido localmente — e a
+ * interface diz que sincronizar com a conta é fase futura.
  */
 export function GameDetailPage({
   gameId,
@@ -52,12 +53,12 @@ export function GameDetailPage({
 
   return (
     <div className="nx-stack">
-      <div className="nx-row nx-row--between">
+      <div className="hub-row hub-row--between">
         <Button onClick={onBack}>{t('common.action.back')}</Button>
         <PlannedBadge label={t('planned.badge')} />
       </div>
 
-      <div className="hub-row" style={{ alignItems: 'flex-start' }}>
+      <div className="hub-detail">
         <div className="nx-cover hub-cover-large">
           {game.cover === null ? (
             <span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>
@@ -66,25 +67,27 @@ export function GameDetailPage({
           )}
         </div>
 
-        <div className="nx-stack" style={{ flex: 1, minWidth: 0 }}>
-          <h1 className="nx-title">{game.title}</h1>
+        <div className="nx-stack">
+          <h1 className="nx-title" style={{ fontSize: '1.75rem' }}>
+            {game.title}
+          </h1>
 
-          <dl className="nx-stack">
-            <div className="hub-row">
-              <dt className="nx-label">{t('details.installPath')}</dt>
-              <dd className="hub-break" style={{ margin: 0 }}>{game.installPath}</dd>
-            </div>
-            <div className="hub-row">
-              <dt className="nx-label">{t('details.executablePath')}</dt>
-              <dd className="hub-break" style={{ margin: 0 }}>{game.executablePath}</dd>
-            </div>
-            <div className="hub-row">
-              <dt className="nx-label">{t('details.playedTime')}</dt>
+          <dl className="hub-kv">
+            <div className="hub-kv__row">
+              <dt className="hub-kv__key">{t('details.playedTime')}</dt>
               <dd style={{ margin: 0 }}>{formatPlayTime(game.totalSeconds, locale, t)}</dd>
             </div>
-            <div className="hub-row">
-              <dt className="nx-label">{t('details.lastPlayed')}</dt>
+            <div className="hub-kv__row">
+              <dt className="hub-kv__key">{t('details.lastPlayed')}</dt>
               <dd style={{ margin: 0 }}>{formatDate(game.lastPlayedAt, locale, t('details.neverPlayed'))}</dd>
+            </div>
+            <div className="hub-kv__row">
+              <dt className="hub-kv__key">{t('details.installPath')}</dt>
+              <dd className="hub-break" style={{ margin: 0 }}>{game.installPath}</dd>
+            </div>
+            <div className="hub-kv__row">
+              <dt className="hub-kv__key">{t('details.executablePath')}</dt>
+              <dd className="hub-break" style={{ margin: 0 }}>{game.executablePath}</dd>
             </div>
           </dl>
 
@@ -115,19 +118,13 @@ export function GameDetailPage({
         </div>
       </div>
 
+      <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
+
       <Card>
         <div className="nx-stack">
-          <strong>{t('saves.title')}</strong>
-          <p className="nx-subtitle">{t('saves.subtitle')}</p>
-          <p className="nx-subtitle hub-break">
-            {t('saves.folder')}: {game.installPath}
-          </p>
-          <SavesList
-            gameKey={game.externalKey}
-            savePath={game.installPath}
-            onMessage={setMessage}
-          />
-          <p className="nx-subtitle">{t('planned.cloudSync')}</p>
+          <strong>{t('community.title')}</strong>
+          <span className="nx-subtitle">{t('community.planned')}</span>
+          <Badge tone="planned">{t('planned.badge')}</Badge>
         </div>
       </Card>
     </div>
@@ -135,13 +132,12 @@ export function GameDetailPage({
 }
 
 /**
- * Lista de snapshots de um jogo.
+ * Saves do jogo — snapshots versionados.
  *
  * A pasta de saves é, nesta fase, a pasta de instalação — dita na interface,
- * não escondida: pastas configuráveis por jogo são a fase seguinte. Criar um
- * snapshot copia essa pasta; restaurar substitui o conteúdo dela.
+ * não escondida: pastas configuráveis por jogo são a fase seguinte.
  */
-function SavesList({
+function SavesCard({
   gameKey,
   savePath,
   onMessage,
@@ -188,38 +184,47 @@ function SavesList({
   );
 
   return (
-    <div className="nx-stack">
-      <div className="hub-row">
-        <Button variant="primary" onClick={() => void onCreate()}>
-          {t('saves.create')}
-        </Button>
-        <Badge tone="planned">{t('planned.badge')}</Badge>
-      </div>
+    <Card>
+      <div className="nx-stack">
+        <div className="hub-row hub-row--between">
+          <strong>{t('saves.title')}</strong>
+          <span className="nx-subtitle hub-break">
+            {t('saves.folder')}: {savePath}
+          </span>
+        </div>
 
-      {snapshots === null ? (
-        <p className="nx-subtitle">{t('common.loading')}</p>
-      ) : snapshots.length === 0 ? (
-        <p className="nx-subtitle">{t('saves.empty')}</p>
-      ) : (
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.5rem' }}>
-          {snapshots.map((snapshot) => (
-            <li key={snapshot.id} className="nx-row nx-row--between">
-              <span className="nx-stack">
-                <strong>
-                  #{snapshot.revision} · {snapshot.label}
-                </strong>
-                <span className="nx-subtitle">
-                  {new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(snapshot.createdAt))} ·{' '}
-                  {new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(snapshot.sizeBytes / 1_000_000)} MB
+        <div className="hub-row">
+          <Button variant="primary" onClick={() => void onCreate()}>
+            {t('saves.create')}
+          </Button>
+          <Badge tone="planned">{t('planned.badge')}</Badge>
+        </div>
+
+        {snapshots === null ? (
+          <p className="nx-subtitle">{t('common.loading')}</p>
+        ) : snapshots.length === 0 ? (
+          <p className="nx-subtitle">{t('saves.empty')}</p>
+        ) : (
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.5rem' }}>
+            {snapshots.map((snapshot) => (
+              <li key={snapshot.id} className="hub-row hub-row--between">
+                <span className="nx-stack">
+                  <strong>
+                    #{snapshot.revision} · {snapshot.label}
+                  </strong>
+                  <span className="nx-subtitle">
+                    {new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(snapshot.createdAt))} ·{' '}
+                    {new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(snapshot.sizeBytes / 1_000_000)} MB
+                  </span>
                 </span>
-              </span>
-              <div className="nx-row">
                 <Button onClick={() => void onRestore(snapshot.id)}>{t('saves.restore')}</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className="nx-subtitle">{t('planned.cloudSync')}</p>
+      </div>
+    </Card>
   );
 }

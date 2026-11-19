@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './auth/AuthContext.js';
 import { AppShell } from './components/AppShell.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
+import { GameDetailPage } from './pages/GameDetailPage.js';
 import { AdminPage } from './pages/AdminPage.js';
 import { NotFoundPage } from './pages/NotFoundPage.js';
 import { accessToken } from './api/client.js';
@@ -30,6 +31,14 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
               element={
                 <RequireAuth>
                   <LibraryPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/jogo/:gameId"
+              element={
+                <RequireAuth>
+                  <GameDetailPage />
                 </RequireAuth>
               }
             />

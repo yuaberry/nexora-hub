@@ -208,4 +208,18 @@ export class PostgresPlaySessionRepository implements PlaySessionRepository {
       .returning();
     return rows[0] ?? null;
   }
+
+  async totalPlayedSeconds(userId: string, gameId: string): Promise<number> {
+    const rows = await this.db
+      .select({ total: sql<number>`coalesce(sum(${schema.gameSessions.durationSeconds}), 0)::int` })
+      .from(schema.gameSessions)
+      .where(
+        and(
+          eq(schema.gameSessions.userId, userId),
+          eq(schema.gameSessions.gameId, gameId),
+          eq(schema.gameSessions.state, 'ended'),
+        ),
+      );
+    return rows[0]?.total ?? 0;
+  }
 }

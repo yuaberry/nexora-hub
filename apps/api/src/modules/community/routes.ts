@@ -22,6 +22,16 @@ import type { Repositories } from '../../repositories/types.js';
 const MAX_BODY_LENGTH = 4_000;
 const MAX_PAGE_LIMIT = 50;
 
+/**
+ * Tempo mínimo de jogo para poder reviewar (10 minutos).
+ *
+ * Regra inspirada na análise do Hydra ("reviews unlocked once you have
+ * played a game for a while") e adaptada: sem medição, a review não é
+ * opinião de quem jogou. O limite é **declarado e aplicado no servidor** —
+ * não um texto de interface.
+ */
+export const MIN_PLAY_SECONDS_FOR_REVIEW = 600;
+
 /** Corpo de um comentário. */
 const CommentBody = z.object({
   body: z.string().min(1).max(MAX_BODY_LENGTH),
@@ -167,6 +177,17 @@ export function registerCommunityRoutes(app: FastifyInstance, repositories: Repo
         { path: 'rating', message: 'Nota de 1 a 10 (categorias opcionais, de 1 a 10).', code: 'invalid_value' },
       ]);
     }
+
+    // A regra: reviewar exige tempo de jogo medido. A recusa traz o mínimo e
+    // o tempo feito — quem recebe sabe exactamente o que falta.
+    const playedSeconds = await repositories.sessions.totalPlayedSeconds(user.id, gameId);
+    if (playedSeconds < MIN_PLAY_SECONDS_FOR_REVIEW) {
+      throw errors.forbidden(
+        `Reviewar exige ${Math.round(MIN_PLAY_SECONDS_FOR_REVIEW / 60)} minutos de jogo medidos neste jogo.`,
+        { playedSeconds, requiredSeconds: MIN_PLAY_SECONDS_FOR_REVIEW },
+      );
+    }
+
     const row = await repositories.reviews.upsert({
       gameId,
       userId: user.id,

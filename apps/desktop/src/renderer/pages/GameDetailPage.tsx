@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
+import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
@@ -104,6 +105,19 @@ export function GameDetailPage({
               {game.favorite ? t('details.favorite') : t('details.notFavorite')}
             </Button>
             <Button
+              onClick={() => {
+                const api = globalThis.window?.nexora;
+                if (api === undefined) {
+                  return;
+                }
+                void api.shortcuts.create(game.id).then((result) => {
+                  setMessage(result.ok ? t('shortcuts.created') : t('shortcuts.unsupported'));
+                });
+              }}
+            >
+              {t('shortcuts.create')}
+            </Button>
+            <Button
               variant="danger"
               onClick={() => {
                 void library.remove(game.id).then(onBack);
@@ -112,6 +126,8 @@ export function GameDetailPage({
               {t('details.remove')}
             </Button>
           </div>
+
+          <CollectionsBar gameKey={game.externalKey} onMessage={setMessage} />
 
           {message === null ? null : <p className="nx-banner"><span>{message}</span></p>}
           {library.error === null ? null : <ErrorNote message={library.error} retry={library.reload} />}
@@ -226,5 +242,84 @@ function SavesCard({
         <p className="nx-subtitle">{t('planned.cloudSync')}</p>
       </div>
     </Card>
+  );
+}
+/**
+ * Colecções do jogo — criar e adicionar.
+ *
+ * A colecção é local (base do launcher): sincronizar colecções com a conta é
+ * fase futura, e a interface diz-o.
+ */
+function CollectionsBar({
+  gameKey,
+  onMessage,
+}: {
+  readonly gameKey: string;
+  readonly onMessage: (message: string) => void;
+}): ReactNode {
+  const { t } = useInterface();
+  const [collections, setCollections] = useState<readonly CollectionView[] | null>(null);
+  const [name, setName] = useState('');
+
+  const reload = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    setCollections(await api.collections.list());
+  }, []);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const onCreate = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined || name.trim() === '') {
+      return;
+    }
+    await api.collections.create(name.trim());
+    setName('');
+    await reload();
+  }, [name, reload]);
+
+  return (
+    <div className="nx-stack">
+      <strong>{t('collections.title')}</strong>
+      <div className="hub-row">
+        <input
+          className="nx-input"
+          value={name}
+          placeholder={t('collections.newName')}
+          aria-label={t('collections.newName')}
+          onChange={(event) => {
+            setName(event.target.value);
+          }}
+        />
+        <Button onClick={() => void onCreate()}>{t('collections.create')}</Button>
+      </div>
+      {collections === null || collections.length === 0 ? (
+        <span className="nx-subtitle">{t('collections.empty')}</span>
+      ) : (
+        <div className="hub-row">
+          {collections.map((collection) => (
+            <Button
+              key={collection.id}
+              onClick={() => {
+                const api = globalThis.window?.nexora;
+                if (api === undefined) {
+                  return;
+                }
+                void api.collections.add(collection.id, gameKey).then((ok) => {
+                  onMessage(ok ? t('collections.added') : t('error.generic'));
+                });
+              }}
+            >
+              + {collection.name} ({collection.count})
+            </Button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

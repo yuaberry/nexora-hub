@@ -1,6 +1,9 @@
 import type {
   AppInfoView,
+  CollectionView,
   DesktopApi,
+  ScanResultView,
+  ShortcutResultView,
   DesktopGameView,
   DetectedFolders,
   DiskUsageView,
@@ -53,6 +56,20 @@ const api: DesktopApi = {
     list: () => ipcRenderer.invoke('sources:list') as Promise<readonly SourceView[]>,
     search: (query, limit) => ipcRenderer.invoke('sources:search', query, limit) as Promise<readonly SourceSearchHit[]>,
     remove: (sourceId) => ipcRenderer.invoke('sources:remove', sourceId) as Promise<boolean>,
+  },
+  collections: {
+    create: (name) => ipcRenderer.invoke('collections:create', name) as Promise<CollectionView | null>,
+    list: () => ipcRenderer.invoke('collections:list') as Promise<readonly CollectionView[]>,
+    add: (collectionId, gameKey) => ipcRenderer.invoke('collections:add', collectionId, gameKey) as Promise<boolean>,
+    remove: (collectionId, gameKey) => ipcRenderer.invoke('collections:remove', collectionId, gameKey) as Promise<boolean>,
+    delete: (collectionId) => ipcRenderer.invoke('collections:delete', collectionId) as Promise<boolean>,
+    games: (collectionId) => ipcRenderer.invoke('collections:games', collectionId) as Promise<readonly string[]>,
+  },
+  shortcuts: {
+    create: (gameId) => ipcRenderer.invoke('shortcuts:create', gameId) as Promise<ShortcutResultView>,
+  },
+  scan: {
+    disks: () => ipcRenderer.invoke('library:scan') as Promise<ScanResultView>,
   },
   saves: {
     create: (gameKey, savePath, label) => ipcRenderer.invoke('saves:create', gameKey, savePath, label) as Promise<SourceOperationResult>,

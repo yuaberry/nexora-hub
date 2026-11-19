@@ -31,8 +31,8 @@ export const errors = {
     new AppError(400, 'invalid_request', message, details),
   unauthenticated: (message = 'Token ausente, expirado ou inválido.') =>
     new AppError(401, 'unauthenticated', message),
-  forbidden: (message = 'Permissão insuficiente para esta operação.') =>
-    new AppError(403, 'forbidden', message),
+  forbidden: (message = 'Permissão insuficiente para esta operação.', details?: unknown) =>
+    new AppError(403, 'forbidden', message, details),
   notFound: (message = 'Recurso não encontrado.') => new AppError(404, 'not_found', message),
   conflict: (message: string, details?: unknown) => new AppError(409, 'conflict', message, details),
   rateLimited: (message = 'Limite de requisições excedido.') =>

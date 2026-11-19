@@ -6,6 +6,7 @@ import { downloads } from './downloads.js';
 import { saves } from './saves.js';
 import { community } from './community.js';
 import { shell } from './shell.js';
+import { libraryExtra } from './library-extra.js';
 import { pages } from './pages.js';
 
 /**
@@ -25,5 +26,6 @@ export const ptBR = {
   ...saves,
   ...community,
   ...shell,
+  ...libraryExtra,
   ...pages,
 } as const;

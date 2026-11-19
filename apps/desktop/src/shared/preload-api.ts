@@ -152,10 +152,42 @@ export interface SaveSnapshotView {
   readonly checksum: string;
 }
 
+/** Uma colecção de jogos (vista do renderer). */
+export interface CollectionView {
+  readonly id: number;
+  readonly name: string;
+  readonly count: number;
+}
+
+/** Resultado da criação de um atalho de desktop. */
+export type ShortcutResultView =
+  | { readonly ok: true; readonly path: string }
+  | { readonly ok: false; readonly reasonKey: string };
+
+/** Resultado do scan de disco. */
+export interface ScanResultView {
+  readonly imported: readonly string[];
+  readonly scanned: number;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
   readonly app: () => Promise<AppInfoView>;
+  readonly collections: {
+    readonly create: (name: string) => Promise<CollectionView | null>;
+    readonly list: () => Promise<readonly CollectionView[]>;
+    readonly add: (collectionId: number, gameKey: string) => Promise<boolean>;
+    readonly remove: (collectionId: number, gameKey: string) => Promise<boolean>;
+    readonly delete: (collectionId: number) => Promise<boolean>;
+    readonly games: (collectionId: number) => Promise<readonly string[]>;
+  };
+  readonly shortcuts: {
+    readonly create: (gameId: string) => Promise<ShortcutResultView>;
+  };
+  readonly scan: {
+    readonly disks: () => Promise<ScanResultView>;
+  };
   readonly library: {
     readonly list: () => Promise<readonly DesktopGameView[]>;
     readonly importFolder: () => Promise<ImportResultView>;

@@ -14,6 +14,29 @@ import { registerUser } from './fixtures.js';
  * - nota fora de 1–10 é `400`, não `500`.
  */
 
+
+/**
+ * Dá tempo de jogo medido a um utilizador, pelo repositório.
+ *
+ * A rota de fim de sessão usa o relógio do servidor; para testar a regra dos
+ * 10 minutos com datas controladas, o teste semea directamente o repositório
+ * — é a forma honesta de dizer "esta pessoa jogou X minutos".
+ */
+async function playFor(
+  repositories: Awaited<ReturnType<typeof buildTestApp>>['repositories'],
+  userId: string,
+  gameId: string,
+  seconds: number,
+): Promise<void> {
+  // A data de início é a que o repositório registou — não uma fixa: a
+  // duração é calculada a partir dela.
+  const session = await repositories.sessions.start(userId, gameId);
+  await repositories.sessions.end(userId, session.id, {
+    endedAt: new Date(session.startedAt.getTime() + seconds * 1000),
+    exitCode: 0,
+  });
+}
+
 describe('comentários', () => {
   it('exige sessão para comentar', async () => {
     const built = await buildTestApp();
@@ -90,6 +113,7 @@ describe('reviews', () => {
   it('uma review por utilizador e jogo: o PUT substitui', async () => {
     const built = await buildTestApp();
     const user = await registerUser(built.app, 'rev1@nexora.local');
+    await playFor(built.repositories, user.userId, 'league-of-legends', 900);
 
     const first = await built.app.inject({
       method: 'PUT',
@@ -118,6 +142,8 @@ describe('reviews', () => {
     const built = await buildTestApp();
     const first = await registerUser(built.app, 'rev2@nexora.local');
     const second = await registerUser(built.app, 'rev3@nexora.local');
+    await playFor(built.repositories, first.userId, 'terraria', 900);
+    await playFor(built.repositories, second.userId, 'terraria', 900);
 
     await built.app.inject({
       method: 'PUT',
@@ -174,5 +200,51 @@ describe('reviews', () => {
       headers: authHeader(stranger.accessToken),
     });
     expect(attempt.statusCode).toBe(404);
+  });
+});
+describe('regra: reviewar depois de jogar', () => {
+  it('recusa a review de quem não jogou (com o mínimo dito)', async () => {
+    const built = await buildTestApp();
+    const user = await registerUser(built.app, 'sem-jogo@nexora.local');
+
+    const response = await built.app.inject({
+      method: 'PUT',
+      url: '/api/v1/games/league-of-legends/reviews/me',
+      headers: authHeader(user.accessToken),
+      payload: { rating: 9 },
+    });
+    expect(response.statusCode).toBe(403);
+    const body = response.json() as { error: { details: { requiredSeconds: number; playedSeconds: number } } };
+    expect(body.error.details.requiredSeconds).toBe(600);
+    expect(body.error.details.playedSeconds).toBe(0);
+  });
+
+  it('recusa uma sessão curta (abaixo do mínimo)', async () => {
+    const built = await buildTestApp();
+    const user = await registerUser(built.app, 'sessao-curta@nexora.local');
+    await playFor(built.repositories, user.userId, 'league-of-legends', 300);
+
+    const response = await built.app.inject({
+      method: 'PUT',
+      url: '/api/v1/games/league-of-legends/reviews/me',
+      headers: authHeader(user.accessToken),
+      payload: { rating: 8 },
+    });
+    expect(response.statusCode).toBe(403);
+  });
+
+  it('aceita a review de quem jogou o mínimo', async () => {
+    const built = await buildTestApp();
+    const user = await registerUser(built.app, 'com-jogo@nexora.local');
+    await playFor(built.repositories, user.userId, 'league-of-legends', 900);
+
+    const response = await built.app.inject({
+      method: 'PUT',
+      url: '/api/v1/games/league-of-legends/reviews/me',
+      headers: authHeader(user.accessToken),
+      payload: { rating: 9, story: 10 },
+    });
+    expect(response.statusCode).toBe(200);
+    expect((response.json() as { rating: number }).rating).toBe(9);
   });
 });

@@ -15,7 +15,7 @@
 | 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ⏳ Planejada | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
-| 6 | **Biblioteca++** (da análise do Hydra): atalhos de desktop/Steam, scan de discos, colecções, "reviewar depois de jogar", rating ProtonDB, extracção automática | ⏳ Planejada | atalho criado e abre o jogo; scan encontra jogos instalados; review sem tempo de jogo é recusada (400) |
+| 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
 | 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | ⏳ Planejada | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
 | 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | ⏳ Planejada | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
 | 9 | **Futuro**: Remote Play (Sunshine/Moonlight + sessões Nexora Cloud), Big Picture, widgets VTuber | ⏳ Planejada | latência medida com percentis; botão de streaming desligado enquanto não houver medição |
@@ -259,6 +259,47 @@ oficial de bibliotecas — fases próprias.
 - **Sem medição semanal, sem separador semanal**: «Top da semana» não existe
   sem dados semanais — o separador honesto é «Quentes» (mais jogados).
 - typecheck limpo; **269 testes verdes**.
+
+
+## Fase 6 — Biblioteca++ (concluída em 2026-11-19)
+
+Inspirada na análise do Hydra Launcher (docs/HYDRA-RESEARCH.md), com
+implementação própria.
+
+### Entregue
+
+- [x] **Atalhos de desktop** (`main/shortcuts.ts`) — ficheiro `.desktop` com
+      `Exec` a apontar para o executável do utilizador; só Linux, e noutros
+      sistemas a criação é recusada com motivo. Provado: o atalho aparece em
+      `~/.local/share/applications`.
+- [x] **Colecções** (base local) — criar, listar com contagem, adicionar
+      (só jogos que existem), remover, apagar e listar os jogos de uma
+      colecção; filtro na Biblioteca.
+- [x] **Scan de disco** — percorre as pastas comuns e importa os **filhos**
+      (cada pasta de jogo), excluindo as ferramentas que o Steam guarda em
+      `steamapps/common` (Proton, runtimes, redistributáveis — lista
+      declarada em `scan-filter.ts`, com teste que fixa a lista e o teste de
+      que um jogo normal nunca é excluído).
+- [x] **Regra "reviewar depois de jogar"** (API) — a review exige 10 minutos
+      medidos no jogo; a recusa (403) traz o mínimo e o tempo feito. A rota
+      de fim de sessão usa o relógio do servidor, e os testes semeiam o
+      repositório para controlar as datas.
+
+### Prova de execução real (2026-11-19)
+
+- Atalho: `shortcuts.create` escreveu
+  `~/.local/share/applications/nexora-hub-league-of-legends.desktop` com
+  `Name=League Of Legends` e `Exec=.../game.sh %F`.
+- Colecções: criada "Favoritos do mês", jogo adicionado (contagem 1),
+  listada e os jogos devolvidos.
+- Scan: 3 pastas verificadas, importados **só jogos** (Epic Games Store, Hollow
+  Knight, REPO, League Of Legends) — depois do filtro, sem Proton nem runtimes.
+- `pnpm typecheck` limpo; **285 testes verdes** (49 no desktop, 76 na API).
+
+### Fica para o próximo lote (declarado, não fingido)
+
+Rating ProtonDB antes de instalar (dado externo, com data), extracção
+automática depois do checksum, cliente de torrent.
 
 ## Fase 5 — Comunidade (iniciada em 2026-11-18)
 

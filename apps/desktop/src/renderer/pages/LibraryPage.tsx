@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Badge, Button, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, ErrorNote } from '../state/desktop.js';
 import { searchLocalLibrary } from '../lib/catalog.js';
 import { formatPlayTime } from '../lib/format.js';
 import { GameTile } from '../components/GameTile.js';
 import type { LibraryGame } from '@nexora/protocol';
-import type { DesktopGameView } from '../../shared/preload-api.js';
+import type { CollectionView, DesktopGameView } from '../../shared/preload-api.js';
 
 /**
  * Biblioteca — todos os jogos, com a pesquisa do cabeçalho.
@@ -28,17 +28,56 @@ export function LibraryPage({
   const { t, locale } = useInterface();
   const library = useLibrary();
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const [collections, setCollections] = useState<readonly CollectionView[] | null>(null);
+  const [activeCollection, setActiveCollection] = useState<number | null>(null);
+  const [collectionGames, setCollectionGames] = useState<readonly string[] | null>(null);
 
   const games = library.value ?? [];
 
-  const hits = useMemo(() => {
-    if (search.trim() === '') {
-      return games;
+  // Colecções: locais, com o filtro a mostrar só os jogos da colecção.
+  const loadCollections = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
     }
-    const found = searchLocalLibrary(search, games, 8);
+    const list = await api.collections.list();
+    setCollections(list);
+    if (activeCollection !== null) {
+      setCollectionGames(await api.collections.games(activeCollection));
+    }
+  }, [activeCollection]);
+
+  useEffect(() => {
+    void loadCollections();
+  }, [loadCollections]);
+
+  const onScan = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    const result = await api.scan.disks();
+    setImportMessage(
+      result.imported.length === 0
+        ? t('scan.scanned', { count: result.scanned })
+        : t('scan.done', { count: result.imported.length }),
+    );
+    library.reload();
+  }, [library, t]);
+
+  const hits = useMemo(() => {
+    const inCollection =
+      activeCollection === null || collectionGames === null
+        ? games
+        : games.filter((game) => collectionGames.includes(game.externalKey));
+
+    if (search.trim() === '') {
+      return inCollection;
+    }
+    const found = searchLocalLibrary(search, inCollection, 8);
     const byKey = new Map(found.map((hit) => [hit.game.id, hit]));
-    return games.filter((game) => byKey.has(game.externalKey));
-  }, [games, search]);
+    return inCollection.filter((game) => byKey.has(game.externalKey));
+  }, [games, search, activeCollection, collectionGames]);
 
   const onImport = useCallback(async () => {
     setImportMessage(null);
@@ -57,11 +96,44 @@ export function LibraryPage({
   return (
     <div className="nx-stack">
       <div className="hub-row hub-row--between">
-        <span className="nx-subtitle">{t('library.count', { count: games.length })}</span>
-        <Button variant="primary" onClick={() => void onImport()}>
-          {t('import.choose')}
-        </Button>
+        <span className="nx-subtitle">{t('library.count', { count: hits.length })}</span>
+        <div className="hub-row">
+          <Button onClick={() => void onScan()}>{t('scan.action')}</Button>
+          <Button variant="primary" onClick={() => void onImport()}>
+            {t('import.choose')}
+          </Button>
+        </div>
       </div>
+
+      {collections !== null && collections.length > 0 ? (
+        <div className="hub-row">
+          <Button
+            aria-pressed={activeCollection === null}
+            onClick={() => {
+              setActiveCollection(null);
+              setCollectionGames(null);
+            }}
+          >
+            {t('library.filters.all')}
+          </Button>
+          {collections.map((collection) => (
+            <Button
+              key={collection.id}
+              aria-pressed={activeCollection === collection.id}
+              onClick={() => {
+                const api = globalThis.window?.nexora;
+                if (api === undefined) {
+                  return;
+                }
+                setActiveCollection(collection.id);
+                void api.collections.games(collection.id).then(setCollectionGames);
+              }}
+            >
+              {collection.name} ({collection.count})
+            </Button>
+          ))}
+        </div>
+      ) : null}
       <p className="nx-subtitle">{t('import.hint')}</p>
 
       {importMessage === null ? null : <p className="nx-banner"><span>{importMessage}</span></p>}

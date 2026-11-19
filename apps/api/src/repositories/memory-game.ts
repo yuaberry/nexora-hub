@@ -208,4 +208,10 @@ export class MemoryPlaySessionRepository implements PlaySessionRepository {
     this.rows.set(id, updated);
     return updated;
   }
+
+  async totalPlayedSeconds(userId: string, gameId: string): Promise<number> {
+    return [...this.rows.values()]
+      .filter((row) => row.userId === userId && row.gameId === gameId && row.state === 'ended')
+      .reduce((total, row) => total + (row.durationSeconds ?? 0), 0);
+  }
 }

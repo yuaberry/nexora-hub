@@ -7,11 +7,12 @@
  * código de tradução, nunca um texto solto.
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, type Dirent } from 'node:fs';
 import { accessSync, constants } from 'node:fs';
 import { join } from 'node:path';
 import { app, ipcMain } from 'electron';
 import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
+import { installDesktopShortcut } from './shortcuts.js';
 import type {
   AppInfoView,
   DesktopGameView,
@@ -22,7 +23,8 @@ import type {
   SessionSummaryView,
 } from '../shared/preload-api.js';
 import { LocalLibrary } from './db.js';
-import { detectCommonFolders, pickAndImport } from './import-service.js';
+import { detectCommonFolders, importFolder, pickAndImport } from './import-service.js';
+import { isKnownToolFolder } from './scan-filter.js';
 import { directorySize, volumeSpace } from './storage.js';
 
 /** Limites de validação dos argumentos do renderer. */
@@ -105,6 +107,80 @@ export function registerIpc(dependencies: IpcDependencies): void {
     return library.remove(numericId);
   });
 
+
+  // ---- Colecções ------------------------------------------------------
+
+  ipcMain.handle('collections:create', (_event, name: unknown) => {
+    if (!isNonEmptyString(name, 64)) {
+      return null;
+    }
+    return library.createCollection(name);
+  });
+
+  ipcMain.handle('collections:list', () => library.listCollections());
+
+  ipcMain.handle('collections:add', (_event, collectionId: unknown, gameKey: unknown) => {
+    if (typeof collectionId !== 'number' || !Number.isInteger(collectionId) || !isNonEmptyString(gameKey)) {
+      return false;
+    }
+    return library.addToCollection(collectionId, gameKey);
+  });
+
+  ipcMain.handle('collections:remove', (_event, collectionId: unknown, gameKey: unknown) => {
+    if (typeof collectionId !== 'number' || !Number.isInteger(collectionId) || !isNonEmptyString(gameKey)) {
+      return false;
+    }
+    return library.removeFromCollection(collectionId, gameKey);
+  });
+
+  ipcMain.handle('collections:delete', (_event, collectionId: unknown) => {
+    if (typeof collectionId !== 'number' || !Number.isInteger(collectionId)) {
+      return false;
+    }
+    return library.deleteCollection(collectionId);
+  });
+
+  ipcMain.handle('collections:games', (_event, collectionId: unknown) => {
+    if (typeof collectionId !== 'number' || !Number.isInteger(collectionId)) {
+      return [];
+    }
+    return library.collectionGames(collectionId);
+  });
+
+  // ---- Scan de disco --------------------------------------------------
+
+  // Procura jogos nas pastas comuns e importa o que encontrar. A detecção é a
+  // mesma da importação manual — e uma pasta sem executável plausível é
+  // recusada com motivo, não adivinhada.
+  ipcMain.handle('library:scan', async (): Promise<{ readonly imported: readonly string[]; readonly scanned: number }> => {
+    const folders = detectCommonFolders();
+    const imported: string[] = [];
+    // As pastas comuns são **contentores**: o scan importa os filhos (cada
+    // pasta de jogo), não o contentor — senão aparecia "/Games" como um
+    // jogo. Uma pasta sem executável plausível é recusada com motivo.
+    for (const folder of folders) {
+      let entries: Dirent[];
+      try {
+        entries = readdirSync(folder.path, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const entry of entries) {
+        if (!entry.isDirectory()) {
+          continue;
+        }
+        // Ferramentas do sistema (Proton, runtimes) não entram: a lista é
+        // declarada em scan-filter.ts, com o motivo escrito.
+        if (isKnownToolFolder(entry.name)) {
+          continue;
+        }
+        const result = importFolder(library, join(folder.path, entry.name));
+        imported.push(...result.imported);
+      }
+    }
+    return { imported, scanned: folders.length };
+  });
+
   ipcMain.handle('storage:usage', (): DiskUsageView => {
     const games = library.list();
     const gamesBytes = games.reduce(
@@ -171,6 +247,29 @@ export function registerIpc(dependencies: IpcDependencies): void {
       gameId: outcome.session.gameId,
       startedAt: outcome.session.startedAt,
     };
+  });
+
+  // Atalho de desktop: só Linux (noutros sistemas, recusa com motivo).
+  ipcMain.handle('shortcuts:create', (_event, id: unknown) => {
+    if (!isNonEmptyString(id)) {
+      return { ok: false, reasonKey: 'not-found' };
+    }
+    const numericId = Number(id);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return { ok: false, reasonKey: 'not-found' };
+    }
+    const game = library.findById(numericId);
+    if (game === null) {
+      return { ok: false, reasonKey: 'not-found' };
+    }
+    if (process.platform !== 'linux') {
+      return { ok: false, reasonKey: 'unsupported-platform' };
+    }
+    const result = installDesktopShortcut(
+      { name: game.title, exec: game.executablePath, icon: game.cover ?? undefined },
+      join(app.getPath('home'), '.local', 'share', 'applications'),
+    );
+    return result.ok ? { ok: true, path: result.path } : { ok: false, reasonKey: 'write-failed' };
   });
 
   ipcMain.handle('runner:running', (): readonly SessionSummaryView[] =>

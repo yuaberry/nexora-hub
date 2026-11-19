@@ -65,6 +65,18 @@ export class LocalLibrary {
         updated_at text not null
       );
 
+      create table if not exists collections (
+        id integer primary key autoincrement,
+        name text not null unique,
+        created_at text not null
+      );
+
+      create table if not exists collection_games (
+        collection_id integer not null,
+        game_key text not null,
+        primary key (collection_id, game_key)
+      );
+
       create table if not exists save_snapshots (
         id text primary key,
         game_key text not null,
@@ -159,6 +171,76 @@ export class LocalLibrary {
 
   close(): void {
     this.db.close();
+  }
+
+
+  // ---- Colecções ------------------------------------------------------
+
+  /** Cria uma colecção (o nome e unico). */
+  createCollection(name: string): { readonly id: number; readonly name: string; readonly count: number } {
+    const trimmed = name.trim();
+    this.db.prepare('insert into collections (name, created_at) values (?, ?)').run(trimmed, new Date().toISOString());
+    const row = this.db.prepare('select id, name from collections where name = ?').get(trimmed) as Record<string, unknown>;
+    return { id: Number(row['id']), name: String(row['name']), count: 0 };
+  }
+
+  /** Lista as colecções com a contagem de jogos. */
+  listCollections(): readonly { readonly id: number; readonly name: string; readonly count: number }[] {
+    return (
+      this.db
+        .prepare(
+          `select c.id, c.name, count(cg.game_key) as count
+           from collections c
+           left join collection_games cg on cg.collection_id = c.id
+           group by c.id
+           order by c.name collate nocase`,
+        )
+        .all() as Record<string, unknown>[]
+    ).map((row) => ({ id: Number(row['id']), name: String(row['name']), count: Number(row['count']) }));
+  }
+
+  /** Junta um jogo a uma colecção (idempotente). */
+  addToCollection(collectionId: number, gameKey: string): boolean {
+    // So jogos que existem na biblioteca entram numa colecção.
+    if (this.byGameKey(gameKey) === null) {
+      return false;
+    }
+    this.db
+      .prepare('insert or ignore into collection_games (collection_id, game_key) values (?, ?)')
+      .run(collectionId, gameKey);
+    return true;
+  }
+
+  /** Remove um jogo de uma colecção. */
+  removeFromCollection(collectionId: number, gameKey: string): boolean {
+    return (
+      Number(
+        this.db
+          .prepare('delete from collection_games where collection_id = ? and game_key = ?')
+          .run(collectionId, gameKey).changes,
+      ) > 0
+    );
+  }
+
+  /** Apaga uma colecção e as suas associacoes. */
+  deleteCollection(collectionId: number): boolean {
+    this.db.prepare('delete from collection_games where collection_id = ?').run(collectionId);
+    return Number(this.db.prepare('delete from collections where id = ?').run(collectionId).changes) > 0;
+  }
+
+  /** Chaves dos jogos de uma colecção. */
+  collectionGames(collectionId: number): readonly string[] {
+    return (
+      this.db
+        .prepare('select game_key from collection_games where collection_id = ? order by game_key')
+        .all(collectionId) as Record<string, unknown>[]
+    ).map((row) => String(row['game_key']));
+  }
+
+  /** Registo de um jogo pela chave externa. */
+  byGameKey(gameKey: string): LocalGameRecord | null {
+    const row = this.db.prepare('select * from games where lower(external_key) = lower(?)').get(gameKey);
+    return row === undefined ? null : toRecord(row as Record<string, unknown>);
   }
 
   // ---- Snapshots de saves ---------------------------------------------

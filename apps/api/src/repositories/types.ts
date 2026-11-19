@@ -186,6 +186,14 @@ export interface PlaySessionRecord {
 
 export interface PlaySessionRepository {
   start: (userId: string, gameId: string) => Promise<PlaySessionRecord>;
+  /**
+   * Segundos jogados num jogo (sessões terminadas).
+   *
+   * É o que a regra "reviewar depois de jogar" consulta: ninguém reviewia
+   * um jogo que não experimentou — e a sessão em curso não conta (o tempo só
+   * é real quando a sessão termina).
+   */
+  totalPlayedSeconds: (userId: string, gameId: string) => Promise<number>;
   findById: (userId: string, id: string) => Promise<PlaySessionRecord | null>;
   list: (
     userId: string,

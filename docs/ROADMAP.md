@@ -331,6 +331,36 @@ automática depois do checksum, cliente de torrent.
   pasta do jogo só com `jogo.sh` executável → jogo entrou na biblioteca;
 - `pnpm typecheck` limpo; **302 testes verdes**.
 
+
+## Fase 7 — Conta no launcher (concluída em 2026-11-20)
+
+### Entregue
+
+- [x] **Cliente HTTP do renderer** (`renderer/lib/api.ts`) — envelope de erro do
+      contrato, token no `sessionStorage` (nunca `localStorage`), renovação
+      *single-flight* (dois `401` em paralelo dão um pedido — a repetição
+      mataria a família do token de renovação).
+- [x] **Contexto de auth** (`renderer/state/auth.tsx`) — login, registo, MFA,
+      logout e **troca de conta** (limpa a sessão sem fechar o launcher: a
+      biblioteca local é do computador, não da conta).
+- [x] **Ecrã de entrada** (`renderer/pages/LoginPage.tsx`) — login/registo/MFA,
+      com "continuar sem conta" (a conta é opcional para jogar).
+- [x] **Comunidade nos detalhes** (`renderer/components/CommunitySection.tsx`) —
+      comentários e reviews (PUT uma por utilizador/jogo), agregado honesto
+      (`—` para categoria sem votos) e aviso quando não há sessão.
+- [x] **Menu de conta na barra lateral** — entrada leva ao login; com sessão,
+      mostra quem está e oferece trocar.
+
+### Prova de execução real (2026-11-20)
+
+- App abre com a biblioteca local (9 jogos) e navegação com "Entrar" — a conta
+  é opcional para jogar;
+- login pela API devolve 200 "Conta Launcher"; a barra lateral passa a mostrar
+  "Conta" e "Trocar de conta";
+- comunidade abre nos detalhes com formulário de review e comentário;
+- **comentário publicado pelo launcher: 201** (o mesmo caminho do browser).
+- `pnpm typecheck` limpo; **302 testes verdes**.
+
 ## Fase 5 — Comunidade (iniciada em 2026-11-18)
 
 ### Entregue

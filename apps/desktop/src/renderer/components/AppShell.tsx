@@ -31,14 +31,17 @@ export function AppShell({
   readonly search: string;
   readonly onSearch: (value: string) => void;
   readonly onBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'account') => void;
   readonly onSelectGame: (gameId: string) => void;
   readonly children: ReactNode;
 }): ReactNode {
   const { t, appliedTheme, toggleTheme } = useInterface();
 
   const activeGameId = route.name === 'details' ? route.gameId : null;
-  const shellRoute = route.name === 'details' ? 'library' : route.name;
+  // A rota da barra lateral: 'details' ilumina a Biblioteca, e 'planned' não
+  // tem entrada própria (os módulos planeados vivem dentro das páginas).
+  const shellRoute: 'home' | 'library' | 'downloads' | 'settings' | 'account' =
+    route.name === 'details' ? 'library' : route.name === 'planned' ? 'home' : route.name;
 
   return (
     <div className="hub-shell">

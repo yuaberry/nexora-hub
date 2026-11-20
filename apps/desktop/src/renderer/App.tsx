@@ -7,6 +7,8 @@ import { GameDetailPage } from './pages/GameDetailPage.js';
 import { DownloadsPage } from './pages/DownloadsPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
 import { PlannedPage } from './pages/PlannedPage.js';
+import { LoginPage } from './pages/LoginPage.js';
+import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
 import type { DesktopGameView } from '../shared/preload-api.js';
 
@@ -29,6 +31,7 @@ export type Route =
   | { readonly name: 'details'; readonly gameId: string }
   | { readonly name: 'downloads' }
   | { readonly name: 'settings' }
+  | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
 export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en' } = {}): ReactNode {
@@ -58,7 +61,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'account') => {
       navigate({ name: target });
     },
     [navigate],
@@ -67,7 +70,9 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   return (
     <InterfaceProvider initialLocale={initialLocale}>
       <Preferences />
-      <Shell route={route} history={history} search={search} setSearch={setSearch} navigate={navigate} goBack={goBack} onNavigate={onNavigate} />
+      <AuthProvider>
+        <Shell route={route} history={history} search={search} setSearch={setSearch} navigate={navigate} goBack={goBack} onNavigate={onNavigate} />
+      </AuthProvider>
     </InterfaceProvider>
   );
 }
@@ -94,7 +99,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'account') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -144,6 +149,15 @@ function Shell({
       {route.name === 'details' ? <GameDetailPage gameId={route.gameId} onBack={goBack} /> : null}
       {route.name === 'downloads' ? <DownloadsPage /> : null}
       {route.name === 'settings' ? <SettingsPage /> : null}
+      {route.name === 'account' ? (
+          <LoginPage
+            onSkip={() => {
+              // Sem session e sem histórico: continuar sem conta leva à
+              // Biblioteca — a rota onde a biblioteca local vive.
+              navigate({ name: 'library' });
+            }}
+          />
+        ) : null}
       {route.name === 'planned' ? <PlannedPage module={route.module} /> : null}
     </AppShell>
   );
@@ -162,6 +176,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.downloads');
     case 'settings':
       return t('nav.settings');
+    case 'account':
+      return t('auth.title');
     default:
       return t('planned.title');
   }

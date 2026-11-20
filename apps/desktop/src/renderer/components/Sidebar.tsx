@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useInterface } from '@nexora/ui';
 import { useLibrary } from '../state/desktop.js';
+import { useAuth } from '../state/auth.js';
 import { initials } from './GameTile.js';
 import type { DownloadTaskView } from '../../shared/preload-api.js';
 
@@ -10,6 +11,9 @@ import type { DownloadTaskView } from '../../shared/preload-api.js';
  * A biblioteca fica **ao alcance de um clique**: a lista filtra enquanto se
  * escreve e abre os detalhes do jogo. O rodapé diz o que a fila de downloads
  * está a fazer — com o número real de tarefas activas, nunca um texto fixo.
+ *
+ * A conta é opcional: sem sessão, a entrada leva ao ecrã de login; com
+ * sessão, mostra quem está e oferece trocar de conta.
  */
 export function Sidebar({
   route,
@@ -17,14 +21,15 @@ export function Sidebar({
   onNavigate,
   onSelectGame,
 }: {
-  readonly route: string;
+  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'account';
   /** Jogo em detalhe (para marcar na lista), ou `null`. */
   readonly activeGameId: string | null;
-  readonly onNavigate: (route: 'home' | 'library' | 'downloads' | 'settings') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'account') => void;
   readonly onSelectGame: (gameId: string) => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibrary();
+  const { user, switchAccount } = useAuth();
   const [filter, setFilter] = useState('');
   const [active, setActive] = useState<readonly DownloadTaskView[]>([]);
 
@@ -58,11 +63,12 @@ export function Sidebar({
     return games.filter((game) => game.title.toLowerCase().includes(needle));
   }, [games, filter]);
 
-  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings'; readonly label: string }[] = [
+  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'account'; readonly label: string }[] = [
     { id: 'home', label: t('nav.home') },
     { id: 'library', label: t('nav.library') },
     { id: 'downloads', label: t('nav.downloads') },
     { id: 'settings', label: t('nav.settings') },
+    { id: 'account', label: user === null ? t('auth.login') : t('auth.account') },
   ];
 
   return (
@@ -128,6 +134,14 @@ export function Sidebar({
 
       <div className="hub-sidebar__footer">
         {active.length === 0 ? t('sidebar.noDownloads') : t('sidebar.downloadsActive', { count: active.length })}
+        {user === null ? null : (
+          <div className="nx-stack" style={{ marginTop: '0.5rem' }}>
+            <span className="hub-break">{t('auth.signedInAs', { name: user.displayName })}</span>
+            <button type="button" className="hub-sidebar__item" onClick={switchAccount}>
+              {t('auth.switch')}
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

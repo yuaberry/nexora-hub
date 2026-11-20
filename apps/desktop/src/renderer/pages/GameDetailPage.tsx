@@ -3,6 +3,7 @@ import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@ne
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
+import { CommunitySection } from '../components/CommunitySection.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
 /**
@@ -136,13 +137,7 @@ export function GameDetailPage({
 
       <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
 
-      <Card>
-        <div className="nx-stack">
-          <strong>{t('community.title')}</strong>
-          <span className="nx-subtitle">{t('community.planned')}</span>
-          <Badge tone="planned">{t('planned.badge')}</Badge>
-        </div>
-      </Card>
+      <CommunitySection gameId={game.externalKey} />
     </div>
   );
 }

@@ -31,10 +31,25 @@ const SCORES = {
   appImage: 4,
   nonGame: -100,
   commonGameName: 3,
+  /** Bónus do candidato que combina com o nome da pasta. */
+  folderMatch: 25,
 } as const;
 
-/** Pontua um candidato (a profundidade do caminho não entra: é ruído). */
-export function scoreExecutable(candidate: ExecutableCandidate, minNameLength = 0): number {
+/**
+ * Pontua um candidato.
+ *
+ * O contexto que faltava à heurística: o **nome da pasta**. Um jogo chama-se
+ * como a pasta que o contém — `Hollow Knight/hollow_knight.exe` é o jogo;
+ * `.../discord/bridge.exe` é ferramenta de terceiro que veio no pacote. Sem
+ * olhar para a pasta, a detecção escolhia o `bridge.exe` do Discord dentro de
+ * `league-of-legends` — e o utilizador ficava com um atalho que abre o
+ * Discord.
+ */
+export function scoreExecutable(
+  candidate: ExecutableCandidate,
+  minNameLength = 0,
+  folderName?: string,
+): number {
   const { name } = candidate;
   let score = 0;
 
@@ -59,7 +74,36 @@ export function scoreExecutable(candidate: ExecutableCandidate, minNameLength = 
     score += SCORES.commonGameName;
   }
 
+  // O candidato que "combina" com a pasta ganha um bónus declarado: é o sinal
+  // mais forte de que é o executável do jogo.
+  if (folderName !== undefined && nameMatchesFolder(name, folderName)) {
+    score += SCORES.folderMatch;
+  }
+
   return score;
+}
+
+/**
+ * `true` quando o nome do ficheiro "combina" com o da pasta.
+ *
+ * Comparação por esqueleto de consoantes (sem extensão): `hollow_knight` e
+ * `Hollow Knight` têm o mesmo esqueleto — e é essa comparação que não depende
+ * de underscore, espaço ou capitalização.
+ */
+export function nameMatchesFolder(fileName: string, folderName: string): boolean {
+  const skeletonOf = (value: string): string =>
+    value
+      .toLowerCase()
+      .replace(/\.[a-z0-9]+$/, '')
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/[aeiou]/g, '');
+
+  const fileSkeleton = skeletonOf(fileName);
+  const folderSkeleton = skeletonOf(folderName);
+  if (fileSkeleton === '' || folderSkeleton === '') {
+    return false;
+  }
+  return fileSkeleton === folderSkeleton || folderSkeleton.startsWith(fileSkeleton) || fileSkeleton.startsWith(folderSkeleton);
 }
 
 /**
@@ -70,12 +114,13 @@ export function scoreExecutable(candidate: ExecutableCandidate, minNameLength = 
  */
 export function rankExecutables(
   candidates: readonly ExecutableCandidate[],
+  folderName?: string,
 ): readonly RankedCandidate[] {
   const executableCandidates = candidates.filter((candidate) =>
     isExecutableName(candidate.name),
   );
   return executableCandidates
-    .map((candidate) => ({ candidate, score: scoreExecutable(candidate) }))
+    .map((candidate) => ({ candidate, score: scoreExecutable(candidate, 0, folderName) }))
     .sort((left, right) => right.score - left.score || left.candidate.name.localeCompare(right.candidate.name));
 }
 
@@ -87,8 +132,9 @@ export function rankExecutables(
  */
 export function detectExecutable(
   candidates: readonly ExecutableCandidate[],
+  folderName?: string,
 ): ExecutableCandidate | null {
-  const ranked = rankExecutables(candidates);
+  const ranked = rankExecutables(candidates, folderName);
   if (ranked.length === 0) {
     return null;
   }

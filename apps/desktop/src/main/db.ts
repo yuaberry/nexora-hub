@@ -95,6 +95,10 @@ export class LocalLibrary {
     const now = new Date().toISOString();
     this.db
       .prepare(
+        // No conflito, **tudo** se actualiza — inclusive o executável: um jogo
+        // re-detectado com um executável melhor (a heurística mudou) tem de
+        // actualizar a entrada, não ficar com a antiga para sempre. O que é do
+        // utilizador (favorito, tempo jogado) mantém-se.
         `insert into games (external_key, title, cover, install_path, executable_path, tags, adult, created_at, updated_at)
          values (?, ?, ?, ?, ?, ?, ?, ?, ?)
          on conflict(external_key) do update set
@@ -104,6 +108,9 @@ export class LocalLibrary {
            executable_path = excluded.executable_path,
            tags = excluded.tags,
            adult = excluded.adult,
+           favorite = favorite,
+           last_played_at = last_played_at,
+           total_seconds = total_seconds,
            updated_at = excluded.updated_at`,
       )
       .run(

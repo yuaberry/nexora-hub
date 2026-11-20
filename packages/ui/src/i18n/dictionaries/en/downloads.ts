@@ -25,4 +25,8 @@ export const downloads = {
   'downloads.verify': 'File verification',
   'downloads.verify.action': 'Verify',
   'downloads.verify.failed': 'Verification failed',
+  'downloads.proton.action': 'ProtonDB',
+  'downloads.proton.failed': 'ProtonDB unavailable',
+  'downloads.extract.failed': 'Extraction failed',
+  'downloads.extract.retry': 'Retry extraction',
 } as const;

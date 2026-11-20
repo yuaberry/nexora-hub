@@ -12,9 +12,11 @@ import {
   createDownloadState,
   installManifestFile,
   queueGame,
+  retryExtraction,
   verifyInstalledGame,
   type DownloadState,
 } from './download-state.js';
+import { fetchProtonRating } from './protondb.js';
 import type { LocalLibrary } from './db.js';
 
 /** Resultado de uma operação de fonte (contrato com o renderer). */
@@ -81,13 +83,18 @@ export function registerDownloadsIpc(library: LocalLibrary): DownloadState {
       return [];
     }
     const take = typeof limit === 'number' && limit > 0 ? Math.min(limit, 50) : 20;
-    return state.registry.search(query, take).map((hit) => ({
-      id: hit.game.id,
-      title: hit.game.title,
-      score: hit.score,
-      match: hit.match,
-      available: state.registry.game(hit.game.id)?.available ?? false,
-    }));
+    return state.registry.search(query, take).map((hit) => {
+      const game = state.registry.game(hit.game.id);
+      return {
+        id: hit.game.id,
+        title: hit.game.title,
+        score: hit.score,
+        match: hit.match,
+        available: game?.available ?? false,
+        launcherRequired: game?.launcherRequired ?? false,
+        steamAppId: game?.steamAppId ?? null,
+      };
+    });
   });
 
   ipcMain.handle('sources:remove', (_event, sourceId: unknown) => {
@@ -99,7 +106,12 @@ export function registerDownloadsIpc(library: LocalLibrary): DownloadState {
 
   // ---- Downloads ------------------------------------------------------
 
-  ipcMain.handle('downloads:list', () => state.queue.list());
+  // A lista inclui os erros de extracção por jogo: a interface mostra o
+  // motivo e oferece retentar — em vez de esconder um arquivo que ficou.
+  ipcMain.handle('downloads:list', () => ({
+    tasks: state.queue.list(),
+    extractionErrors: Object.fromEntries(state.extractionErrors),
+  }));
 
   // Verificação de integridade dos ficheiros no disco (qualquer fonte).
   ipcMain.handle(
@@ -134,6 +146,35 @@ export function registerDownloadsIpc(library: LocalLibrary): DownloadState {
       return { ok: false, code: result.code, message: result.message };
     }
     return { ok: true, taskIds: result.taskIds };
+  });
+
+  // Rating do ProtonDB: consulta externa, só quando o manifesto declara o app id.
+  ipcMain.handle('downloads:protonRating', async (_event, unifiedId: unknown) => {
+    if (typeof unifiedId !== 'string') {
+      return { ok: false, reasonKey: 'no-app-id', reason: 'Jogo em falta.' };
+    }
+    const game = state.registry.game(unifiedId);
+    if (game === null) {
+      return { ok: false, reasonKey: 'no-app-id', reason: 'Jogo não encontrado no catálogo unificado.' };
+    }
+    const result = await fetchProtonRating(game.steamAppId);
+    if (!result.ok) {
+      return { ok: false, reasonKey: result.reasonKey, reason: result.reason };
+    }
+    return {
+      ok: true,
+      reason: `${result.rating.tier} · ${result.rating.total} relatórios`,
+      rating: result.rating,
+    };
+  });
+
+  // Retentar a extracção (depois de instalar a ferramenta em falta).
+  ipcMain.handle('downloads:retryExtract', async (_event, unifiedId: unknown) => {
+    if (typeof unifiedId !== 'string') {
+      return { ok: false, message: 'Jogo em falta.' };
+    }
+    const result = await retryExtraction(state, unifiedId);
+    return { ok: result.ok, message: result.reason ?? 'Extracção concluída.' };
   });
 
   ipcMain.handle('downloads:pause', (_event, taskId: unknown) =>

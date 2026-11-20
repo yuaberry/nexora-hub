@@ -56,6 +56,25 @@ export const ManifestGameSchema = z.object({
   launcherRequired: z.boolean().default(false),
   /** Tamanho declarado em bytes (informativo; a verdade é medida no download). */
   sizeBytes: z.number().int().nonnegative().optional(),
+  /**
+   * App id da Steam, quando o manifesto o declara.
+   *
+   * É o que permite consultar o **ProtonDB** antes de instalar (dado
+   * externo, com data da consulta). Sem app id não há rating — e a interface
+   * não inventa um.
+   */
+  steamAppId: z.string().regex(/^\d{1,10}$/, 'steamAppId tem de ser numérico.').optional(),
+  /**
+   * Extracção automática: método e ficheiro a extrair **depois** da
+   * verificação por checksum. Nunca se extrai o que não foi verificado.
+   */
+  extract: z
+    .object({
+      method: z.enum(['zip', 'tar.gz']),
+      /** Caminho relativo (dentro da instalação) do arquivo a extrair. */
+      filePath: z.string().min(1).max(512),
+    })
+    .optional(),
 });
 
 /** Declaração de base legal — obrigatória, sem ela o manifesto é recusado. */

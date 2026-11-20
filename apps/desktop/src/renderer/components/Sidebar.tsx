@@ -35,7 +35,8 @@ export function Sidebar({
     if (api === undefined) {
       return;
     }
-    const tasks = await api.downloads.list();
+    const list = await api.downloads.list();
+    const tasks = list.tasks;
     setActive(tasks.filter((task) => task.state === 'downloading' || task.state === 'queued' || task.state === 'paused'));
   }, []);
 

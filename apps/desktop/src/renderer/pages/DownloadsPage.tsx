@@ -19,6 +19,8 @@ export function DownloadsPage(): ReactNode {
   const isDesktop = useIsDesktop();
   const [sources, setSources] = useState<readonly SourceView[] | null>(null);
   const [tasks, setTasks] = useState<readonly DownloadTaskView[] | null>(null);
+  const [extractionErrors, setExtractionErrors] = useState<Readonly<Record<string, string>>>({});
+  const [proton, setProton] = useState<Readonly<Record<string, string>>>({});
   const [query, setQuery] = useState('');
   const [hits, setHits] = useState<readonly SourceSearchHit[]>([]);
   const [destination, setDestination] = useState('');
@@ -32,9 +34,10 @@ export function DownloadsPage(): ReactNode {
       return;
     }
     try {
-      const [sourceList, taskList] = await Promise.all([api.sources.list(), api.downloads.list()]);
+      const [sourceList, downloadList] = await Promise.all([api.sources.list(), api.downloads.list()]);
       setSources(sourceList);
-      setTasks(taskList);
+      setTasks(downloadList.tasks);
+      setExtractionErrors(downloadList.extractionErrors);
       setError(null);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t('error.generic'));
@@ -52,7 +55,10 @@ export function DownloadsPage(): ReactNode {
       return;
     }
     const timer = setInterval(() => {
-      void api.downloads.list().then(setTasks);
+      void api.downloads.list().then((list) => {
+        setTasks(list.tasks);
+        setExtractionErrors(list.extractionErrors);
+      });
     }, 1000);
     return () => {
       clearInterval(timer);
@@ -227,6 +233,26 @@ export function DownloadsPage(): ReactNode {
                     >
                       {t('downloads.verify.action')}
                     </Button>
+                    {hit.steamAppId === null ? null : (
+                      <Button
+                        onClick={() => {
+                          if (api === undefined) {
+                            return;
+                          }
+                          // Rating **externo**: mostra valor, data e fonte —
+                          // e recusa com motivo quando a ProtonDB não responde.
+                          void api.downloads.protonRating(hit.id).then((result) => {
+                            const label = result.ok ? result.reason : `${t('downloads.proton.failed')}: ${result.reason}`;
+                            setProton((current) => ({ ...current, [hit.id]: label }));
+                          });
+                        }}
+                      >
+                        {t('downloads.proton.action')}
+                      </Button>
+                    )}
+                    {proton[hit.id] === undefined ? null : (
+                      <span className="nx-subtitle">{proton[hit.id]}</span>
+                    )}
                   </div>
                 </li>
               ))}
@@ -239,6 +265,24 @@ export function DownloadsPage(): ReactNode {
       <Card>
         <div className="nx-stack">
           <strong>{t('downloads.queue')}</strong>
+          {Object.entries(extractionErrors).map(([gameId, reason]) => (
+            <p key={gameId} className="nx-banner">
+              <span>
+                {t('downloads.extract.failed')}: {reason}
+              </span>
+              <Button
+                onClick={() => {
+                  if (api === undefined) {
+                    return;
+                  }
+                  void api.downloads.retryExtract(gameId).then(() => reload());
+                }}
+              >
+                {t('downloads.extract.retry')}
+              </Button>
+            </p>
+          ))}
+
           {tasks === null || tasks.length === 0 ? (
             <EmptyState title={t('downloads.queue.empty')} hint={t('downloads.queue.empty.hint')} />
           ) : (

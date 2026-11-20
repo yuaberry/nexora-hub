@@ -116,6 +116,10 @@ export interface SourceSearchHit {
     | 'fuzzy';
   /** `false` quando o jogo só existe por torrent (transporte planeado). */
   readonly available: boolean;
+  /** `true` quando o jogo precisa do launcher oficial (handoff). */
+  readonly launcherRequired: boolean;
+  /** App id da Steam declarado pelo manifesto (para ProtonDB), ou `null`. */
+  readonly steamAppId: string | null;
 }
 
 /** Uma tarefa de download (vista do renderer). */
@@ -170,6 +174,23 @@ export interface ScanResultView {
   readonly scanned: number;
 }
 
+/** Um rating do ProtonDB (dado externo, com data da consulta). */
+export interface ProtonRatingView {
+  readonly tier: string;
+  readonly confidence: string;
+  readonly score: number;
+  readonly total: number;
+  readonly fetchedAt: string;
+  readonly sourceUrl: string;
+}
+
+/** Estado da fila de downloads (tarefas + erros de extracção por jogo). */
+export interface DownloadsListView {
+  readonly tasks: readonly DownloadTaskView[];
+  /** Motivos de extracção falhada, por id unificado do jogo. */
+  readonly extractionErrors: Readonly<Record<string, string>>;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -220,10 +241,17 @@ export interface DesktopApi {
     readonly remove: (gameKey: string, snapshotId: string) => Promise<boolean>;
   };
   readonly downloads: {
-    readonly list: () => Promise<readonly DownloadTaskView[]>;
+    readonly list: () => Promise<DownloadsListView>;
     readonly add: (unifiedId: string, destinationRoot: string) => Promise<SourceOperationResult>;
     /** Verifica os ficheiros instalados contra o checksum do manifesto. */
     readonly verify: (unifiedId: string, destinationRoot: string) => Promise<SourceOperationResult>;
+    /** Rating do ProtonDB (só quando o manifesto declara o app id). */
+    readonly protonRating: (unifiedId: string) => Promise<
+      | { readonly ok: true; readonly rating: ProtonRatingView; readonly reason: string }
+      | { readonly ok: false; readonly reasonKey: string; readonly reason: string }
+    >;
+    /** Retenta a extracção automática de um jogo. */
+    readonly retryExtract: (unifiedId: string) => Promise<SourceOperationResult>;
     readonly pause: (taskId: string) => Promise<boolean>;
     readonly resume: (taskId: string) => Promise<boolean>;
     readonly cancel: (taskId: string) => Promise<boolean>;

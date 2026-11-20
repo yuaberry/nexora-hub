@@ -106,7 +106,9 @@ export function importFolder(library: LocalLibrary, installPath: string): Import
   }
 
   const candidates = scanForExecutables(installPath);
-  const executable = detectExecutable(candidates);
+  // O nome da pasta é o contexto da detecção: o executável do jogo costuma
+  // chamar-se como a pasta que o contém.
+  const executable = detectExecutable(candidates, basename(installPath));
   if (executable === null) {
     return { imported: [], skipped: [{ path: installPath, reasonKey: 'no-executable' }] };
   }

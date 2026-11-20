@@ -7,8 +7,10 @@ import type {
   DesktopGameView,
   DetectedFolders,
   DiskUsageView,
+  DownloadsListView,
   ImportResultView,
   LaunchResultView,
+  ProtonRatingView,
   LibraryGames,
   RunningSessions,
   SaveSnapshotView,
@@ -16,7 +18,6 @@ import type {
   SourceOperationResult,
   SourceSearchHit,
   SourceView,
-  DownloadTaskView,
 } from '../shared/preload-api.js';
 
 /**
@@ -78,9 +79,13 @@ const api: DesktopApi = {
     remove: (gameKey, snapshotId) => ipcRenderer.invoke('saves:remove', gameKey, snapshotId) as Promise<boolean>,
   },
   downloads: {
-    list: () => ipcRenderer.invoke('downloads:list') as Promise<readonly DownloadTaskView[]>,
+    list: () => ipcRenderer.invoke('downloads:list') as Promise<DownloadsListView>,
     add: (unifiedId, destinationRoot) => ipcRenderer.invoke('downloads:add', unifiedId, destinationRoot) as Promise<SourceOperationResult>,
     verify: (unifiedId, installFolder) => ipcRenderer.invoke('downloads:verify', unifiedId, installFolder) as Promise<SourceOperationResult>,
+    protonRating: (unifiedId) => ipcRenderer.invoke('downloads:protonRating', unifiedId) as Promise<
+      { readonly ok: true; readonly rating: ProtonRatingView; readonly reason: string } | { readonly ok: false; readonly reasonKey: string; readonly reason: string }
+    >,
+    retryExtract: (unifiedId) => ipcRenderer.invoke('downloads:retryExtract', unifiedId) as Promise<SourceOperationResult>,
     pause: (taskId) => ipcRenderer.invoke('downloads:pause', taskId) as Promise<boolean>,
     resume: (taskId) => ipcRenderer.invoke('downloads:resume', taskId) as Promise<boolean>,
     cancel: (taskId) => ipcRenderer.invoke('downloads:cancel', taskId) as Promise<boolean>,

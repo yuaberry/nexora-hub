@@ -11,11 +11,10 @@
  * adivinhado.
  */
 
-import { existsSync } from 'node:fs';
-import { chmodSync } from 'node:fs';
+import { existsSync, chmodSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { DownloadQueue, verifyInstall, type DownloadEvent } from '@nexora/download';
+import { DownloadQueue, extractArchive, verifyInstall, type DownloadEvent } from '@nexora/download';
 import { createSourceRegistry, type SourceRegistry, type UnifiedGame } from '@nexora/sources';
 import type { LocalLibrary } from './db.js';
 import { externalKeyFor } from './naming.js';
@@ -25,18 +24,20 @@ import { localCoverFile } from './import-service.js';
 export function createDownloadState(library: LocalLibrary): DownloadState {
   const registry = createSourceRegistry();
   const queue = new DownloadQueue();
+  const extractionErrors = new Map<string, string>();
 
-  // **Um** ouvinte para toda a fila: quando uma tarefa termina, o jogo
-  // entra na biblioteca local. Um ouvinte por download acumularia listeners
-  // a cada instalação — e a memória do launcher cresceria sem parar.
+  // **Um** ouvinte para toda a fila: quando uma tarefa termina, o jogo entra
+  // na biblioteca local — mas só **depois** da extracção, quando o manifesto
+  // a declara. Um ouvinte por download acumularia listeners a cada instalação
+  // — e a memória do launcher cresceria sem parar.
   queue.on((event: DownloadEvent) => {
     if (event.task.state !== 'completed') {
       return;
     }
-    registerCompletedTask(registry, library, event.task.gameId, event.task.destinationPath);
+    void handleCompletedTask({ registry, library, queue, extractionErrors }, event.task.gameId, event.task.destinationPath);
   });
 
-  return { registry, queue, library };
+  return { registry, queue, library, extractionErrors };
 }
 
 /** Estado partilhado do launcher. */
@@ -44,6 +45,8 @@ export interface DownloadState {
   readonly registry: SourceRegistry;
   readonly queue: DownloadQueue;
   readonly library: LocalLibrary;
+  /** Erros de extracção por jogo (a interface mostra e oferece retentar). */
+  readonly extractionErrors: Map<string, string>;
 }
 
 /** Erro de uma operação de fonte/download (chave de tradução + texto). */
@@ -141,6 +144,60 @@ export async function queueGame(
   }
 
   return { ok: true, taskIds, destinationPath };
+}
+
+/**
+ * Tarefa terminada: extrai (se o manifesto declarar) e regista o jogo.
+ *
+ * A ordem é a regra: **checksum primeiro** (a fila já verificou), extracção
+ * depois, e só então a biblioteca. Uma extracção que falha impede o registo —
+ * o jogo não entra sem executável — e o motivo fica em `extractionErrors`,
+ * onde a interface o mostra com um botão para retentar.
+ */
+async function handleCompletedTask(
+  state: DownloadState,
+  unifiedId: string,
+  destinationPath: string,
+): Promise<void> {
+  const game = state.registry.game(unifiedId);
+  if (game === null) {
+    return;
+  }
+  const gameFolder = join(destinationPath, '..');
+
+  if (game.extract !== null) {
+    const archivePath = join(gameFolder, game.extract.filePath);
+    const result = await extractArchive(archivePath, gameFolder, game.extract.method);
+    if (!result.ok) {
+      state.extractionErrors.set(unifiedId, result.reason);
+      return;
+    }
+    state.extractionErrors.delete(unifiedId);
+  }
+
+  registerCompletedTask(state.registry, state.library, unifiedId, destinationPath);
+}
+
+/** Retenta a extracção de um jogo (depois de instalar a ferramenta em falta). */
+export async function retryExtraction(state: DownloadState, unifiedId: string): Promise<{ readonly ok: boolean; readonly reason?: string }> {
+  const game = state.registry.game(unifiedId);
+  if (game === null || game.extract === null) {
+    return { ok: false, reason: 'Jogo sem extracção declarada.' };
+  }
+  // A pasta do jogo é derivada do destino da primeira tarefa do jogo.
+  const task = state.queue.list().find((entry) => entry.gameId === unifiedId);
+  if (task === undefined) {
+    return { ok: false, reason: 'Tarefa do jogo não encontrada na fila.' };
+  }
+  const gameFolder = join(task.destinationPath, '..');
+  const result = await extractArchive(join(gameFolder, game.extract.filePath), gameFolder, game.extract.method);
+  if (!result.ok) {
+    state.extractionErrors.set(unifiedId, result.reason);
+    return { ok: false, reason: result.reason };
+  }
+  state.extractionErrors.delete(unifiedId);
+  registerCompletedTask(state.registry, state.library, unifiedId, task.destinationPath);
+  return { ok: true };
 }
 
 /**

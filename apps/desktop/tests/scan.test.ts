@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectExecutable, rankExecutables, scoreExecutable } from '../src/main/scan.js';
+import { detectExecutable, nameMatchesFolder, rankExecutables, scoreExecutable } from '../src/main/scan.js';
 import {
   externalKeyFor,
   isExecutableName,
@@ -93,5 +93,25 @@ describe('naming', () => {
     expect(scoreExecutable({ path: 'C:/X/game.exe', name: 'game.exe' })).toBeGreaterThan(
       scoreExecutable({ path: 'C:/X/setup.exe', name: 'setup.exe' }),
     );
+  });
+});
+describe('nameMatchesFolder', () => {
+  it('reconhece o executável do jogo pelo nome da pasta', () => {
+    expect(nameMatchesFolder('hollow_knight.exe', 'Hollow Knight')).toBe(true);
+    expect(nameMatchesFolder('leagueoflegends.exe', 'league-of-legends')).toBe(true);
+    expect(nameMatchesFolder('REPO.exe', 'REPO')).toBe(true);
+  });
+
+  it('não confunde ferramentas de terceiros com o jogo', () => {
+    expect(nameMatchesFolder('bridge.exe', 'league-of-legends')).toBe(false);
+    expect(nameMatchesFolder('unins000.exe', 'qualquer jogo')).toBe(false);
+  });
+});
+
+describe('scoreExecutable com contexto de pasta', () => {
+  it('prefere o executável que combina com a pasta', () => {
+    const loL = scoreExecutable({ path: '/p/leagueoflegends.exe', name: 'leagueoflegends.exe' }, 0, 'league-of-legends');
+    const discord = scoreExecutable({ path: '/p/bridge.exe', name: 'bridge.exe' }, 0, 'league-of-legends');
+    expect(loL).toBeGreaterThan(discord);
   });
 });

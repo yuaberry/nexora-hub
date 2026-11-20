@@ -38,6 +38,10 @@ export interface UnifiedGame {
   readonly sizeBytes: number | undefined;
   /** Caminhos candidatos a executável, do manifesto. */
   readonly executables: readonly string[];
+  /** App id da Steam declarado pelo manifesto (para ProtonDB), ou `null`. */
+  readonly steamAppId: string | null;
+  /** Extracção automática declarada (método + ficheiro), ou `null`. */
+  readonly extract: { readonly method: 'zip' | 'tar.gz'; readonly filePath: string } | null;
 }
 
 /** Cria o registro de fontes. */
@@ -142,6 +146,8 @@ function toUnifiedGame(sourceId: string, game: ManifestGame): UnifiedGame {
     launcherRequired: game.launcherRequired,
     sizeBytes: game.sizeBytes,
     executables: game.executables,
+    steamAppId: game.steamAppId ?? null,
+    extract: game.extract === undefined ? null : { method: game.extract.method, filePath: game.extract.filePath },
   };
 }
 

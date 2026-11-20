@@ -28,6 +28,13 @@ export {
   probe,
 } from './http-downloader.js';
 export { sha256OfFile, verifyFile } from './checksum.js';
+export {
+  extractArchive,
+  planExtraction,
+  type ExtractMethod,
+  type ExtractPlan,
+  type ExtractResult,
+} from './extract.js';
 export { verifyInstall, type FileVerification, type InstallVerification, type VerifiableFile } from './verify.js';
 export { volumeSpace } from './volume.js';
 export { DownloadQueue, MAX_CONCURRENT, createDownloadQueue } from './queue.js';

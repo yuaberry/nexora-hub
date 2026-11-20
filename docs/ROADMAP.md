@@ -301,6 +301,36 @@ implementação própria.
 Rating ProtonDB antes de instalar (dado externo, com data), extracção
 automática depois do checksum, cliente de torrent.
 
+
+## Fase 6b — ProtonDB e extracção automática (concluída em 2026-11-19)
+
+### Entregue
+
+- [x] **Rating ProtonDB** (`apps/desktop/src/main/protondb.ts`) — consulta
+      externa com `fetch` injectado (testável sem rede), tempo limite
+      declarado (5 s) e recusa honesta quando o jogo não declara app id ou a
+      ProtonDB não responde. O manifesto passou a aceitar `steamAppId`
+      opcional (`packages/sources`), e o catálogo unificado expõe-no.
+- [x] **Extracção automática** (`packages/download/src/extract.ts`) — corre
+      **depois** do checksum passar, para a pasta do jogo; o arquivo
+      desaparece só quando a extracção tem sucesso e uma ferramenta ausente
+      (`unzip`/`tar`) recusa com motivo, com retento pela interface.
+- [x] **Fluxo completo no download-state** — tarefa concluída → extracção (se
+      declarada) → registo na biblioteca. Falha de extracção impede o registo
+      e fica em `extractionErrors`, com botão "Retentar extracção".
+- [x] **Interface** — botão "ProtonDB" por resultado da pesquisa (mostra
+      nível, nº de relatórios e fonte), erros de extracção com retento, e
+      contagem correcta de downloads na barra lateral.
+
+### Prova de execução real (2026-11-19)
+
+- Manifesto de prova com `steamAppId` + `extract` instalado na app;
+- ProtonDB consultada ao vivo: recusa honesta para jogo sem relatórios
+  (a API real respondeu 404 — correcto, não inventado);
+- download `completed` + `verified: true` (checksum) → extracção correu →
+  pasta do jogo só com `jogo.sh` executável → jogo entrou na biblioteca;
+- `pnpm typecheck` limpo; **302 testes verdes**.
+
 ## Fase 5 — Comunidade (iniciada em 2026-11-18)
 
 ### Entregue

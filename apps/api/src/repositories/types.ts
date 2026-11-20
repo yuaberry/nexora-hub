@@ -237,6 +237,23 @@ export interface AuditRepository {
 }
 
 /** Todas as dependências de persistência da API. */
+/** Um item da lista de desejos. */
+export interface WishlistRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly gameId: string;
+  readonly createdAt: Date;
+}
+
+export interface WishlistRepository {
+  /** Adiciona um jogo (idempotente pelo par utilizador/jogo). */
+  readonly add: (userId: string, gameId: string, id: string) => Promise<WishlistRecord>;
+  /** Remove um jogo da lista do utilizador. */
+  readonly remove: (userId: string, gameId: string) => Promise<boolean>;
+  /** Lista a lista de desejos do utilizador. */
+  readonly listByUser: (userId: string) => Promise<readonly WishlistRecord[]>;
+}
+
 export interface Repositories {
   readonly comments: CommentRepository;
   readonly reviews: ReviewRepository;
@@ -246,6 +263,7 @@ export interface Repositories {
   readonly library: LibraryRepository;
   readonly sessions: PlaySessionRepository;
   readonly audit: AuditRepository;
+  readonly wishlist: WishlistRepository;
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;

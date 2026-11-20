@@ -12,7 +12,9 @@ import { accessSync, constants } from 'node:fs';
 import { join } from 'node:path';
 import { app, ipcMain } from 'electron';
 import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
+import { DEFAULT_API_BASE_URL } from './config.js';
 import { installDesktopShortcut } from './shortcuts.js';
+import { openExternal } from './window.js';
 import type {
   AppInfoView,
   DesktopGameView,
@@ -26,6 +28,41 @@ import { LocalLibrary } from './db.js';
 import { detectCommonFolders, importFolder, pickAndImport } from './import-service.js';
 import { isKnownToolFolder } from './scan-filter.js';
 import { directorySize, volumeSpace } from './storage.js';
+
+/**
+ * Chamada autenticada à API, com o token da sessão do renderer.
+ *
+ * O processo principal **nunca** guarda credenciais: recebe o token do
+ * renderer, reencaminha com o cabeçalho e esquece-o. Sem token, o pedido é
+ * recusado — a lista de desejos exige conta.
+ */
+async function apiCall(
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  path: string,
+  token: unknown,
+): Promise<{ ok: boolean; items?: unknown; total?: number; message?: string }> {
+  if (typeof token !== 'string' || token === '') {
+    return { ok: false, message: 'Sessão obrigatória.' };
+  }
+  try {
+    const response = await fetch(`${DEFAULT_API_BASE_URL}${path}`, {
+      method,
+      headers: { accept: 'application/json', authorization: `Bearer ${token}` },
+    });
+    const text = await response.text();
+    const payload = (text === '' ? {} : JSON.parse(text)) as {
+      items?: unknown;
+      total?: number;
+      error?: { message?: string };
+    };
+    if (!response.ok) {
+      return { ok: false, message: payload.error?.message ?? 'Pedido recusado.' };
+    }
+    return { ok: true, items: payload.items, total: payload.total };
+  } catch {
+    return { ok: false, message: 'A API está inacessível.' };
+  }
+}
 
 /** Limites de validação dos argumentos do renderer. */
 const MAX_ID_LENGTH = 512;
@@ -181,6 +218,36 @@ export function registerIpc(dependencies: IpcDependencies): void {
     return { imported, scanned: folders.length };
   });
 
+
+  // ---- Loja (directório público + lista de desejos) --------------------
+
+  // O directório é público: a rota da API não exige sessão. A lista de
+  // desejos vai nas credenciais da sessão do renderer (o token vive no
+  // sessionStorage do renderer, nunca no processo principal).
+  ipcMain.handle('store:catalog', async (_event, query: unknown, platform: unknown, hideAdult: unknown) => {
+    const params = new URLSearchParams();
+    if (typeof query === 'string' && query.trim() !== '') {
+      params.set('q', query);
+    }
+    if (typeof platform === 'string' && platform !== '') {
+      params.set('platform', platform);
+    }
+    if (hideAdult === false) {
+      params.set('hideAdult', 'false');
+    }
+    const url = `${DEFAULT_API_BASE_URL}/api/v1/store${params.size > 0 ? `?${params}` : ''}`;
+    try {
+      const response = await fetch(url, { headers: { accept: 'application/json' } });
+      if (!response.ok) {
+        return { ok: false, message: 'Não foi possível carregar o directório.' };
+      }
+      const body = (await response.json()) as { items: unknown[]; total: number };
+      return { ok: true, items: body.items, total: body.total };
+    } catch {
+      return { ok: false, message: 'A API está inacessível.' };
+    }
+  });
+
   ipcMain.handle('storage:usage', (): DiskUsageView => {
     const games = library.list();
     const gamesBytes = games.reduce(
@@ -247,6 +314,33 @@ export function registerIpc(dependencies: IpcDependencies): void {
       gameId: outcome.session.gameId,
       startedAt: outcome.session.startedAt,
     };
+  });
+
+  // Abrir um URL no browser do sistema (usado pelas ligações de compra da
+  // loja: a compra acontece na loja oficial, fora do launcher).
+  ipcMain.handle('shell:openExternal', async (_event, url: unknown) => {
+    if (typeof url !== 'string' || (!url.startsWith('https://') && !url.startsWith('http://'))) {
+      return { ok: false };
+    }
+    await openExternal(url);
+    return { ok: true };
+  });
+
+  // Lista de desejos: exige conta (o token vem da sessão do renderer).
+  ipcMain.handle('wishlist:list', async (_event, token: unknown) => apiCall('GET', '/api/v1/wishlist', token));
+
+  ipcMain.handle('wishlist:add', async (_event, gameId: unknown, token: unknown) => {
+    if (typeof gameId !== 'string' || gameId === '') {
+      return { ok: false, message: 'Jogo em falta.' };
+    }
+    return apiCall('POST', `/api/v1/wishlist/${encodeURIComponent(gameId)}`, token);
+  });
+
+  ipcMain.handle('wishlist:remove', async (_event, gameId: unknown, token: unknown) => {
+    if (typeof gameId !== 'string' || gameId === '') {
+      return { ok: false, message: 'Jogo em falta.' };
+    }
+    return apiCall('DELETE', `/api/v1/wishlist/${encodeURIComponent(gameId)}`, token);
   });
 
   // Atalho de desktop: só Linux (noutros sistemas, recusa com motivo).

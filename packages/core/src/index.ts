@@ -12,3 +12,6 @@ export * from './catalog/alias-index.js';
 export * from './catalog/search.js';
 export * from './storage/bar.js';
 export * from './plans/plans.js';
+export * from './store/types.js';
+export * from './store/catalog.js';
+export * from './store/filters.js';

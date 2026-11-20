@@ -1,10 +1,13 @@
 import { createDatabase } from '../db/client.js';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { Env } from '../config/env.js';
 import {
   MemoryAuditRepository,
   MemoryUserRepository,
 } from './memory-users.js';
 import { MemoryAuthSessionRepository, MemoryMfaRepository } from './memory-auth.js';
+import { MemoryWishlistRepository } from './memory-wishlist.js';
+import { PostgresWishlistRepository } from './postgres-wishlist.js';
 import { MemoryCommentRepository, MemoryReviewRepository } from './memory-community.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
@@ -32,6 +35,7 @@ export function createMemoryRepositories(): Repositories {
     comments: new MemoryCommentRepository(),
     reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
+    wishlist: new MemoryWishlistRepository(),
     sessions: new MemoryPlaySessionRepository(),
     audit: new MemoryAuditRepository(),
     mode: 'memory',
@@ -62,6 +66,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     library: new PostgresLibraryRepository(database.db),
     sessions: new PostgresPlaySessionRepository(database.db),
     audit: new PostgresAuditRepository(database.db),
+    wishlist: new PostgresWishlistRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     mode: 'postgres',
     close: async () => {
       await database.close();

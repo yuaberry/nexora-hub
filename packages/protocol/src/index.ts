@@ -13,3 +13,4 @@ export * from './catalog.js';
 export * from './sessions.js';
 export * from './planned.js';
 export * from './realtime.js';
+export * from './store.js';

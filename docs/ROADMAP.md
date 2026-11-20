@@ -332,6 +332,34 @@ automática depois do checksum, cliente de torrent.
 - `pnpm typecheck` limpo; **302 testes verdes**.
 
 
+
+## Fase 8 — Loja (directório de compras) (concluída em 2026-11-20)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/store/`) — tipos, directório curado com
+      ligações para **lojas oficiais** (Steam, GOG, site oficial) e filtros
+      puros (pesquisa, plataforma, conteúdo adulto escondido por omissão).
+- [x] **API** — `GET /api/v1/store` (público: ver sem conta) e
+      `GET/POST/DELETE /api/v1/wishlist` (exige sessão, idempotente pelo par
+      utilizador/jogo, com implementação em memória **e** PostgreSQL).
+- [x] **Launcher** — página da Loja com grelha, filtros (plataforma, adulto),
+      botão "Comprar" que abre a loja oficial no browser do sistema, lista de
+      desejos com aviso quando não há sessão, e preços formatados por `Intl`.
+- [x] **shell.openExternal** — o renderer nunca abre URLs: o processo
+      principal decide, e só `http(s)` passa.
+
+### Prova de execução real (2026-11-20)
+
+- Loja abre pela barra lateral com 5 jogos (League of Legends, Cyberpunk 2077,
+  Hollow Knight, Terraria, Stardew Valley), cada um com plataformas, preço e
+  botão "Comprar via <loja>" — selo ◇Planejado e o aviso de que a NEXORA não
+  vende nem hospedeia;
+- API: directório público (200 sem sessão), lista de desejos exige 401,
+  adicionar/remover idempotente, jogo inexistente devolve 404, plataforma
+  inválida devolve 400 — **83 testes verdes na API**;
+- `pnpm typecheck` limpo; **319 testes verdes** no total.
+
 ## Fase 7 — Conta no launcher (concluída em 2026-11-20)
 
 ### Entregue

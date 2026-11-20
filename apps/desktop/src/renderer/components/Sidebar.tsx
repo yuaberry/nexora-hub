@@ -21,10 +21,10 @@ export function Sidebar({
   onNavigate,
   onSelectGame,
 }: {
-  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'account';
+  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'account';
   /** Jogo em detalhe (para marcar na lista), ou `null`. */
   readonly activeGameId: string | null;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'account') => void;
   readonly onSelectGame: (gameId: string) => void;
 }): ReactNode {
   const { t } = useInterface();
@@ -63,11 +63,12 @@ export function Sidebar({
     return games.filter((game) => game.title.toLowerCase().includes(needle));
   }, [games, filter]);
 
-  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'account'; readonly label: string }[] = [
+  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'account'; readonly label: string }[] = [
     { id: 'home', label: t('nav.home') },
     { id: 'library', label: t('nav.library') },
     { id: 'downloads', label: t('nav.downloads') },
     { id: 'settings', label: t('nav.settings') },
+    { id: 'store', label: t('nav.store') },
     { id: 'account', label: user === null ? t('auth.login') : t('auth.account') },
   ];
 

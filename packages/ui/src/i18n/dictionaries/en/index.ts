@@ -8,6 +8,7 @@ import { community } from './community.js';
 import { shell } from './shell.js';
 import { libraryExtra } from './library-extra.js';
 import { auth } from './auth.js';
+import { store } from './store.js';
 import { pages } from './pages.js';
 
 /**
@@ -27,5 +28,6 @@ export const en = {
   ...shell,
   ...libraryExtra,
   ...auth,
+  ...store,
   ...pages,
 };

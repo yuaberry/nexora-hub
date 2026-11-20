@@ -4,6 +4,8 @@ import type {
   DesktopApi,
   ScanResultView,
   ShortcutResultView,
+  StoreCatalogResult,
+  WishlistItemView,
   DesktopGameView,
   DetectedFolders,
   DiskUsageView,
@@ -71,6 +73,21 @@ const api: DesktopApi = {
   },
   scan: {
     disks: () => ipcRenderer.invoke('library:scan') as Promise<ScanResultView>,
+  },
+  shell: {
+    // Abrir no browser do sistema: a compra acontece na loja oficial, fora
+    // do launcher. O processo principal decide — o renderer não abre URLs.
+    openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url) as Promise<void>,
+  },
+  store: {
+    catalog: (query, platform, hideAdult) => ipcRenderer.invoke('store:catalog', query, platform, hideAdult) as Promise<StoreCatalogResult>,
+  },
+  wishlist: {
+    // A lista de desejos exige conta: o pedido vai com o token da sessão do
+    // renderer (nunca com credenciais guardadas no processo principal).
+    list: () => ipcRenderer.invoke('wishlist:list') as Promise<{ readonly ok: boolean; readonly items?: readonly WishlistItemView[]; readonly message?: string }>,
+    add: (gameId) => ipcRenderer.invoke('wishlist:add', gameId) as Promise<{ readonly ok: boolean; readonly message?: string }>,
+    remove: (gameId) => ipcRenderer.invoke('wishlist:remove', gameId) as Promise<{ readonly ok: boolean; readonly message?: string }>,
   },
   saves: {
     create: (gameKey, savePath, label) => ipcRenderer.invoke('saves:create', gameKey, savePath, label) as Promise<SourceOperationResult>,

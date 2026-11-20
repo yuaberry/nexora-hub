@@ -191,6 +191,38 @@ export interface DownloadsListView {
   readonly extractionErrors: Readonly<Record<string, string>>;
 }
 
+/** Um jogo no directório da loja (vista do renderer). */
+export interface StoreGameView {
+  readonly id: string;
+  readonly title: string;
+  readonly aliases: readonly string[];
+  readonly tagline: string;
+  readonly cover: string | null;
+  readonly platforms: readonly string[];
+  readonly adult: boolean;
+  readonly tags: readonly string[];
+  readonly links: readonly {
+    readonly store: string;
+    readonly url: string;
+    readonly price: number | null;
+    readonly currency: string | null;
+  }[];
+}
+
+/** Resultado da consulta ao directório. */
+export interface StoreCatalogResult {
+  readonly ok: boolean;
+  readonly items?: readonly StoreGameView[];
+  readonly total?: number;
+  readonly message?: string;
+}
+
+/** Um item da lista de desejos. */
+export interface WishlistItemView {
+  readonly gameId: string;
+  readonly addedAt: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -202,6 +234,20 @@ export interface DesktopApi {
     readonly remove: (collectionId: number, gameKey: string) => Promise<boolean>;
     readonly delete: (collectionId: number) => Promise<boolean>;
     readonly games: (collectionId: number) => Promise<readonly string[]>;
+  };
+  readonly shell: {
+    /** Abre um URL no browser do sistema (usado pelas ligações de compra). */
+    readonly openExternal: (url: string) => Promise<void>;
+  };
+  readonly store: {
+    /** Catálogo público (não exige conta — a API é pública). */
+    readonly catalog: (query?: string, platform?: string, hideAdult?: boolean) => Promise<StoreCatalogResult>;
+  };
+  readonly wishlist: {
+    /** Lista de desejos (exige conta — vai nas credenciais da sessão). */
+    readonly list: () => Promise<{ readonly ok: boolean; readonly items?: readonly WishlistItemView[]; readonly message?: string }>;
+    readonly add: (gameId: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
+    readonly remove: (gameId: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
   };
   readonly shortcuts: {
     readonly create: (gameId: string) => Promise<ShortcutResultView>;

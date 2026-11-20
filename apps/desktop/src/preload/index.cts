@@ -2,6 +2,8 @@ import type {
   AppInfoView,
   CollectionView,
   DesktopApi,
+  FamilyResult,
+  FamilyGameView,
   ScanResultView,
   ShortcutResultView,
   StoreCatalogResult,
@@ -83,11 +85,24 @@ const api: DesktopApi = {
     catalog: (query, platform, hideAdult) => ipcRenderer.invoke('store:catalog', query, platform, hideAdult) as Promise<StoreCatalogResult>,
   },
   wishlist: {
-    // A lista de desejos exige conta: o pedido vai com o token da sessão do
-    // renderer (nunca com credenciais guardadas no processo principal).
-    list: () => ipcRenderer.invoke('wishlist:list') as Promise<{ readonly ok: boolean; readonly items?: readonly WishlistItemView[]; readonly message?: string }>,
-    add: (gameId) => ipcRenderer.invoke('wishlist:add', gameId) as Promise<{ readonly ok: boolean; readonly message?: string }>,
-    remove: (gameId) => ipcRenderer.invoke('wishlist:remove', gameId) as Promise<{ readonly ok: boolean; readonly message?: string }>,
+    // A lista de desejos exige conta: o token da sessão do renderer viaja
+    // em cada chamada (nunca há credenciais guardadas no principal).
+    list: (token) => ipcRenderer.invoke('wishlist:list', token) as Promise<{ readonly ok: boolean; readonly items?: readonly WishlistItemView[]; readonly message?: string }>,
+    add: (gameId, token) => ipcRenderer.invoke('wishlist:add', gameId, token) as Promise<{ readonly ok: boolean; readonly message?: string }>,
+    remove: (gameId, token) => ipcRenderer.invoke('wishlist:remove', gameId, token) as Promise<{ readonly ok: boolean; readonly message?: string }>,
+  },
+  family: {
+    // O grupo familiar exige conta: o token viaja do renderer, como na
+    // lista de desejos. O servidor é o dono das regras (limite de plano,
+    // convites, papéis) — o launcher só as mostra.
+    get: (token) => ipcRenderer.invoke('family:get', token) as Promise<FamilyResult>,
+    create: (name, token) => ipcRenderer.invoke('family:create', name, token) as Promise<FamilyResult>,
+    invite: (email, token) => ipcRenderer.invoke('family:invite', email, token) as Promise<FamilyResult>,
+    accept: (code, token) => ipcRenderer.invoke('family:accept', code, token) as Promise<FamilyResult>,
+    decline: (code, token) => ipcRenderer.invoke('family:decline', code, token) as Promise<FamilyResult>,
+    remove: (userId, token) => ipcRenderer.invoke('family:remove', userId, token) as Promise<FamilyResult>,
+    dissolve: (token) => ipcRenderer.invoke('family:dissolve', token) as Promise<FamilyResult>,
+    games: (token) => ipcRenderer.invoke('family:games', token) as Promise<{ readonly ok: boolean; readonly items?: readonly FamilyGameView[]; readonly total?: number; readonly message?: string }>,
   },
   saves: {
     create: (gameKey, savePath, label) => ipcRenderer.invoke('saves:create', gameKey, savePath, label) as Promise<SourceOperationResult>,

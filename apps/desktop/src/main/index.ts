@@ -16,6 +16,7 @@ import { createMainWindow } from './window.js';
 import { registerIpc } from './library-ipc.js';
 import { registerDownloadsIpc } from './downloads-ipc.js';
 import { registerSavesIpc } from './saves-ipc.js';
+import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
 /**
@@ -100,6 +101,10 @@ function bootstrap(): void {
 
   // Saves: snapshots versionados, com o índice na base local.
   registerSavesIpc(library);
+
+  // Família: grupo, convites e biblioteca partilhada (a API é a dona das
+  // regras — o dono do limite de plano é o servidor).
+  registerFamilyIpc();
 
   mainWindow = createMainWindow(config);
 }

@@ -8,6 +8,8 @@ import {
 import { MemoryAuthSessionRepository, MemoryMfaRepository } from './memory-auth.js';
 import { MemoryWishlistRepository } from './memory-wishlist.js';
 import { PostgresWishlistRepository } from './postgres-wishlist.js';
+import { MemoryFamilyRepository } from './memory-family.js';
+import { PostgresFamilyRepository } from './postgres-family.js';
 import { MemoryCommentRepository, MemoryReviewRepository } from './memory-community.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
@@ -36,6 +38,7 @@ export function createMemoryRepositories(): Repositories {
     reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
     wishlist: new MemoryWishlistRepository(),
+    family: new MemoryFamilyRepository(),
     sessions: new MemoryPlaySessionRepository(),
     audit: new MemoryAuditRepository(),
     mode: 'memory',
@@ -67,6 +70,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     sessions: new PostgresPlaySessionRepository(database.db),
     audit: new PostgresAuditRepository(database.db),
     wishlist: new PostgresWishlistRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
+    family: new PostgresFamilyRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     mode: 'postgres',
     close: async () => {
       await database.close();

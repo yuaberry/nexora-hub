@@ -170,6 +170,41 @@ própria: só tokens de papel. Nada de animação que ignore "reduzir movimento"
 (o CSS usa `--paper-motion`, que é 0 ms nesse modo). O módulo planeado não
 entra na navegação principal — fica numa linha "Em breve".
 
+## D25 — O limite de plano é do domínio, aplicado pelo servidor
+
+Os limites dos planos (hotbars, membros da família) vivem em
+`packages/core/plans` como função pura, e a **API** é que os aplica — a
+interface mostra o que o plano dá, e o servidor recusa o que ele não dá.
+`null` significa "sem limite", nunca um número gigante a fingir. Testada a
+regra, testada a recusa (409), nas duas implementações de repositório.
+
+## D26 — Um grupo familiar é um estado, não uma tabela com lógica
+
+As transições do grupo (criar, convidar, aceitar, remover, dissolver,
+expirar) são funções puras em `packages/core/family/state.ts`: recebem o
+estado e os argumentos (relógio e identificadores incluídos) e devolvem um
+estado novo ou o motivo da recusa. A API apenas carrega o estado da base,
+aplica a transição e persiste — a mesma regra corre contra memória e
+PostgreSQL, e os testes do domínio não precisam de infraestrutura.
+
+## D27 — Convite pendente ocupa lugar
+
+Os convites pendentes contam para o limite do plano: sem isso, uma pilha de
+convites furaria o teto antes de alguém aceitar. O lugar é devolvido quando
+o convite é aceite, recusado ou expira — e a expiração (7 dias) é verificada
+a aceitar, com a marca persistida na recusa.
+
+## D28 — A migração acompanha o esquema
+
+Bug real encontrado neste lote: as tabelas `comments`, `reviews` e
+`wishlists` existiam no esquema Drizzle mas **não** na migração 0000 — os
+repositórios PostgreSQL escreveriam contra tabelas inexistentes, e os testes
+de integração (ignorados sem `DATABASE_URL`) não cobriam essas rotas. A
+partir daqui: mexer no esquema obriga a gerar migração e a provar a suite de
+integração contra uma base real. A migração 0001 criou as tabelas em falta e
+as da família; um teste de integração escreve comunidade, desejos e família
+sobre a base real para que o buraco não volte em silêncio.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

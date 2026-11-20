@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import { buildApp } from '../src/app.js';
 import { runMigrations } from '../src/db/migrate.js';
 import { loadEnv } from '../src/config/env.js';
+import { createRepositories } from '../src/repositories/index.js';
 import { accessTokenOf, registerUser } from './fixtures.js';
 
 /**
@@ -81,6 +83,150 @@ describeIfDatabase('integração com PostgreSQL real', () => {
     expect(locked.statusCode).toBe(423);
 
     await app.close();
+  });
+
+  it('o grupo familiar funciona sobre as tabelas reais', async () => {
+    await runMigrations(DATABASE_URL as string);
+    const env = loadEnv({ DATABASE_URL, NODE_ENV: 'test' } as NodeJS.ProcessEnv);
+    const app = await buildApp({ env, logger: false });
+
+    const stamp = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+    const owner = await registerUser(app, `familia-pg-dono-${stamp}@nexora.local`, 'senha-de-teste-123', 'Dono PG');
+    const guest = await registerUser(app, `familia-pg-membro-${stamp}@nexora.local`, 'senha-de-teste-123', 'Membro PG');
+
+    const created = await app.inject({
+      method: 'POST',
+      url: '/api/v1/family',
+      payload: { name: 'Família PostgreSQL' },
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+    });
+    expect(created.statusCode).toBe(201);
+
+    const invited = await app.inject({
+      method: 'POST',
+      url: '/api/v1/family/invites',
+      payload: { email: guest.email },
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+    });
+    expect(invited.statusCode).toBe(201);
+    const code = (invited.json() as { code: string }).code;
+
+    // Duas contas novas em tabelas novas: o aceite tem de escrever o membro
+    // e marcar o convite — em PostgreSQL, com os índices únicos a valer.
+    const accepted = await app.inject({
+      method: 'POST',
+      url: '/api/v1/family/invites/accept',
+      payload: { code },
+      headers: { authorization: `Bearer ${guest.accessToken}` },
+    });
+    expect(accepted.statusCode).toBe(200);
+    expect((accepted.json() as { group: { members: unknown[] } }).group.members).toHaveLength(2);
+
+    // Aceitar duas vezes o mesmo código não cria um terceiro membro.
+    const again = await app.inject({
+      method: 'POST',
+      url: '/api/v1/family/invites/accept',
+      payload: { code },
+      headers: { authorization: `Bearer ${owner.accessToken}` },
+    });
+    expect(again.statusCode).toBeGreaterThanOrEqual(400);
+
+    await app.close();
+  });
+
+  it('comunidade e desejos escrevem nas tabelas reais', async () => {
+    // Regressão: as tabelas `comments`, `reviews` e `wishlists` faltavam na
+    // migração 0000 — os repositórios PostgreSQL existiam, mas a base não
+    // tinha onde escrever. A migração 0001 criou-as; este teste garante que
+    // escrever, substituir e remover funcionam sobre a base real.
+    await runMigrations(DATABASE_URL as string);
+    const env = loadEnv({ DATABASE_URL, NODE_ENV: 'test' } as NodeJS.ProcessEnv);
+    const { repositories, close } = createRepositories(env);
+
+    const stamp = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+    // Jogo único por execução: a base é partilhada entre testes e entre
+    // corridas — contar comentários de um jogo conhecido contaria os dos
+    // outros também.
+    const gameId = `jogo-integracao-${stamp}`;
+    const user = await repositories.users.create({
+      email: `comunidade-pg-${stamp}@nexora.local`,
+      displayName: 'Comunidade PG',
+      passwordHash: 'ab'.repeat(32),
+      passwordSalt: 'cd'.repeat(8),
+    });
+
+    // Comentário: cria, lista e apaga (o dono é quem criou).
+    await repositories.comments.create({ gameId, userId: user.id, body: 'Comentário real.' });
+    expect(await repositories.comments.listByGame(gameId, 10, 0)).toHaveLength(1);
+    const created = await repositories.comments.create({ gameId, userId: user.id, body: 'Outro.' });
+    expect(await repositories.comments.deleteOwned(created.id, user.id)).toBe(true);
+    expect(await repositories.comments.listByGame(gameId, 10, 0)).toHaveLength(1);
+
+    // Review: o *upsert* substitui (índice único jogo/utilizador) — se a
+    // tabela não tivesse o índice, a segunda chamada criaria uma linha.
+    await repositories.reviews.upsert({
+      gameId,
+      userId: user.id,
+      rating: 7,
+      story: null,
+      gameplay: 8,
+      graphics: null,
+      sound: null,
+      body: '',
+    });
+    await repositories.reviews.upsert({
+      gameId,
+      userId: user.id,
+      rating: 9,
+      story: null,
+      gameplay: 9,
+      graphics: null,
+      sound: null,
+      body: 'Revisto.',
+    });
+    const reviews = await repositories.reviews.listByGame(gameId, 10, 0);
+    expect(reviews).toHaveLength(1);
+    expect(reviews[0]?.rating).toBe(9);
+
+    // Lista de desejos: adicionar duas vezes não duplica (chave primária).
+    await repositories.wishlist.add(user.id, gameId, 'w1');
+    await repositories.wishlist.add(user.id, gameId, 'w2');
+    expect(await repositories.wishlist.listByUser(user.id)).toHaveLength(1);
+    expect(await repositories.wishlist.remove(user.id, gameId)).toBe(true);
+    expect(await repositories.wishlist.remove(user.id, gameId)).toBe(false);
+
+    // Grupo familiar: criar, aceitar um convite e dissolver — as três
+    // tabelas novas, com os índices únicos a valer.
+    const group = await repositories.family.createGroup({
+      id: randomUUID(),
+      name: 'Família Real',
+      ownerId: user.id,
+    });
+    expect((await repositories.family.findGroupByUser(user.id))?.group.id).toBe(group.id);
+    const guest = await repositories.users.create({
+      email: `familia-pg-membro-${stamp}@nexora.local`,
+      displayName: 'Membro PG',
+      passwordHash: 'ab'.repeat(32),
+      passwordSalt: 'cd'.repeat(8),
+    });
+    const code = `CONVITE-${stamp}`;
+    await repositories.family.createInvite({
+      id: randomUUID(),
+      groupId: group.id,
+      code,
+      email: guest.email,
+      invitedBy: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+    expect((await repositories.family.findInviteByCode(code))?.status).toBe('pending');
+    await repositories.family.addMember({ groupId: group.id, userId: guest.id, role: 'member', joinedAt: new Date() });
+    await repositories.family.respondInvite((await repositories.family.findInviteByCode(code))?.id ?? randomUUID(), 'accepted', new Date());
+    const snapshot = await repositories.family.findGroupByUser(guest.id);
+    expect(snapshot?.members).toHaveLength(2);
+    expect(await repositories.family.deleteGroup(group.id)).toBe(true);
+    expect(await repositories.family.findGroupByUser(guest.id)).toBeNull();
+
+    await close();
   });
 });
 

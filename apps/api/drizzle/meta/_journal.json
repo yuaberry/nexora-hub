@@ -8,6 +8,13 @@
       "when": 1794904048111,
       "tag": "0000_magenta_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795214324349,
+      "tag": "0001_community_wishlist_family",
+      "breakpoints": true
     }
   ]
 }

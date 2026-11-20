@@ -10,20 +10,37 @@
  * limite no servidor é a fase dos planos.
  */
 
-/** Um plano e o seu limite de hotbars. */
+/** Um plano e os seus limites. */
 export interface HotbarPlan {
   readonly id: string;
   /** Chave de tradução do nome do plano (`plans.<id>`). */
   readonly labelKey: string;
   /** Número máximo de hotbars; `null` = ilimitado. */
   readonly maxHotbars: number | null;
+  /**
+   * Número máximo de membros do grupo familiar (dono incluído).
+   *
+   * O limite é aplicado pelo **servidor** quando um convite é aceite — a
+   * interface mostra o que o plano dá, e a API recusa o que ele não dá.
+   */
+  readonly maxFamilyMembers: number | null;
 }
 
-/** Plano gratuito: seis hotbars. */
-export const FREE_PLAN: HotbarPlan = { id: 'free', labelKey: 'free', maxHotbars: 6 };
+/** Plano gratuito: seis hotbars e grupo familiar até dois membros. */
+export const FREE_PLAN: HotbarPlan = {
+  id: 'free',
+  labelKey: 'free',
+  maxHotbars: 6,
+  maxFamilyMembers: 2,
+};
 
-/** Plano premium: hotbars ilimitadas. */
-export const PREMIUM_PLAN: HotbarPlan = { id: 'premium', labelKey: 'premium', maxHotbars: null };
+/** Plano premium: hotbars ilimitadas e grupo familiar até seis membros. */
+export const PREMIUM_PLAN: HotbarPlan = {
+  id: 'premium',
+  labelKey: 'premium',
+  maxHotbars: null,
+  maxFamilyMembers: 6,
+};
 
 /** Catálogo de planos (a fonte de verdade dos limites). */
 export const PLANS: readonly HotbarPlan[] = [FREE_PLAN, PREMIUM_PLAN];

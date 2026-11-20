@@ -18,6 +18,8 @@ export default defineConfig({
     './src/db/sessions-schema.ts',
     './src/db/audit-schema.ts',
     './src/db/community-schema.ts',
+    './src/db/wishlist-schema.ts',
+    './src/db/family-schema.ts',
   ],
   out: './drizzle',
   dbCredentials: {

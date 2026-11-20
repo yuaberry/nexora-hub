@@ -223,6 +223,78 @@ export interface WishlistItemView {
   readonly addedAt: string;
 }
 
+/** Um membro do grupo familiar (vista do renderer). */
+export interface FamilyMemberView {
+  readonly userId: string;
+  readonly displayName: string | null;
+  readonly email: string | null;
+  readonly role: 'owner' | 'adult' | 'member';
+  readonly joinedAt: string;
+}
+
+/** Um convite do grupo. */
+export interface FamilyInviteView {
+  readonly id: string;
+  readonly email: string;
+  /** Código a partilhar com quem foi convidado. */
+  readonly code: string;
+  readonly status: 'pending' | 'accepted' | 'declined' | 'expired';
+  readonly createdAt: string;
+  readonly expiresAt: string;
+}
+
+/** Um benefício do plano (o que ainda não existe vem com `available: false`). */
+export interface FamilyBenefitItemView {
+  readonly labelKey: string;
+  readonly value: string;
+  readonly available: boolean;
+}
+
+/** Limites e benefícios do plano da conta. */
+export interface FamilyPlanView {
+  readonly id: string;
+  readonly maxMembers: number | null;
+  readonly remainingSlots: number | null;
+  readonly benefits: readonly FamilyBenefitItemView[];
+}
+
+/** O grupo familiar da conta. */
+export interface FamilyView {
+  readonly id: string;
+  readonly name: string;
+  readonly ownerId: string;
+  readonly createdAt: string;
+  readonly plan: {
+    readonly id: string;
+    readonly maxMembers: number | null;
+    readonly remainingSlots: number | null;
+    readonly benefits: readonly FamilyBenefitItemView[];
+  };
+  readonly members: readonly FamilyMemberView[];
+  readonly invites: readonly FamilyInviteView[];
+}
+
+/** Um jogo na biblioteca partilhada. */
+export interface FamilyGameView {
+  readonly externalKey: string;
+  readonly title: string;
+  readonly owners: readonly { readonly userId: string; readonly displayName: string | null }[];
+}
+
+/** Resultado das operações da família. */
+export interface FamilyResult {
+  readonly ok: boolean;
+  /** O grupo depois da operação (`null` quando a pessoa não tem grupo). */
+  readonly group?: FamilyView | null;
+  /** Limites do plano da conta (vêm sempre, com ou sem grupo). */
+  readonly plan?: FamilyPlanView;
+  /** Convite criado (o código é o que se partilha). */
+  readonly code?: string;
+  readonly email?: string;
+  readonly expiresAt?: string;
+  readonly message?: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -244,10 +316,38 @@ export interface DesktopApi {
     readonly catalog: (query?: string, platform?: string, hideAdult?: boolean) => Promise<StoreCatalogResult>;
   };
   readonly wishlist: {
-    /** Lista de desejos (exige conta — vai nas credenciais da sessão). */
-    readonly list: () => Promise<{ readonly ok: boolean; readonly items?: readonly WishlistItemView[]; readonly message?: string }>;
-    readonly add: (gameId: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
-    readonly remove: (gameId: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
+    /**
+     * Lista de desejos (exige conta — o token da sessão viaja do renderer).
+     *
+     * O token é passado em cada chamada e nunca guardado no processo
+     * principal: sem ele, o pedido é recusado antes de sair.
+     */
+    readonly list: (token: string) => Promise<{ readonly ok: boolean; readonly items?: readonly WishlistItemView[]; readonly message?: string }>;
+    readonly add: (gameId: string, token: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
+    readonly remove: (gameId: string, token: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
+  };
+  readonly family: {
+    /**
+     * O grupo da conta (ou `null` — a página explica o que falta).
+     *
+     * O token da sessão viaja do renderer em cada chamada e nunca é
+     * guardado no processo principal.
+     */
+    readonly get: (token: string) => Promise<FamilyResult>;
+    /** Cria o grupo com quem pede como dono. */
+    readonly create: (name: string, token: string) => Promise<FamilyResult>;
+    /** Convida um email (a pessoa tem de ter conta). */
+    readonly invite: (email: string, token: string) => Promise<FamilyResult>;
+    /** Aceita um convite pelo código. */
+    readonly accept: (code: string, token: string) => Promise<FamilyResult>;
+    /** Recusa um convite pelo código. */
+    readonly decline: (code: string, token: string) => Promise<FamilyResult>;
+    /** Remove um membro (ou sai do grupo, quando o membro é o próprio). */
+    readonly remove: (userId: string, token: string) => Promise<FamilyResult>;
+    /** Dissolve o grupo (só o dono). */
+    readonly dissolve: (token: string) => Promise<FamilyResult>;
+    /** Biblioteca partilhada do grupo. */
+    readonly games: (token: string) => Promise<{ readonly ok: boolean; readonly items?: readonly FamilyGameView[]; readonly total?: number; readonly message?: string }>;
   };
   readonly shortcuts: {
     readonly create: (gameId: string) => Promise<ShortcutResultView>;

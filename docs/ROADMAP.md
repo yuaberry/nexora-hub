@@ -11,7 +11,7 @@
 | 1 | Fundação, domínio (busca/planos/armazenamento), API (auth/biblioteca/sessões), web e **desktop jogável** (biblioteca local, pesquisa dinâmica, início com medição, configurações) | ✅ Concluída | 215 testes verdes + AppImage/deb construídos + app real provada (pesquisa "l"→League, jogo lançado e tempo gravado) |
 | 2 | **Downloads**: motor HTTP multi-conexão com verificação, manifestos de fonte, fila com prioridade, instalação na biblioteca; API de fontes unificada | ✅ Concluída (HTTP) | ciclo completo provado (manifesto → pesquisa → download verificado → biblioteca → jogo lançado → tempo gravado); **torrent e Wine/Proton ficam planeados** |
 | 2b | **Torrent e Wine/Proton** | ⏳ Planejada | cliente torrent real (decisão de dependência nativa) + handoff para launcher oficial |
-| 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | ⏳ Planejada | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
+| 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | 🟡 Em curso (Família pronta) | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
 | 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ⏳ Planejada | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
@@ -333,6 +333,57 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+
+## Fase 3b — Família (concluída em 2026-11-20)
+
+Grupo familiar com limite de plano e biblioteca partilhada — a primeiro
+bloco da Fase 3 (Nuvem e perfis) a ficar pronto: saves na nuvem e perfis
+animados continuam planeados.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/family/`) — tipos, limites por plano
+      (`maxFamilyMembers`: livre 2, premium 6), benefícios declarados (a
+      partilha de saves na nuvem aparece como **planeada**, não como
+      existente) e a máquina de estados pura (`createFamily`,
+      `inviteMember`, `acceptInvite`, `declineInvite`, `removeMember`,
+      `dissolveFamily`, `expireInvites`) mais a junção da biblioteca
+      partilhada (`mergeSharedLibraries`) — 31 testes no core.
+- [x] **Planos** (`packages/core/plans/`) — `maxFamilyMembers` por plano; o
+      limite é regra de domínio, aplicada pelo servidor.
+- [x] **API** — `GET/POST/DELETE /api/v1/family`, `POST /api/v1/family/invites`,
+      `POST /api/v1/family/invites/accept|decline`,
+      `DELETE /api/v1/family/members/:userId`, `GET /api/v1/family/games`,
+      com repositórios em memória **e** PostgreSQL, convites com código único
+      e validade de 7 dias, escritas auditadas — 24 testes na API.
+- [x] **Launcher** — página **Família**: criar grupo, entrar com código,
+      convidos pendentes com o código à vista, membros com papel, remover
+      (dono) / sair (na própria linha), dissolver (só o dono), indicadores de
+      membros e biblioteca partilhada, e benefícios do plano com o selo
+      honesto no que ainda não existe.
+- [x] **Migrações** — migração `0001` que criou as tabelas `comments`,
+      `reviews` e `wishlists` (que faltavam na 0000 — bug real: os
+      repositórios PostgreSQL escreveriam contra tabelas inexistentes) e as
+      três tabelas da família, com os índices únicos que as regras exigem.
+- [x] **Bug real corrigido** — a lista de desejos nunca funcionou no
+      launcher: o preload chamava `wishlist:list` sem o token, e o handler
+      exige-o. O token passa a viajar do renderer em cada chamada.
+
+### Prova de execução real (2026-11-20)
+
+- Ao vivo, pela API: grupo criado (dono + plano livre = 2 membros), mãe
+  convidada (código `BVATPGAUF4`) e aceite — grupo com dois membros e
+  **0 lugares livres**; terceiro convite recusado com **409** (o limite do
+  plano é aplicado no servidor, não só mostrado);
+- PostgreSQL **real** (cluster local): migrações aplicadas (13 tabelas),
+  suite de integração verde — incluindo o fluxo da família e o teste de
+  regressão que escreve comunidade, desejos e família sobre a base real;
+- Launcher real: página **Família** mostrou "Família Real · Limite do plano:
+  2 membros · 0 lugares livres", membros Dono e Mãe, botão "Dissolver grupo"
+  e "Nenhum convite pendente";
+- `pnpm typecheck` limpo; **389 testes verdes** (4 ignorados sem
+  `DATABASE_URL`; com base real, **392 verdes**).
 
 ## Fase 9 — Estatísticas e timeline (concluída em 2026-11-20)
 

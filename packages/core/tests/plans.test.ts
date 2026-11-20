@@ -43,4 +43,9 @@ describe('planos', () => {
     expect(planById('premium')).toBe(PREMIUM_PLAN);
     expect(planById('inexistente')).toBeUndefined();
   });
+
+  it('declara o limite de membros da família (free 2, premium 6)', () => {
+    expect(FREE_PLAN.maxFamilyMembers).toBe(2);
+    expect(PREMIUM_PLAN.maxFamilyMembers).toBe(6);
+  });
 });

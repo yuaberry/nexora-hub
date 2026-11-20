@@ -85,6 +85,13 @@ export class PostgresUserRepository implements UserRepository {
       .where(eq(schema.users.id, userId));
   }
 
+  async setPlan(userId: string, planId: string): Promise<void> {
+    await this.db
+      .update(schema.users)
+      .set({ planId, updatedAt: new Date() })
+      .where(eq(schema.users.id, userId));
+  }
+
   async setDisplayName(userId: string, displayName: string): Promise<void> {
     await this.db
       .update(schema.users)

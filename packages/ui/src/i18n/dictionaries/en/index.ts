@@ -10,6 +10,7 @@ import { libraryExtra } from './library-extra.js';
 import { auth } from './auth.js';
 import { store } from './store.js';
 import { stats } from './stats.js';
+import { family } from './family.js';
 import { pages } from './pages.js';
 
 /**
@@ -31,5 +32,6 @@ export const en = {
   ...auth,
   ...store,
   ...stats,
+  ...family,
   ...pages,
 };

@@ -40,4 +40,10 @@ export type AuditAction =
   | 'library.collection.add'
   | 'library.entry.remove'
   | 'session.start'
-  | 'session.end';
+  | 'session.end'
+  | 'family.create'
+  | 'family.invite'
+  | 'family.invite.accept'
+  | 'family.invite.decline'
+  | 'family.member.remove'
+  | 'family.dissolve';

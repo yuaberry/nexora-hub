@@ -95,6 +95,14 @@ export class MemoryUserRepository implements UserRepository {
     this.rows.set(userId, { ...row, role, updatedAt: new Date() });
   }
 
+  async setPlan(userId: string, planId: string): Promise<void> {
+    const row = this.rows.get(userId);
+    if (row === undefined) {
+      return;
+    }
+    this.rows.set(userId, { ...row, planId, updatedAt: new Date() });
+  }
+
   async setDisplayName(userId: string, displayName: string): Promise<void> {
     const row = this.rows.get(userId);
     if (row === undefined) {

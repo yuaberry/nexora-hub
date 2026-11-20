@@ -5,6 +5,7 @@ import type {
   GameSessionState,
   UserRole,
 } from '../db/types.js';
+import type { FamilyInviteStatus, FamilyRole } from '@nexora/core';
 
 /**
  * Interfaces dos repositórios.
@@ -52,6 +53,8 @@ export interface UserRepository {
   resetFailedAttempts: (userId: string) => Promise<void>;
   lockUntil: (userId: string, until: Date | null) => Promise<void>;
   setRole: (userId: string, role: UserRole) => Promise<void>;
+  /** Muda o plano do utilizador (os limites passam a valer a partir daqui). */
+  setPlan: (userId: string, planId: string) => Promise<void>;
   setDisplayName: (userId: string, displayName: string) => Promise<void>;
 }
 
@@ -243,6 +246,89 @@ export interface AuditRepository {
 }
 
 /** Todas as dependências de persistência da API. */
+
+/** Um grupo familiar (o dono é um membro com papel `owner`). */
+export interface FamilyGroupRecord {
+  readonly id: string;
+  readonly name: string;
+  readonly ownerId: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+/** Um membro do grupo. */
+export interface FamilyMemberRecord {
+  readonly groupId: string;
+  readonly userId: string;
+  readonly role: FamilyRole;
+  readonly joinedAt: Date;
+}
+
+/** Um convite para entrar no grupo. */
+export interface FamilyInviteRecord {
+  readonly id: string;
+  readonly groupId: string;
+  /** Código apresentado por quem aceita. */
+  readonly code: string;
+  readonly email: string;
+  readonly invitedBy: string;
+  readonly status: FamilyInviteStatus;
+  readonly createdAt: Date;
+  readonly expiresAt: Date;
+  /** Data da resposta (aceite/recusa), ou `null`. */
+  readonly respondedAt: Date | null;
+}
+
+/** O grupo com os seus membros e convites (a vista que as rotas consomem). */
+export interface FamilyGroupSnapshot {
+  readonly group: FamilyGroupRecord;
+  readonly members: readonly FamilyMemberRecord[];
+  readonly invites: readonly FamilyInviteRecord[];
+}
+
+/** Entrada para adicionar um membro. */
+export interface NewFamilyMemberInput {
+  readonly groupId: string;
+  readonly userId: string;
+  readonly role: FamilyRole;
+  readonly joinedAt: Date;
+}
+
+/** Entrada para criar um convite. */
+export interface NewFamilyInviteInput {
+  readonly id: string;
+  readonly groupId: string;
+  readonly code: string;
+  readonly email: string;
+  readonly invitedBy: string;
+  readonly expiresAt: Date;
+}
+
+export interface FamilyRepository {
+  /** Cria o grupo com o criador como dono (recusa duplicado pelo índice único). */
+  readonly createGroup: (input: { id: string; name: string; ownerId: string }) => Promise<FamilyGroupRecord>;
+  /** Grupo de um utilizador (por membro), ou `null` quando não tem. */
+  readonly findGroupByUser: (userId: string) => Promise<FamilyGroupSnapshot | null>;
+  /** Grupo por identificador, ou `null`. */
+  readonly findGroupById: (groupId: string) => Promise<FamilyGroupSnapshot | null>;
+  /** Acrescenta um membro (idempotente pelo par grupo/utilizador). */
+  readonly addMember: (input: NewFamilyMemberInput) => Promise<void>;
+  /** Remove um membro (devolve `false` quando não era membro). */
+  readonly removeMember: (groupId: string, userId: string) => Promise<boolean>;
+  /** Cria um convite pendente. */
+  readonly createInvite: (input: NewFamilyInviteInput) => Promise<FamilyInviteRecord>;
+  /** Convite pelo código, ou `null`. */
+  readonly findInviteByCode: (code: string) => Promise<FamilyInviteRecord | null>;
+  /** Marca a resposta de um convite (`null` quando não existe). */
+  readonly respondInvite: (
+    inviteId: string,
+    status: 'accepted' | 'declined' | 'expired',
+    now: Date,
+  ) => Promise<FamilyInviteRecord | null>;
+  /** Apaga o grupo, os membros e os convites. */
+  readonly deleteGroup: (groupId: string) => Promise<boolean>;
+}
+
 /** Um item da lista de desejos. */
 export interface WishlistRecord {
   readonly id: string;
@@ -270,6 +356,7 @@ export interface Repositories {
   readonly sessions: PlaySessionRepository;
   readonly audit: AuditRepository;
   readonly wishlist: WishlistRepository;
+  readonly family: FamilyRepository;
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;

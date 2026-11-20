@@ -46,8 +46,9 @@ export function StorePage(): ReactNode {
     setMessage(null);
 
     // A lista de desejos exige conta: sem sessão, fica vazia.
-    if (accessToken() !== null) {
-      const list = await api.wishlist.list();
+    const token = accessToken();
+    if (token !== null) {
+      const list = await api.wishlist.list(token);
       if (list.ok && list.items !== undefined) {
         setWishlist(list.items.map((item) => item.gameId));
       }
@@ -63,12 +64,13 @@ export function StorePage(): ReactNode {
       if (api === undefined) {
         return;
       }
-      if (accessToken() === null) {
+      const token = accessToken();
+      if (token === null) {
         setMessage(t('store.signInRequired'));
         return;
       }
       const inList = wishlist.includes(gameId);
-      const result = inList ? await api.wishlist.remove(gameId) : await api.wishlist.add(gameId);
+      const result = inList ? await api.wishlist.remove(gameId, token) : await api.wishlist.add(gameId, token);
       setMessage(result.ok ? (inList ? t('store.wishlist.removed') : t('store.wishlist.added')) : (result.message ?? t('error.generic')));
       await reload();
     },

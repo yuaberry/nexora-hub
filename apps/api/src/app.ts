@@ -20,6 +20,7 @@ import { registerGameRoutes } from './modules/games/routes.js';
 import { registerSourceRoutes } from './modules/sources/routes.js';
 import { registerCommunityRoutes } from './modules/community/routes.js';
 import { registerStoreRoutes } from './modules/store/routes.js';
+import { registerStatsRoutes } from './modules/stats/routes.js';
 import { registerSessionRoutes } from './modules/sessions/routes.js';
 import { registerAdminRoutes } from './modules/admin/routes.js';
 import { registerGatewayRoutes } from './gateway/socket.js';
@@ -99,6 +100,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerSourceRoutes(app);
   registerCommunityRoutes(app, repositories);
   registerStoreRoutes(app, repositories);
+  registerStatsRoutes(app, repositories);
   registerSessionRoutes(app, repositories);
   registerAdminRoutes(app, repositories);
 

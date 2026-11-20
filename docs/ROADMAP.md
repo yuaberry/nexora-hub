@@ -333,6 +333,31 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+## Fase 9 — Estatísticas e timeline (concluída em 2026-11-20)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/stats/`) — `summarizeSessions` (horas,
+      sessões, jogos distintos, top de jogos, género favorito pela etiqueta,
+      histograma por hora e hora de pico) e timeline (`sortTimeline`,
+      `limitTimeline` com ordem estável em empates) — 60 testes no core.
+- [x] **API** — `GET /api/v1/stats/summary` e `GET /api/v1/timeline`
+      (exigem sessão; a agregação é no **servidor**, o cliente não soma
+      listas) com `listAllByUser`, `listEndedByUser` e `listByUser` nos
+      repositórios em memória **e** PostgreSQL.
+- [x] **Launcher** — página "Estatísticas" com quatro indicadores, top de
+      jogos, género favorito e timeline (sessões, comentários, reviews,
+      desejos), com aviso quando não há sessão.
+
+### Prova de execução real (2026-11-20)
+
+- Duas sessões criadas e terminadas pela **API** (caminho real do
+  utilizador); a página mostrou **0,09 h · 2 sessões · 2 jogos distintos ·
+  hora de pico 19:00**, top de jogos e "Género favorito: sem dados ainda"
+  (a biblioteca da conta está vazia — honesto, não inventado);
+- `pnpm typecheck` limpo; **334 testes verdes** no total.
+
 ## Fase 8 — Loja (directório de compras) (concluída em 2026-11-20)
 
 ### Entregue

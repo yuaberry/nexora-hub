@@ -9,6 +9,7 @@ import { SettingsPage } from './pages/SettingsPage.js';
 import { PlannedPage } from './pages/PlannedPage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { StorePage } from './pages/StorePage.js';
+import { StatsPage } from './pages/StatsPage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
 import type { DesktopGameView } from '../shared/preload-api.js';
@@ -33,6 +34,7 @@ export type Route =
   | { readonly name: 'downloads' }
   | { readonly name: 'settings' }
   | { readonly name: 'store' }
+  | { readonly name: 'stats' }
   | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
@@ -63,7 +65,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'account') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'account') => {
       navigate({ name: target });
     },
     [navigate],
@@ -101,7 +103,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'account') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -152,6 +154,7 @@ function Shell({
       {route.name === 'downloads' ? <DownloadsPage /> : null}
       {route.name === 'settings' ? <SettingsPage /> : null}
       {route.name === 'store' ? <StorePage /> : null}
+      {route.name === 'stats' ? <StatsPage /> : null}
       {route.name === 'account' ? (
           <LoginPage
             onSkip={() => {
@@ -181,6 +184,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.settings');
     case 'store':
       return t('nav.store');
+    case 'stats':
+      return t('nav.stats');
     case 'account':
       return t('auth.title');
     default:

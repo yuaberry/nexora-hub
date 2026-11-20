@@ -9,6 +9,7 @@ import { shell } from './shell.js';
 import { libraryExtra } from './library-extra.js';
 import { auth } from './auth.js';
 import { store } from './store.js';
+import { stats } from './stats.js';
 import { pages } from './pages.js';
 
 /**
@@ -31,5 +32,6 @@ export const ptBR = {
   ...libraryExtra,
   ...auth,
   ...store,
+  ...stats,
   ...pages,
 } as const;

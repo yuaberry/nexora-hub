@@ -51,6 +51,16 @@ export class PostgresCommentRepository implements CommentRepository {
     return rows.map(toComment);
   }
 
+  async listByUser(userId: string, limit: number): Promise<readonly CommentRecord[]> {
+    const rows = await this.db
+      .select()
+      .from(comments)
+      .where(eq(comments.userId, userId))
+      .orderBy(desc(comments.createdAt))
+      .limit(limit);
+    return rows.map(toComment);
+  }
+
   async deleteOwned(commentId: string, userId: string): Promise<boolean> {
     const rows = await this.db
       .delete(comments)
@@ -118,6 +128,16 @@ export class PostgresReviewRepository implements ReviewRepository {
       averageGraphics: meanOrNull(rows.map((row) => row.graphics)),
       averageSound: meanOrNull(rows.map((row) => row.sound)),
     };
+  }
+
+  async listByUser(userId: string, limit: number): Promise<readonly ReviewRecord[]> {
+    const rows = await this.db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.userId, userId))
+      .orderBy(desc(reviews.updatedAt))
+      .limit(limit);
+    return rows.map(toReview);
   }
 
   async deleteOwned(reviewId: string, userId: string): Promise<boolean> {

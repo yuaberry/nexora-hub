@@ -1,0 +1,21 @@
+/** EN dictionary — statistics and timeline. */
+export const stats = {
+  'nav.stats': 'Statistics',
+  'stats.title': 'Statistics',
+  'stats.subtitle': 'The numbers come from the server — the launcher does not sum lists.',
+  'stats.signIn': 'Sign in to see your statistics',
+  'stats.signIn.hint': 'Statistics belong to your NEXORA account.',
+  'stats.totalHours': 'Hours played',
+  'stats.sessions': 'Sessions',
+  'stats.games': 'Distinct games',
+  'stats.peakHour': 'Peak hour',
+  'stats.topGames': 'Most played games',
+  'stats.favoriteGenre': 'Favorite genre',
+  'stats.empty': 'No data yet.',
+  'stats.timeline': 'Timeline',
+  'stats.timeline.empty': 'No events yet.',
+  'timeline.session-ended': 'Session ended',
+  'timeline.comment-created': 'Comment',
+  'timeline.review-created': 'Review',
+  'timeline.wishlist-added': 'Wishlist',
+} as const;

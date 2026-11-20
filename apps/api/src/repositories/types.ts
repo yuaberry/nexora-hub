@@ -171,6 +171,8 @@ export interface LibraryRepository {
   /** Soma o tempo jogado da sessão ao total da entrada. */
   addPlayedSeconds: (userId: string, gameId: string, seconds: number, playedAt: Date) => Promise<void>;
   totalsByGame: (userId: string) => Promise<ReadonlyMap<string, number>>;
+  /** Todas as entradas da biblioteca do utilizador (para as estatísticas). */
+  listByUser: (userId: string) => Promise<readonly LibraryEntryRecord[]>;
 }
 
 export interface PlaySessionRecord {
@@ -194,6 +196,10 @@ export interface PlaySessionRepository {
    * é real quando a sessão termina).
    */
   totalPlayedSeconds: (userId: string, gameId: string) => Promise<number>;
+  /** Todas as sessões do utilizador (para a agregação de estatísticas). */
+  listAllByUser: (userId: string) => Promise<readonly PlaySessionRecord[]>;
+  /** Sessões terminadas do utilizador, das mais recentes. */
+  listEndedByUser: (userId: string, limit: number) => Promise<readonly PlaySessionRecord[]>;
   findById: (userId: string, id: string) => Promise<PlaySessionRecord | null>;
   list: (
     userId: string,
@@ -290,6 +296,8 @@ export interface CommentRepository {
   readonly create: (input: NewCommentInput) => Promise<CommentRecord>;
   /** Lista comentários de um jogo, do mais recente para o mais antigo. */
   readonly listByGame: (gameId: string, limit: number, offset: number) => Promise<readonly CommentRecord[]>;
+  /** Comentários do utilizador, dos mais recentes (para a timeline). */
+  readonly listByUser: (userId: string, limit: number) => Promise<readonly CommentRecord[]>;
   /** Apaga um comentário **do dono** (devolve `false` se não for dele). */
   readonly deleteOwned: (commentId: string, userId: string) => Promise<boolean>;
 }
@@ -326,6 +334,8 @@ export interface ReviewRepository {
   readonly upsert: (input: UpsertReviewInput) => Promise<ReviewRecord>;
   /** Lista reviews de um jogo, da mais recente para a mais antiga. */
   readonly listByGame: (gameId: string, limit: number, offset: number) => Promise<readonly ReviewRecord[]>;
+  /** Reviews do utilizador, das mais recentes (para a timeline). */
+  readonly listByUser: (userId: string, limit: number) => Promise<readonly ReviewRecord[]>;
   /** Agregado de notas de um jogo (médias e contagem). */
   readonly aggregate: (gameId: string) => Promise<ReviewAggregate>;
   /** Apaga a review do dono. */

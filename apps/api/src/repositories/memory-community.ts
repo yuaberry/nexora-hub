@@ -38,6 +38,13 @@ export class MemoryCommentRepository implements CommentRepository {
       .slice(offset, offset + limit);
   }
 
+  async listByUser(userId: string, limit: number): Promise<readonly CommentRecord[]> {
+    return [...this.rows.values()]
+      .filter((row) => row.userId === userId)
+      .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime())
+      .slice(0, limit);
+  }
+
   async deleteOwned(commentId: string, userId: string): Promise<boolean> {
     const row = this.rows.get(commentId);
     // Um comentário de outro utilizador é indistinguível de um inexistente.
@@ -110,6 +117,13 @@ export class MemoryReviewRepository implements ReviewRepository {
       averageGraphics: meanOrNull(rows.map((row) => row.graphics)),
       averageSound: meanOrNull(rows.map((row) => row.sound)),
     };
+  }
+
+  async listByUser(userId: string, limit: number): Promise<readonly ReviewRecord[]> {
+    return [...this.rows.values()]
+      .filter((row) => row.userId === userId)
+      .sort((left, right) => right.updatedAt.getTime() - left.updatedAt.getTime())
+      .slice(0, limit);
   }
 
   async deleteOwned(reviewId: string, userId: string): Promise<boolean> {

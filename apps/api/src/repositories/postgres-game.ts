@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, sql, desc } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { secondsBetween } from '../lib/time.js';
 import * as schema from '../db/schema.js';
@@ -138,6 +138,11 @@ export class PostgresLibraryRepository implements LibraryRepository {
       );
   }
 
+  async listByUser(userId: string): Promise<readonly LibraryEntryRecord[]> {
+    const rows = await this.db.select().from(schema.libraryEntries).where(eq(schema.libraryEntries.userId, userId));
+    return rows;
+  }
+
   async totalsByGame(userId: string): Promise<ReadonlyMap<string, number>> {
     const rows = await this.db
       .select({
@@ -207,6 +212,21 @@ export class PostgresPlaySessionRepository implements PlaySessionRepository {
       .where(and(eq(schema.gameSessions.id, id), eq(schema.gameSessions.userId, userId)))
       .returning();
     return rows[0] ?? null;
+  }
+
+  async listAllByUser(userId: string): Promise<readonly PlaySessionRecord[]> {
+    const rows = await this.db.select().from(schema.gameSessions).where(eq(schema.gameSessions.userId, userId));
+    return rows;
+  }
+
+  async listEndedByUser(userId: string, limit: number): Promise<readonly PlaySessionRecord[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.gameSessions)
+      .where(and(eq(schema.gameSessions.userId, userId), eq(schema.gameSessions.state, 'ended')))
+      .orderBy(desc(schema.gameSessions.endedAt))
+      .limit(limit);
+    return rows;
   }
 
   async totalPlayedSeconds(userId: string, gameId: string): Promise<number> {

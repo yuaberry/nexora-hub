@@ -1,0 +1,21 @@
+/** Dicionário PT-BR — estatísticas e timeline. */
+export const stats = {
+  'nav.stats': 'Estatísticas',
+  'stats.title': 'Estatísticas',
+  'stats.subtitle': 'Os números vêm do servidor — o launcher não soma listas.',
+  'stats.signIn': 'Entre para ver as suas estatísticas',
+  'stats.signIn.hint': 'As estatísticas são da sua conta NEXORA.',
+  'stats.totalHours': 'Horas jogadas',
+  'stats.sessions': 'Sessões',
+  'stats.games': 'Jogos distintos',
+  'stats.peakHour': 'Hora de pico',
+  'stats.topGames': 'Jogos mais jogados',
+  'stats.favoriteGenre': 'Género favorito',
+  'stats.empty': 'Sem dados ainda.',
+  'stats.timeline': 'Timeline',
+  'stats.timeline.empty': 'Nenhum evento ainda.',
+  'timeline.session-ended': 'Sessão terminada',
+  'timeline.comment-created': 'Comentário',
+  'timeline.review-created': 'Review',
+  'timeline.wishlist-added': 'Lista de desejos',
+} as const;

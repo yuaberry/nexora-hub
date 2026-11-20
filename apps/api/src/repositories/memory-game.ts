@@ -146,6 +146,12 @@ export class MemoryLibraryRepository implements LibraryRepository {
     }
     return totals;
   }
+
+  async listByUser(userId: string): Promise<readonly LibraryEntryRecord[]> {
+    return [...this.rows.values()]
+      .filter((row) => row.userId === userId)
+      .sort((left, right) => left.title.localeCompare(right.title));
+  }
 }
 
 /** Repositório de sessões de jogo em memória. */
@@ -207,6 +213,17 @@ export class MemoryPlaySessionRepository implements PlaySessionRepository {
     };
     this.rows.set(id, updated);
     return updated;
+  }
+
+  async listAllByUser(userId: string): Promise<readonly PlaySessionRecord[]> {
+    return [...this.rows.values()].filter((row) => row.userId === userId);
+  }
+
+  async listEndedByUser(userId: string, limit: number): Promise<readonly PlaySessionRecord[]> {
+    return [...this.rows.values()]
+      .filter((row) => row.userId === userId && row.state === 'ended')
+      .sort((left, right) => (right.endedAt ?? right.startedAt).getTime() - (left.endedAt ?? left.startedAt).getTime())
+      .slice(0, limit);
   }
 
   async totalPlayedSeconds(userId: string, gameId: string): Promise<number> {

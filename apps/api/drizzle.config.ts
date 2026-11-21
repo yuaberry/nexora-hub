@@ -20,6 +20,7 @@ export default defineConfig({
     './src/db/community-schema.ts',
     './src/db/wishlist-schema.ts',
     './src/db/family-schema.ts',
+    './src/db/friends-schema.ts',
   ],
   out: './drizzle',
   dbCredentials: {

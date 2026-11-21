@@ -12,7 +12,7 @@
 | 2 | **Downloads**: motor HTTP multi-conexão com verificação, manifestos de fonte, fila com prioridade, instalação na biblioteca; API de fontes unificada | ✅ Concluída (HTTP) | ciclo completo provado (manifesto → pesquisa → download verificado → biblioteca → jogo lançado → tempo gravado); **torrent e Wine/Proton ficam planeados** |
 | 2b | **Torrent e Wine/Proton** | ⏳ Planejada | cliente torrent real (decisão de dependência nativa) + handoff para launcher oficial |
 | 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | 🟡 Em curso (Família pronta) | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
-| 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ⏳ Planejada | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
+| 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | 🟡 Em curso (amigos e presença prontos; chat planeado) | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
@@ -336,6 +336,47 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+
+## Fase 4 — Amigos e presença (concluída em 2026-11-21)
+
+Primeira metade da Fase 4 (Social): amigos, pedidos e presença. O chat fica
+como o que é — planeado.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/social/`) — máquina de estados da amizade
+      (pedir, aceitar, recusar, cancelar, remover) e presença com validade
+      (heartbeat, TTL de 45 s, presença visível só para amigos, limpeza dos
+      expirados) — 18 testes no core.
+- [x] **API** — `GET/POST /api/v1/friends`,
+      `POST /api/v1/friends/requests/:id/accept|decline|cancel`,
+      `DELETE /api/v1/friends/:userId`, `GET /api/v1/friends/presence` e
+      `POST /api/v1/presence/heartbeat`, com repositórios em memória **e**
+      PostgreSQL (migração 0002) — 17 testes na API + teste de integração
+      sobre a base real.
+- [x] **Launcher** — página **Amigos**: adicionar por email, pedidos
+      recebidos (aceitar/recusar) e enviados (cancelar), lista com a
+      presença de cada amigo ("A jogar X", "Online", "Offline"), remover, e
+      actualização automática a cada 15 s.
+- [x] **Presença enquanto se joga** — o lançamento do jogo bate o coração
+      com o jogo em curso, repete a cada 30 s enquanto a sessão dura, e bate
+      com `null` quando ela acaba. O token da conta vive só dentro da sessão.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, pela API: Ana pediu amizade a Bruno, Bruno aceitou (a amizade
+  ficou nos dois sentidos), Bruno bateu o coração e **Ana viu Bruno online**;
+- no launcher: **Ana lançou o Hollow Knight pelo launcher** (com a conta
+  dela) e a presença do Bruno passou a mostrar Ana
+  **"A jogar Hollow Knight"** com o jogo real do manifesto
+  (`/home/llinux/.local/share/steam/steamapps/common/hollow knight`); ao
+  parar a sessão, o jogo saiu da presença (o coração final bate com `null`)
+  e a pessoa continua online;
+- a página Amigos mostrou a lista com o selo "Online" e o subtítulo "A jogar
+  Hollow Knight";
+- `pnpm typecheck` limpo; **466 testes verdes** no total (136 verdes contra
+  o PostgreSQL real).
 
 ## Fase 2b — Wine/Proton na prática e handoff para a loja (2026-11-21)
 

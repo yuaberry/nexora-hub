@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
+import { accessToken } from '../lib/api.js';
 import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import { CommunitySection } from '../components/CommunitySection.js';
@@ -33,7 +34,7 @@ export function GameDetailPage({
     if (game === null) {
       return;
     }
-    const result = await runner.launch(game.id);
+    const result = await runner.launch(game.id, accessToken() ?? undefined);
     setMessage(
       result.ok
         ? t('runner.session.started')

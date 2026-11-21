@@ -9,7 +9,9 @@ import { MemoryAuthSessionRepository, MemoryMfaRepository } from './memory-auth.
 import { MemoryWishlistRepository } from './memory-wishlist.js';
 import { PostgresWishlistRepository } from './postgres-wishlist.js';
 import { MemoryFamilyRepository } from './memory-family.js';
+import { MemoryFriendsRepository, MemoryPresenceRepository } from './memory-friends.js';
 import { PostgresFamilyRepository } from './postgres-family.js';
+import { PostgresFriendsRepository, PostgresPresenceRepository } from './postgres-friends.js';
 import { MemoryCommentRepository, MemoryReviewRepository } from './memory-community.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
@@ -39,6 +41,8 @@ export function createMemoryRepositories(): Repositories {
     library: new MemoryLibraryRepository(),
     wishlist: new MemoryWishlistRepository(),
     family: new MemoryFamilyRepository(),
+    friends: new MemoryFriendsRepository(),
+    presence: new MemoryPresenceRepository(),
     sessions: new MemoryPlaySessionRepository(),
     audit: new MemoryAuditRepository(),
     mode: 'memory',
@@ -71,6 +75,8 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     audit: new PostgresAuditRepository(database.db),
     wishlist: new PostgresWishlistRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     family: new PostgresFamilyRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
+    friends: new PostgresFriendsRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
+    presence: new PostgresPresenceRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     mode: 'postgres',
     close: async () => {
       await database.close();

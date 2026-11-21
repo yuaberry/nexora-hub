@@ -5,8 +5,11 @@ import type {
   FamilyResult,
   FamilyGameView,
   OfficialImportResult,
+  FriendsListView,
+  PresenceView,
   ScanResultView,
   ShortcutResultView,
+  SocialWriteResult,
   StoreCatalogResult,
   WishlistItemView,
   DesktopGameView,
@@ -49,7 +52,8 @@ const api: DesktopApi = {
     remove: (id) => ipcRenderer.invoke('library:remove', id) as Promise<boolean>,
   },
   runner: {
-    launch: (id) => ipcRenderer.invoke('runner:launch', id) as Promise<LaunchResultView>,
+    // O token (opcional) liga a presença: com conta, os amigos vêem o jogo a correr.
+    launch: (id, token) => ipcRenderer.invoke('runner:launch', id, token) as Promise<LaunchResultView>,
     running: () => ipcRenderer.invoke('runner:running') as Promise<RunningSessions>,
     stop: (sessionId) => ipcRenderer.invoke('runner:stop', sessionId) as Promise<SessionSummaryView | null>,
   },
@@ -119,6 +123,14 @@ const api: DesktopApi = {
     list: (gameKey) => ipcRenderer.invoke('saves:list', gameKey) as Promise<readonly SaveSnapshotView[]>,
     restore: (snapshotId, savePath) => ipcRenderer.invoke('saves:restore', snapshotId, savePath) as Promise<SourceOperationResult>,
     remove: (gameKey, snapshotId) => ipcRenderer.invoke('saves:remove', gameKey, snapshotId) as Promise<boolean>,
+  },
+  friends: {
+    list: (token) => ipcRenderer.invoke('friends:list', token) as Promise<FriendsListView>,
+    request: (email, token) => ipcRenderer.invoke('friends:request', email, token) as Promise<SocialWriteResult>,
+    respond: (requestId, action, token) => ipcRenderer.invoke('friends:respond', requestId, action, token) as Promise<SocialWriteResult>,
+    remove: (userId, token) => ipcRenderer.invoke('friends:remove', userId, token) as Promise<SocialWriteResult>,
+    presence: (token) => ipcRenderer.invoke('friends:presence', token) as Promise<PresenceView>,
+    heartbeat: (gameId, token) => ipcRenderer.invoke('friends:heartbeat', gameId, token) as Promise<SocialWriteResult>,
   },
   downloads: {
     list: () => ipcRenderer.invoke('downloads:list') as Promise<DownloadsListView>,

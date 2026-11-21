@@ -21,10 +21,10 @@ export function Sidebar({
   onNavigate,
   onSelectGame,
 }: {
-  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'account';
+  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'account';
   /** Jogo em detalhe (para marcar na lista), ou `null`. */
   readonly activeGameId: string | null;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'account') => void;
   readonly onSelectGame: (gameId: string) => void;
 }): ReactNode {
   const { t } = useInterface();
@@ -63,7 +63,7 @@ export function Sidebar({
     return games.filter((game) => game.title.toLowerCase().includes(needle));
   }, [games, filter]);
 
-  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'account'; readonly label: string }[] = [
+  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'account'; readonly label: string }[] = [
     { id: 'home', label: t('nav.home') },
     { id: 'library', label: t('nav.library') },
     { id: 'downloads', label: t('nav.downloads') },
@@ -71,6 +71,7 @@ export function Sidebar({
     { id: 'store', label: t('nav.store') },
     { id: 'stats', label: t('nav.stats') },
     { id: 'family', label: t('nav.family') },
+    { id: 'friends', label: t('nav.friends') },
     { id: 'account', label: user === null ? t('auth.login') : t('auth.account') },
   ];
 

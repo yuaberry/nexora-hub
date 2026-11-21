@@ -319,6 +319,53 @@ export interface FamilyResult {
   readonly message?: string;
 }
 
+/** Um amigo (vista do renderer). */
+export interface FriendView {
+  readonly userId: string;
+  readonly displayName: string | null;
+  readonly email: string | null;
+  readonly since: string;
+}
+
+/** Um pedido de amizade. */
+export interface FriendRequestView {
+  readonly id: string;
+  /** O outro lado do pedido (quem enviou, ou para quem foi enviado). */
+  readonly userId: string;
+  readonly displayName: string | null;
+  readonly email: string | null;
+  readonly createdAt: string;
+}
+
+/** O que a rota de amigos devolve. */
+export interface FriendsListView {
+  readonly ok: boolean;
+  readonly friends?: readonly FriendView[];
+  readonly incoming?: readonly FriendRequestView[];
+  readonly outgoing?: readonly FriendRequestView[];
+  readonly message?: string;
+}
+
+/** O que a rota de presença devolve. */
+export interface PresenceView {
+  readonly ok: boolean;
+  /** A minha presença (para a página mostrar o que estou a partilhar). */
+  readonly self?: { readonly status: 'online' | 'offline'; readonly gameId: string | null };
+  /** Amigos online — só amigos, com o jogo em curso quando estão a jogar. */
+  readonly friends?: readonly { readonly userId: string; readonly displayName: string | null; readonly gameId: string | null; readonly at: string }[];
+  readonly ttlSeconds?: number;
+  readonly message?: string;
+}
+
+/** Resultado de uma escrita social. */
+export interface SocialWriteResult {
+  readonly ok: boolean;
+  readonly message?: string;
+  readonly status?: string;
+  readonly userId?: string;
+  readonly code?: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -344,6 +391,20 @@ export interface DesktopApi {
      * `ok: false` quando o jogo não tem appid da Steam.
      */
     readonly open: (appId: string) => Promise<{ readonly ok: boolean }>;
+  };
+  readonly friends: {
+    /** Amigos, pedidos recebidos e enviados (exige conta). */
+    readonly list: (token: string) => Promise<FriendsListView>;
+    /** Pede amizade a um email (a pessoa tem de ter conta). */
+    readonly request: (email: string, token: string) => Promise<SocialWriteResult>;
+    /** Aceita, recusa ou cancela um pedido. */
+    readonly respond: (requestId: string, action: 'accept' | 'decline' | 'cancel', token: string) => Promise<SocialWriteResult>;
+    /** Remove um amigo (nos dois sentidos). */
+    readonly remove: (userId: string, token: string) => Promise<SocialWriteResult>;
+    /** Presença minha e dos meus amigos (só amigos aparecem). */
+    readonly presence: (token: string) => Promise<PresenceView>;
+    /** Bate o coração da presença (o jogo em curso pode ser `null`). */
+    readonly heartbeat: (gameId: string | null, token: string) => Promise<SocialWriteResult>;
   };
   readonly store: {
     /** Catálogo público (não exige conta — a API é pública). */
@@ -401,7 +462,11 @@ export interface DesktopApi {
     readonly remove: (id: string) => Promise<boolean>;
   };
   readonly runner: {
-    readonly launch: (id: string) => Promise<LaunchResultView>;
+    /**
+     * Lança um jogo. O token (opcional) liga a presença: com conta, os
+     * amigos vêem o jogo a correr enquanto ele durar.
+     */
+    readonly launch: (id: string, token?: string) => Promise<LaunchResultView>;
     readonly running: () => Promise<readonly SessionSummaryView[]>;
     readonly stop: (sessionId: string) => Promise<SessionSummaryView | null>;
   };

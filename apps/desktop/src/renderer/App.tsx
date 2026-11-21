@@ -11,6 +11,7 @@ import { LoginPage } from './pages/LoginPage.js';
 import { StorePage } from './pages/StorePage.js';
 import { StatsPage } from './pages/StatsPage.js';
 import { FamilyPage } from './pages/FamilyPage.js';
+import { FriendsPage } from './pages/FriendsPage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
 import type { DesktopGameView } from '../shared/preload-api.js';
@@ -37,6 +38,7 @@ export type Route =
   | { readonly name: 'store' }
   | { readonly name: 'stats' }
   | { readonly name: 'family' }
+  | { readonly name: 'friends' }
   | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
@@ -67,7 +69,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'account') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'account') => {
       navigate({ name: target });
     },
     [navigate],
@@ -105,7 +107,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'account') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -158,6 +160,7 @@ function Shell({
       {route.name === 'store' ? <StorePage /> : null}
       {route.name === 'stats' ? <StatsPage /> : null}
       {route.name === 'family' ? <FamilyPage /> : null}
+      {route.name === 'friends' ? <FriendsPage /> : null}
       {route.name === 'account' ? (
           <LoginPage
             onSkip={() => {
@@ -191,6 +194,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.stats');
     case 'family':
       return t('nav.family');
+    case 'friends':
+      return t('nav.friends');
     case 'account':
       return t('auth.title');
     default:

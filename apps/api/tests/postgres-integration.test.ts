@@ -228,6 +228,73 @@ describeIfDatabase('integração com PostgreSQL real', () => {
 
     await close();
   });
+
+  it('amizades e presença escrevem nas tabelas reais', async () => {
+    // Regressão: as tabelas sociais são novas — o teste garante que pedido,
+    // aceite (a amizade nos dois sentidos), remoção e heartbeat funcionam
+    // sobre a base real, com os índices únicos a valer.
+    await runMigrations(DATABASE_URL as string);
+    const env = loadEnv({ DATABASE_URL, NODE_ENV: 'test' } as NodeJS.ProcessEnv);
+    const app = await buildApp({ env, logger: false });
+
+    const stamp = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+    const ana = await registerUser(app, `amizade-ana-${stamp}@nexora.local`, 'senha-de-teste-123', 'Ana');
+    const bruno = await registerUser(app, `amizade-bruno-${stamp}@nexora.local`, 'senha-de-teste-123', 'Bruno');
+    const tokenAna = accessTokenOf(ana);
+    const tokenBruno = accessTokenOf(bruno);
+
+    const pedido = await app.inject({
+      method: 'POST',
+      url: '/api/v1/friends',
+      payload: { email: bruno.email },
+      headers: { authorization: `Bearer ${tokenAna}` },
+    });
+    expect(pedido.statusCode).toBe(201);
+    const requestId = (pedido.json() as { id: string }).id;
+
+    // O pedido pendente chega ao destinatário (e só a ele).
+    const deBruno = await app.inject({ method: 'GET', url: '/api/v1/friends', headers: { authorization: `Bearer ${tokenBruno}` } });
+    expect((deBruno.json() as { incoming: unknown[] }).incoming).toHaveLength(1);
+
+    const aceite = await app.inject({
+      method: 'POST',
+      url: `/api/v1/friends/requests/${requestId}/accept`,
+      headers: { authorization: `Bearer ${tokenBruno}` },
+    });
+    expect(aceite.statusCode).toBe(200);
+
+    // A amizade vive nos dois sentidos — cada um tem o outro na lista.
+    const amigosAna = (await app.inject({ method: 'GET', url: '/api/v1/friends', headers: { authorization: `Bearer ${tokenAna}` } })).json() as { friends: { userId: string }[] };
+    const amigosBruno = (await app.inject({ method: 'GET', url: '/api/v1/friends', headers: { authorization: `Bearer ${tokenBruno}` } })).json() as { friends: { userId: string }[] };
+    expect(amigosAna.friends.map((f) => f.userId)).toEqual([bruno.userId]);
+    expect(amigosBruno.friends.map((f) => f.userId)).toEqual([ana.userId]);
+
+    // Coração com jogo: a presença do amigo mostra o jogo.
+    const coracao = await app.inject({
+      method: 'POST',
+      url: '/api/v1/presence/heartbeat',
+      payload: { gameId: 'hollow-knight' },
+      headers: { authorization: `Bearer ${tokenAna}` },
+    });
+    expect(coracao.statusCode).toBe(200);
+    const presenca = (await app.inject({ method: 'GET', url: '/api/v1/friends/presence', headers: { authorization: `Bearer ${tokenBruno}` } })).json() as {
+      friends: { userId: string; gameId: string | null }[];
+    };
+    expect(presenca.friends).toHaveLength(1);
+    expect(presenca.friends[0]?.gameId).toBe('hollow-knight');
+
+    // Remover apaga os dois lados.
+    const remover = await app.inject({
+      method: 'DELETE',
+      url: `/api/v1/friends/${ana.userId}`,
+      headers: { authorization: `Bearer ${tokenBruno}` },
+    });
+    expect(remover.statusCode).toBe(204);
+    const depois = (await app.inject({ method: 'GET', url: '/api/v1/friends', headers: { authorization: `Bearer ${tokenAna}` } })).json() as { friends: unknown[] };
+    expect(depois.friends).toHaveLength(0);
+
+    await app.close();
+  });
 });
 
 describe('modo de persistência reportado', () => {

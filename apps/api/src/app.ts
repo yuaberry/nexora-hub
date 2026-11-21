@@ -23,6 +23,7 @@ import { registerStoreRoutes } from './modules/store/routes.js';
 import { registerStatsRoutes } from './modules/stats/routes.js';
 import { registerFamilyRoutes } from './modules/family/routes.js';
 import { registerFamilyInviteRoutes } from './modules/family/invites.js';
+import { registerFriendsRoutes } from './modules/friends/routes.js';
 import { registerSessionRoutes } from './modules/sessions/routes.js';
 import { registerAdminRoutes } from './modules/admin/routes.js';
 import { registerGatewayRoutes } from './gateway/socket.js';
@@ -105,6 +106,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerStatsRoutes(app, repositories);
   registerFamilyRoutes(app, repositories);
   registerFamilyInviteRoutes(app, repositories);
+  registerFriendsRoutes(app, repositories);
   registerSessionRoutes(app, repositories);
   registerAdminRoutes(app, repositories);
 

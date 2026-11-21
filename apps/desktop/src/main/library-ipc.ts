@@ -14,6 +14,7 @@ import { app, ipcMain } from 'electron';
 import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
 import { DEFAULT_API_BASE_URL } from './config.js';
 import { ensureWinePrefix } from './wine-prefix.js';
+import { startSessionPresence } from './friends-ipc.js';
 import { installDesktopShortcut } from './shortcuts.js';
 import { openExternal } from './window.js';
 import type {
@@ -268,7 +269,7 @@ export function registerIpc(dependencies: IpcDependencies): void {
     };
   });
 
-  ipcMain.handle('runner:launch', async (_event, id: unknown): Promise<LaunchResultView> => {
+  ipcMain.handle('runner:launch', async (_event, id: unknown, launchToken: unknown): Promise<LaunchResultView> => {
     if (!isNonEmptyString(id)) {
       return { ok: false, reasonKey: 'not-found' };
     }
@@ -313,9 +314,16 @@ export function registerIpc(dependencies: IpcDependencies): void {
       return { ok: false, reasonKey: outcome.reasonKey };
     }
 
+    // Presença: com conta, os amigos vêem o jogo a correr — e vêem-no
+    // acabar quando a sessão acaba. O token vive só dentro da sessão.
+    const sessionEnd = runner.wait(outcome.session.sessionId);
+    if (typeof launchToken === 'string' && launchToken !== '') {
+      startSessionPresence(launchToken, game.externalKey, sessionEnd);
+    }
+
     // O tempo jogado é gravado quando a sessão termina — incluindo o código
     // de saída, para que um crash não seja confundido com uma sessão normal.
-    void runner.wait(outcome.session.sessionId).then((summary) => {
+    void sessionEnd.then((summary) => {
       if (summary !== null && !summary.crashed) {
         library.addPlayedSeconds(game.externalKey, summary.durationSeconds, summary.endedAt ?? new Date().toISOString());
       }

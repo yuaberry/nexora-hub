@@ -18,6 +18,7 @@ import type {
   SessionSummaryView,
 } from '../../shared/preload-api.js';
 import { isDesktopRuntime } from '../../shared/preload-api.js';
+import { accessToken } from '../lib/api.js';
 
 /** A API do desktop, ou `null` no browser. */
 export function desktopApi(): DesktopApi | null {
@@ -131,7 +132,7 @@ export function useLibrary(): AsyncState<readonly DesktopGameView[]> & {
 
 /** Estado do runner (sessões em curso + acções). */
 export interface RunnerState extends AsyncState<readonly SessionSummaryView[]> {
-  readonly launch: (id: string) => Promise<LaunchResultView>;
+  readonly launch: (id: string, token?: string) => Promise<LaunchResultView>;
   readonly stop: (sessionId: string) => Promise<void>;
 }
 
@@ -148,7 +149,7 @@ export function useRunner(): RunnerState {
       if (api === null) {
         return { ok: false as const, reasonKey: 'no-runner' as const };
       }
-      const result = await api.runner.launch(id);
+      const result = await api.runner.launch(id, accessToken() ?? undefined);
       void state.reload();
       return result;
     },

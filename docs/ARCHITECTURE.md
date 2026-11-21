@@ -252,6 +252,25 @@ fronteira está escrita em `docs/LEGAL.md`, e a interface só oferece o
 caminho legítimo: jogar com o que o utilizador tem, ou abrir na loja onde
 comprou.
 
+## D33 — Presença é um coração que bate, não um interruptor
+
+"Online" não é um estado que se declara: é um **heartbeat com validade**
+(`PRESENCE_TTL_SECONDS` = 45 s). Quem passou desse tempo sem bater aparece
+offline — mesmo que o processo tenha morrido sem avisar. O launcher bate
+imediatamente ao lançar um jogo (com o jogo em curso), repete a cada 30 s
+enquanto a sessão dura, e bate com `null` quando ela acaba: quem estava a
+ver vê o amigo perder o jogo, não a pessoa desaparecer. Nada de estado
+zumbi a mostrar "a jogar" quem fechou o launcher há uma hora.
+
+## D34 — Só amigos vêem a presença, e o token vive dentro da sessão
+
+A presença de um estranho **não existe** nesta API: a rota devolve apenas os
+amigos. O token da conta chega ao processo principal no lançamento e vive só
+dentro da sessão — sem conta, não há presença (é honesto: a presença é da
+conta, não do computador). O pedido de amizade é unidireccional na
+aceitação — só quem recebeu aceita ou recusa — e um recurso de outro
+utilizador devolve 404, nunca 403 (não confirma existência).
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

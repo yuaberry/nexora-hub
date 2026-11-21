@@ -17,4 +17,5 @@ export * from './audit-schema.js';
 export * from './community-schema.js';
 export * from './wishlist-schema.js';
 export * from './family-schema.js';
+export * from './friends-schema.js';
 export * from './types.js';

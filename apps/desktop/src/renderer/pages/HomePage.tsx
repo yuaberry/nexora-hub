@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Badge, Button, EmptyState, PlannedBadge, useInterface, type Translator } from '@nexora/ui';
 import { useLibrary, useRunner } from '../state/desktop.js';
 import { formatPlayTime } from '../lib/format.js';
+import { accessToken } from '../lib/api.js';
 import { GameTile } from '../components/GameTile.js';
 import type { LibraryGame } from '@nexora/protocol';
 import type { DesktopGameView } from '../../shared/preload-api.js';
@@ -29,7 +30,7 @@ type TabId = (typeof TABS)[number]['id'];
 
 /** As acções do runner de que a Home precisa. */
 interface RunnerActions {
-  readonly launch: (id: string) => Promise<{ readonly ok: boolean; readonly reasonKey?: string }>;
+  readonly launch: (id: string, token?: string) => Promise<{ readonly ok: boolean; readonly reasonKey?: string }>;
 }
 
 export function HomePage({
@@ -174,7 +175,7 @@ async function onPlayFeatured(
   setMessage: (message: string) => void,
   t: Translator,
 ): Promise<void> {
-  const result = await runner.launch(game.id);
+  const result = await runner.launch(game.id, accessToken() ?? undefined);
   setMessage(
     result.ok
       ? t('runner.session.started')

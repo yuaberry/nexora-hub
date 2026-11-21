@@ -13,6 +13,7 @@ import { stats } from './stats.js';
 import { family } from './family.js';
 import { official } from './official.js';
 import { steam } from './steam.js';
+import { friends } from './friends.js';
 import { pages } from './pages.js';
 
 /**
@@ -39,5 +40,6 @@ export const ptBR = {
   ...family,
   ...official,
   ...steam,
+  ...friends,
   ...pages,
 } as const;

@@ -337,6 +337,75 @@ export interface WishlistRecord {
   readonly createdAt: Date;
 }
 
+/** Um pedido de amizade. */
+export interface FriendRequestRecord {
+  readonly id: string;
+  readonly fromUserId: string;
+  readonly toUserId: string;
+  readonly status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  readonly createdAt: Date;
+  readonly respondedAt: Date | null;
+}
+
+/** Uma amizade estabelecida (um lado do par). */
+export interface FriendshipRecord {
+  readonly userId: string;
+  readonly friendId: string;
+  readonly since: Date;
+}
+
+/** Um registo de presença. */
+export interface PresenceRecord {
+  readonly userId: string;
+  readonly gameId: string | null;
+  readonly at: Date;
+  readonly expiresAt: Date;
+}
+
+/** Entrada para criar um pedido de amizade. */
+export interface NewFriendRequestInput {
+  readonly id: string;
+  readonly fromUserId: string;
+  readonly toUserId: string;
+}
+
+export interface FriendsRepository {
+  /** Amigos de um utilizador, do mais recente ao mais antigo. */
+  readonly listFriends: (userId: string) => Promise<readonly FriendshipRecord[]>;
+  /** Pedidos recebidos ainda pendentes. */
+  readonly listIncomingRequests: (userId: string) => Promise<readonly FriendRequestRecord[]>;
+  /** Pedidos enviados ainda pendentes. */
+  readonly listOutgoingRequests: (userId: string) => Promise<readonly FriendRequestRecord[]>;
+  /**
+   * Cria um pedido, ou devolve `null` quando já existe um pendente entre os
+   * dois (em qualquer direcção).
+   *
+   * A verificação é da base, não só do domínio: dois pedidos em paralelo
+   * passariam os dois pela regra pura e criariam dois pendentes para a
+   * mesma amizade.
+   */
+  readonly createRequest: (input: NewFriendRequestInput) => Promise<FriendRequestRecord | null>;
+  /** Marca a resposta de um pedido (`null` quando não existe). */
+  readonly respondRequest: (
+    requestId: string,
+    status: 'accepted' | 'declined' | 'cancelled',
+    now: Date,
+  ) => Promise<FriendRequestRecord | null>;
+  /** Grava a amizade nos dois sentidos (idempotente). */
+  readonly addFriendship: (userId: string, friendId: string, now: Date) => Promise<void>;
+  /** Apaga a amizade nos dois sentidos. */
+  readonly removeFriendship: (userId: string, friendId: string) => Promise<boolean>;
+}
+
+export interface PresenceRepository {
+  /** Grava (ou substitui) o coração de um utilizador. */
+  readonly heartbeat: (input: { userId: string; gameId: string | null; at: Date; expiresAt: Date }) => Promise<void>;
+  /** Registos de vários utilizadores (a origem filtra os expirados). */
+  readonly list: (userIds: readonly string[]) => Promise<readonly PresenceRecord[]>;
+  /** Apaga os registos já expirados. */
+  readonly prune: (before: Date) => Promise<number>;
+}
+
 export interface WishlistRepository {
   /** Adiciona um jogo (idempotente pelo par utilizador/jogo). */
   readonly add: (userId: string, gameId: string, id: string) => Promise<WishlistRecord>;
@@ -357,6 +426,8 @@ export interface Repositories {
   readonly audit: AuditRepository;
   readonly wishlist: WishlistRepository;
   readonly family: FamilyRepository;
+  readonly friends: FriendsRepository;
+  readonly presence: PresenceRepository;
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;

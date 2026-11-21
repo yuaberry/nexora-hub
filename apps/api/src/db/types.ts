@@ -46,4 +46,10 @@ export type AuditAction =
   | 'family.invite.accept'
   | 'family.invite.decline'
   | 'family.member.remove'
-  | 'family.dissolve';
+  | 'family.dissolve'
+  | 'friends.request'
+  | 'friends.accept'
+  | 'friends.decline'
+  | 'friends.cancel'
+  | 'friends.remove'
+  | 'presence.heartbeat';

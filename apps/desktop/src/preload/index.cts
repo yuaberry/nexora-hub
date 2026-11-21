@@ -9,6 +9,7 @@ import type {
   PresenceView,
   ScanResultView,
   ShortcutResultView,
+  TelemetrySampleView,
   SocialWriteResult,
   StoreCatalogResult,
   WishlistItemView,
@@ -123,6 +124,10 @@ const api: DesktopApi = {
     list: (gameKey) => ipcRenderer.invoke('saves:list', gameKey) as Promise<readonly SaveSnapshotView[]>,
     restore: (snapshotId, savePath) => ipcRenderer.invoke('saves:restore', snapshotId, savePath) as Promise<SourceOperationResult>,
     remove: (gameKey, snapshotId) => ipcRenderer.invoke('saves:remove', gameKey, snapshotId) as Promise<boolean>,
+  },
+  telemetry: {
+    sample: () => ipcRenderer.invoke('telemetry:sample') as Promise<TelemetrySampleView>,
+    reset: () => ipcRenderer.invoke('telemetry:reset') as Promise<{ ok: boolean }>,
   },
   friends: {
     list: (token) => ipcRenderer.invoke('friends:list', token) as Promise<FriendsListView>,

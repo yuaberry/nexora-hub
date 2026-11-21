@@ -5,6 +5,7 @@ import { accessToken } from '../lib/api.js';
 import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import { CommunitySection } from '../components/CommunitySection.js';
+import { PerformanceCard } from '../components/PerformanceCard.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
 /**
@@ -159,6 +160,10 @@ export function GameDetailPage({
       <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
 
       <CommunitySection gameId={game.externalKey} />
+
+      {/* Leituras reais do sistema: o cartão mede enquanto a página está
+          aberta — o jogo a correr é quando ele mais interessa. */}
+      <PerformanceCard label={t('perf.whilePlaying')} />
     </div>
   );
 }

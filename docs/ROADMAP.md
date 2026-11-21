@@ -16,7 +16,7 @@
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
-| 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | ⏳ Planejada | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
+| 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (CPU/memória/temperatura medidos; FPS ainda planeado) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
 | 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | ⏳ Planejada | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
 | 9 | **Futuro**: Remote Play (Sunshine/Moonlight + sessões Nexora Cloud), Big Picture, widgets VTuber | ⏳ Planejada | latência medida com percentis; botão de streaming desligado enquanto não houver medição |
 
@@ -159,6 +159,41 @@ fase (`docs/LEGAL.md`).
   (`no-runner`). Testes cobrem nativo, Wine, recusa e prefixos distintos.
 
 
+
+
+## Fase 7 — Desempenho (primeira parte, concluída em 2026-11-21)
+
+Medir o que o sistema realmente tem. O FPS continua planeado — a razão está
+escrita na interface.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/telemetry/`) — leitura da linha `cpu` do
+      `/proc/stat` com o uso por **diferença**, `/proc/meminfo` pelo
+      disponível, `/proc/loadavg` e sensores de `/sys/class/hwmon`
+      (miligraus → graus) — 13 testes no core, com fixtures das leituras
+      reais desta máquina.
+- [x] **Launcher** (`main/telemetry.ts`, `main/telemetry-ipc.ts`) —
+      amostras reais a cada 2 s com um observador que guarda a leitura
+      anterior da CPU; cartão **Desempenho** nos detalhes do jogo e nas
+      Configurações, com CPU, memória, temperatura mais quente (chip e
+      rótulo), carga média e o **FPS marcado como planeado** com o motivo.
+- [x] **Bug real corrigido pelo teste contra o sistema** — as entradas de
+      `/sys/class/hwmon` são *symlinks*: `Dirent.isDirectory()` devolve
+      `false` para elas, e nenhum sensor era encontrado. O leitor passou a
+      usar `stat` para resolver o symlink.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, nos detalhes do Hollow Knight e nas Configurações: **CPU 50,3 %,
+  memória 44,5 %, temperatura 64 °C (dell_smm · GPU), carga média 4,2** —
+  oito sensores reais lidos do sistema (GPU, CPU, coretemp em 2 núcleos,
+  ambiente e duas zonas `acpitz`);
+- a primeira amostra mostrou **"—"** para a CPU (honesto: sem duas leituras
+  não há uso) e passados 2 s mostrou o valor real;
+- com o jogo lançado, as leituras continuaram reais (CPU 43,7 %, memória
+  37,4 %);
+- `pnpm typecheck` limpo; **487 testes verdes** no total.
 
 ## Fase 4 — Interface Profissional (concluída em 2026-11-18)
 
@@ -337,6 +372,41 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+
+## Fase 7 — Desempenho (primeira parte, concluída em 2026-11-21)
+
+Medir o que o sistema realmente tem. O FPS continua planeado — a razão está
+escrita na interface.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/telemetry/`) — leitura da linha `cpu` do
+      `/proc/stat` com o uso por **diferença**, `/proc/meminfo` pelo
+      disponível, `/proc/loadavg` e sensores de `/sys/class/hwmon`
+      (miligraus → graus) — 13 testes no core, com fixtures das leituras
+      reais desta máquina.
+- [x] **Launcher** (`main/telemetry.ts`, `main/telemetry-ipc.ts`) —
+      amostras reais a cada 2 s com um observador que guarda a leitura
+      anterior da CPU; cartão **Desempenho** nos detalhes do jogo e nas
+      Configurações, com CPU, memória, temperatura mais quente (chip e
+      rótulo), carga média e o **FPS marcado como planeado** com o motivo.
+- [x] **Bug real corrigido pelo teste contra o sistema** — as entradas de
+      `/sys/class/hwmon` são *symlinks*: `Dirent.isDirectory()` devolve
+      `false` para elas, e nenhum sensor era encontrado. O leitor passou a
+      usar `stat` para resolver o symlink.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, nos detalhes do Hollow Knight e nas Configurações: **CPU 50,3 %,
+  memória 44,5 %, temperatura 64 °C (dell_smm · GPU), carga média 4,2** —
+  oito sensores reais lidos do sistema (GPU, CPU, coretemp em 2 núcleos,
+  ambiente e duas zonas `acpitz`);
+- a primeira amostra mostrou **"—"** para a CPU (honesto: sem duas leituras
+  não há uso) e passados 2 s mostrou o valor real;
+- com o jogo lançado, as leituras continuaram reais (CPU 43,7 %, memória
+  37,4 %);
+- `pnpm typecheck` limpo; **487 testes verdes** no total.
 
 ## Fase 4 — Amigos e presença (concluída em 2026-11-21)
 

@@ -25,4 +25,5 @@ export * from './importers/vdf.js';
 export * from './importers/steam.js';
 export * from './social/friends.js';
 export * from './social/presence.js';
+export * from './telemetry/procfs.js';
 

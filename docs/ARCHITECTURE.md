@@ -271,6 +271,17 @@ conta, não do computador). O pedido de amizade é unidireccional na
 aceitação — só quem recebeu aceita ou recusa — e um recurso de outro
 utilizador devolve 404, nunca 403 (não confirma existência).
 
+## D35 — A medida vem do sistema, não de uma estimativa
+
+A telemetria lê o que o Linux expõe: `/proc/stat` (CPU), `/proc/meminfo`
+(memória), `/proc/loadavg` (carga) e os sensores de `/sys/class/hwmon`
+(temperatura). Nada de biblioteca externa, nada de número estimado. O uso
+da CPU é medido por **diferença** entre duas leituras — o absoluto daria a
+média desde o arranque — e a primeira amostra não sabe o uso: mostra "—" em
+vez de inventar. A memória usa o **disponível** (não o livre, que ignoraria a
+cache recuperável). O que não é medível sem injecção no processo do jogo
+(FPS) fica **planeado**, com o motivo escrito — nunca um número fingido.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

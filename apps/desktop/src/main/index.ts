@@ -18,6 +18,7 @@ import { registerDownloadsIpc } from './downloads-ipc.js';
 import { registerSavesIpc } from './saves-ipc.js';
 import { registerOfficialImportIpc } from './official-ipc.js';
 import { registerFriendsIpc } from './friends-ipc.js';
+import { registerTelemetryIpc } from './telemetry-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -115,6 +116,9 @@ function bootstrap(): void {
   // Amigos e presença: a API é a dona das regras; o launcher bate o coração
   // enquanto uma sessão de jogo dura.
   registerFriendsIpc();
+
+  // Telemetria: leituras reais do sistema (CPU, memória, temperaturas).
+  registerTelemetryIpc();
 
   mainWindow = createMainWindow(config);
 }

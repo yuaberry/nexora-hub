@@ -15,6 +15,7 @@ import {
   type Translator,
 } from '@nexora/ui';
 import { useDiskUsage, useIsDesktop, useAppInfo } from '../state/desktop.js';
+import { PerformanceCard } from '../components/PerformanceCard.js';
 import { formatBytes } from '../lib/format.js';
 import { FREE_PLAN } from '@nexora/core';
 
@@ -166,7 +167,11 @@ export function SettingsPage(): ReactNode {
         </div>
       </Card>
       </div>
-    </div>
+    
+
+      {/* Desempenho: as leituras reais do sistema, no diagnóstico do launcher. */}
+      <PerformanceCard />
+</div>
   );
 }
 

@@ -366,6 +366,29 @@ export interface SocialWriteResult {
   readonly code?: string;
 }
 
+/** Uma leitura de temperatura (vista do renderer). */
+export interface TemperatureReadingView {
+  /** Chip do sensor (`coretemp`, `dell_smm`…). */
+  readonly chip: string;
+  /** Rótulo do sensor, ou `null`. */
+  readonly label: string | null;
+  readonly celsius: number;
+}
+
+/** Uma amostra do sistema (CPU, memória, carga, temperaturas). */
+export interface TelemetrySampleView {
+  /** Uso da CPU desde a amostra anterior (`null` na primeira). */
+  readonly cpuPercent: number | null;
+  /** Percentagem de memória em uso. */
+  readonly memoryPercent: number | null;
+  /** Carga média de 1 minuto, ou `null`. */
+  readonly loadAverage: number | null;
+  /** Sensores de temperatura, do mais quente para o mais frio. */
+  readonly temperatures: readonly TemperatureReadingView[];
+  /** ISO-8601 UTC da leitura. */
+  readonly at: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -405,6 +428,12 @@ export interface DesktopApi {
     readonly presence: (token: string) => Promise<PresenceView>;
     /** Bate o coração da presença (o jogo em curso pode ser `null`). */
     readonly heartbeat: (gameId: string | null, token: string) => Promise<SocialWriteResult>;
+  };
+  readonly telemetry: {
+    /** Uma amostra do sistema (CPU, memória, carga, temperaturas). */
+    readonly sample: () => Promise<TelemetrySampleView>;
+    /** Esquece a leitura anterior da CPU (a próxima não sabe o uso). */
+    readonly reset: () => Promise<{ readonly ok: boolean }>;
   };
   readonly store: {
     /** Catálogo público (não exige conta — a API é pública). */

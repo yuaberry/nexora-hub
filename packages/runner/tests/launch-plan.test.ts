@@ -20,6 +20,7 @@ const linuxWithWine: LaunchContext = { platform: 'linux', winePath: '/usr/bin/wi
 
 /** Contexto Linux sem Wine. */
 const linuxWithoutWine: LaunchContext = { platform: 'linux', winePath: null, winePrefixRoot: '/prefixos' };
+const linuxWithGameMode: LaunchContext = { ...linuxWithWine, gameModePath: '/usr/games/gamemoderun' };
 
 describe('resolveLaunchPlan', () => {
   it('um executável nativo é invocado directamente', () => {
@@ -112,5 +113,53 @@ describe('winePrefixPath', () => {
     }
     // A correcção do bug: quem cria a pasta tem de criar a que o plano usa.
     expect(plan.env['WINEPREFIX']).toBe(winePrefixPath('/prefixos', '/jogos/Hollow Knight'));
+  });
+});
+
+describe('GameMode no plano de arranque', () => {
+  it('embreula o executável nativo quando o GameMode existe', () => {
+    const plan = resolveLaunchPlan({ gameId: 'jogo', executablePath: '/jogos/jogo.sh' }, {
+      platform: 'linux',
+      winePath: null,
+      winePrefixRoot: '/prefixos',
+      gameModePath: '/usr/games/gamemoderun',
+    });
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) {
+      return;
+    }
+    expect(plan.command).toBe('/usr/games/gamemoderun');
+    expect(plan.args).toEqual(['/jogos/jogo.sh']);
+    // A camada continua a ser a do jogo — o embrulho não a substitui.
+    expect(plan.layer).toBe('native');
+  });
+
+  it('empresta o Wine por baixo do GameMode, sem perder o prefixo', () => {
+    const plan = resolveLaunchPlan(
+      { gameId: '/jogos/hollow knight', executablePath: '/jogos/hollow knight/hollow_knight.exe' },
+      linuxWithGameMode,
+    );
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) {
+      return;
+    }
+    expect(plan.command).toBe('/usr/games/gamemoderun');
+    expect(plan.args[0]).toBe('/usr/bin/wine');
+    expect(plan.args[1]).toBe('/jogos/hollow knight/hollow_knight.exe');
+    // O ambiente do prefixo sobrevive ao embrulho — é o que faz o jogo correr.
+    expect(plan.env['WINEPREFIX']).toBe(winePrefixPath('/prefixos', '/jogos/hollow knight'));
+    expect(plan.layer).toBe('wine');
+  });
+
+  it('sem GameMode o plano é o de sempre (nada fingido)', () => {
+    const semGameMode = resolveLaunchPlan(
+      { gameId: 'jogo', executablePath: '/jogos/jogo.sh' },
+      { platform: 'linux', winePath: null, winePrefixRoot: '/prefixos' },
+    );
+    const comGameMode = resolveLaunchPlan(
+      { gameId: 'jogo', executablePath: '/jogos/jogo.sh' },
+      { platform: 'linux', winePath: null, winePrefixRoot: '/prefixos', gameModePath: null },
+    );
+    expect(JSON.stringify(semGameMode)).toBe(JSON.stringify(comGameMode));
   });
 });

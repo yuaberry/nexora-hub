@@ -15,6 +15,7 @@ import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/
 import { DEFAULT_API_BASE_URL } from './config.js';
 import { ensureWinePrefix } from './wine-prefix.js';
 import { startSessionPresence } from './friends-ipc.js';
+import { findGameMode } from './optimizer.js';
 import { installDesktopShortcut } from './shortcuts.js';
 import { openExternal } from './window.js';
 import type {
@@ -438,6 +439,9 @@ export function launchContext(): LaunchContext {
     platform: process.platform,
     winePath: findInPath('wine') ?? findInPath('wine64'),
     winePrefixRoot: join(app.getPath('userData'), 'wine-prefixes'),
+    // O GameMode é o tweak de desempenho que se pode aplicar sem privilégios:
+    // detectado, não presumido. Sem ele, o plano de arranque não muda.
+    gameModePath: findGameMode(),
   };
 }
 

@@ -9,6 +9,9 @@ import type {
   PresenceView,
   ScanResultView,
   ShortcutResultView,
+  OptimizerScanResult,
+  OptimizerRunResult,
+  OptimizerHistoryResult,
   TelemetrySampleView,
   SocialWriteResult,
   StoreCatalogResult,
@@ -136,6 +139,13 @@ const api: DesktopApi = {
     remove: (userId, token) => ipcRenderer.invoke('friends:remove', userId, token) as Promise<SocialWriteResult>,
     presence: (token) => ipcRenderer.invoke('friends:presence', token) as Promise<PresenceView>,
     heartbeat: (gameId, token) => ipcRenderer.invoke('friends:heartbeat', gameId, token) as Promise<SocialWriteResult>,
+  },
+  optimizer: {
+    scan: (targetIds) => ipcRenderer.invoke('optimizer:scan', targetIds) as Promise<OptimizerScanResult>,
+    clean: (targetIds) => ipcRenderer.invoke('optimizer:clean', targetIds) as Promise<OptimizerRunResult>,
+    history: () => ipcRenderer.invoke('optimizer:history') as Promise<OptimizerHistoryResult>,
+    restore: (runId) => ipcRenderer.invoke('optimizer:restore', runId) as Promise<{ ok: boolean; message?: string }>,
+    gameMode: () => ipcRenderer.invoke('optimizer:gamemode') as Promise<{ available: boolean; path: string | null }>,
   },
   downloads: {
     list: () => ipcRenderer.invoke('downloads:list') as Promise<DownloadsListView>,

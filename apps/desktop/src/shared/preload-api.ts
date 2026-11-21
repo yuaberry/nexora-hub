@@ -389,6 +389,49 @@ export interface TelemetrySampleView {
   readonly at: string;
 }
 
+/** O que um alvo tem para limpar (vista do renderer). */
+export interface OptimizerTargetScanView {
+  readonly targetId: string;
+  readonly fileCount: number;
+  readonly totalBytes: number;
+}
+
+/** Resultado de uma varredura. */
+export interface OptimizerScanResult {
+  readonly ok: boolean;
+  readonly items?: readonly OptimizerTargetScanView[];
+  readonly totalBytes?: number;
+  readonly fileCount?: number;
+  readonly message?: string;
+}
+
+/** Resultado de uma limpeza. */
+export interface OptimizerRunResult {
+  readonly ok: boolean;
+  readonly freedBytes?: number;
+  readonly removed?: number;
+  readonly failures?: number;
+  readonly runId?: string;
+  readonly message?: string;
+}
+
+/** Uma execução no histórico. */
+export interface OptimizerRunView {
+  readonly id: string;
+  readonly at: string;
+  readonly freedBytes: number;
+  readonly removed: number;
+  readonly failures: number;
+  readonly restored: boolean;
+}
+
+/** Resultado da leitura do histórico. */
+export interface OptimizerHistoryResult {
+  readonly ok: boolean;
+  readonly runs?: readonly OptimizerRunView[];
+  readonly message?: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -434,6 +477,18 @@ export interface DesktopApi {
     readonly sample: () => Promise<TelemetrySampleView>;
     /** Esquece a leitura anterior da CPU (a próxima não sabe o uso). */
     readonly reset: () => Promise<{ readonly ok: boolean }>;
+  };
+  readonly optimizer: {
+    /** Varre os alvos (quanto espaço cada um tem). */
+    readonly scan: (targetIds: readonly string[]) => Promise<OptimizerScanResult>;
+    /** Limpa os alvos e guarda a execução no histórico. */
+    readonly clean: (targetIds: readonly string[]) => Promise<OptimizerRunResult>;
+    /** O histórico das execuções. */
+    readonly history: () => Promise<OptimizerHistoryResult>;
+    /** Aplica o ponto de restauro de uma execução. */
+    readonly restore: (runId: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
+    /** O GameMode está instalado? (tweak de arranque sem privilégios). */
+    readonly gameMode: () => Promise<{ readonly available: boolean; readonly path: string | null }>;
   };
   readonly store: {
     /** Catálogo público (não exige conta — a API é pública). */

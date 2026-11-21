@@ -15,6 +15,7 @@ import { official } from './official.js';
 import { steam } from './steam.js';
 import { friends } from './friends.js';
 import { perf } from './perf.js';
+import { optimizer } from './optimizer.js';
 import { pages } from './pages.js';
 
 /**
@@ -41,5 +42,6 @@ export const en = {
   ...steam,
   ...friends,
   ...perf,
+  ...optimizer,
   ...pages,
 };

@@ -16,7 +16,7 @@
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
-| 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (CPU/memória/temperatura medidos; FPS ainda planeado) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
+| 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (medidas + otimizador prontos; FPS e overlay planeados) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
 | 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | ⏳ Planejada | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
 | 9 | **Futuro**: Remote Play (Sunshine/Moonlight + sessões Nexora Cloud), Big Picture, widgets VTuber | ⏳ Planejada | latência medida com percentis; botão de streaming desligado enquanto não houver medição |
 
@@ -160,6 +160,38 @@ fase (`docs/LEGAL.md`).
 
 
 
+
+
+## Fase 7 — Otimizador (concluída em 2026-11-21)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/optimizer/`) — catálogo declarativo dos
+      alvos de limpeza (com o custo de cada um escrito) e o que a ferramenta
+      **recusa**, com o motivo (governor, swappiness, serviços, limpar RAM)
+      — 8 testes no core.
+- [x] **Launcher** (`main/optimizer.ts`, `main/optimizer-ipc.ts`) — varredura
+      real dos alvos, limpeza com o que foi apagado e o que falhou, histórico
+      das execuções e **ponto de restauro** (recria a estrutura; os ficheiros
+      de cache não voltam, e a interface diz-o) — 10 testes no desktop.
+- [x] **GameMode como tweak de arranque** — quando o `gamemoderun` existe, o
+      plano de arranque embrulha o jogo com ele (a camada do jogo mantém-se,
+      o ambiente do prefixo Wine mantém-se) — 3 testes novos no runner.
+- [x] **Página Otimizador** — o que pode limpar (com MB reais e o custo), os
+      ajustes de arranque, **o que a ferramenta não faz** com os motivos, e o
+      histórico com o ponto de restauro por execução.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, nesta máquina: a varredura encontrou **29,56 MB em 8014
+  ficheiros** (miniaturas 1,70 MB, fontconfig 6,89 MB, shaders Mesa 13,47 MB,
+  shaders da Steam 7,50 MB); a limpeza das miniaturas libertou 1,70 MB em 77
+  ficheiros sem falhas e a segunda varredura do mesmo alvo deu zero;
+- o ponto de restauro foi aplicado a uma execução do histórico;
+- **GameMode**: detectado (`/usr/games/gamemoderun`); com o Hollow Knight
+  lançado pelo launcher, o daemon **`/usr/bin/gamemoded`** ficou activo com os
+  processos do jogo — o tweak é real, não um selo;
+- `pnpm typecheck` limpo; **508 testes verdes** no total.
 
 ## Fase 7 — Desempenho (primeira parte, concluída em 2026-11-21)
 
@@ -373,6 +405,38 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+
+## Fase 7 — Otimizador (concluída em 2026-11-21)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/optimizer/`) — catálogo declarativo dos
+      alvos de limpeza (com o custo de cada um escrito) e o que a ferramenta
+      **recusa**, com o motivo (governor, swappiness, serviços, limpar RAM)
+      — 8 testes no core.
+- [x] **Launcher** (`main/optimizer.ts`, `main/optimizer-ipc.ts`) — varredura
+      real dos alvos, limpeza com o que foi apagado e o que falhou, histórico
+      das execuções e **ponto de restauro** (recria a estrutura; os ficheiros
+      de cache não voltam, e a interface diz-o) — 10 testes no desktop.
+- [x] **GameMode como tweak de arranque** — quando o `gamemoderun` existe, o
+      plano de arranque embrulha o jogo com ele (a camada do jogo mantém-se,
+      o ambiente do prefixo Wine mantém-se) — 3 testes novos no runner.
+- [x] **Página Otimizador** — o que pode limpar (com MB reais e o custo), os
+      ajustes de arranque, **o que a ferramenta não faz** com os motivos, e o
+      histórico com o ponto de restauro por execução.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, nesta máquina: a varredura encontrou **29,56 MB em 8014
+  ficheiros** (miniaturas 1,70 MB, fontconfig 6,89 MB, shaders Mesa 13,47 MB,
+  shaders da Steam 7,50 MB); a limpeza das miniaturas libertou 1,70 MB em 77
+  ficheiros sem falhas e a segunda varredura do mesmo alvo deu zero;
+- o ponto de restauro foi aplicado a uma execução do histórico;
+- **GameMode**: detectado (`/usr/games/gamemoderun`); com o Hollow Knight
+  lançado pelo launcher, o daemon **`/usr/bin/gamemoded`** ficou activo com os
+  processos do jogo — o tweak é real, não um selo;
+- `pnpm typecheck` limpo; **508 testes verdes** no total.
 
 ## Fase 7 — Desempenho (primeira parte, concluída em 2026-11-21)
 

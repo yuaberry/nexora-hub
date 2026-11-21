@@ -39,6 +39,15 @@ export interface LaunchContext {
   readonly winePath: string | null;
   /** Directório base para os prefixos Wine. */
   readonly winePrefixRoot: string;
+  /**
+   * Caminho do `gamemoderun`, ou `null`.
+   *
+   * O GameMode (Feral) é o tweak de desempenho que se pode fazer **sem
+   * privilégios e sem quebrar nada**: governor, prioridade de I/O e
+   * escalonador, aplicados só enquanto o jogo corre. Sem ele, o plano não
+   * muda — a ferramenta não finge uma optimização que não existe.
+   */
+  readonly gameModePath?: string | null;
 }
 
 /**
@@ -64,34 +73,48 @@ export function resolveLaunchPlan(request: LaunchRequest, context: LaunchContext
   const isWindowsExecutable = request.executablePath.toLowerCase().endsWith('.exe');
   const needsWine = context.platform === 'linux' && isWindowsExecutable;
 
-  if (!needsWine) {
-    return {
-      ok: true,
-      command: request.executablePath,
-      args: request.args ?? [],
-      layer: 'native',
-      env: {},
-    };
-  }
+  // A camada de compatibilidade decide o comando e os argumentos; o GameMode
+  // (quando existe) embrulha o resultado — as duas camadas compõem-se sem
+  // substituir o ambiente do prefixo.
+  let command: string;
+  let args: readonly string[];
+  let layer: CompatLayer;
+  let env: Readonly<Record<string, string>>;
 
-  if (context.winePath === null) {
+  if (!needsWine) {
+    command = request.executablePath;
+    args = request.args ?? [];
+    layer = 'native';
+    env = {};
+  } else if (context.winePath === null) {
     return {
       ok: false,
       reasonKey: 'no-runner',
       reason: 'Wine não encontrado: instale o Wine (ou o Proton) para correr jogos Windows no Linux.',
     };
-  }
-
-  return {
-    ok: true,
-    command: context.winePath,
-    args: [request.executablePath, ...(request.args ?? [])],
-    layer: 'wine',
-    env: {
+  } else {
+    command = context.winePath;
+    args = [request.executablePath, ...(request.args ?? [])];
+    layer = 'wine';
+    env = {
       WINEPREFIX: winePrefixPath(context.winePrefixRoot, request.gameId),
       WINEDLLOVERRIDES: 'winemenubuilder.exe=d',
-    },
-  };
+    };
+  }
+
+  if (context.gameModePath !== undefined && context.gameModePath !== null) {
+    return {
+      ok: true,
+      command: context.gameModePath,
+      args: [command, ...args],
+      // A camada continua a ser a do jogo: o GameMode é um embrulho, não a
+      // forma de correr o jogo.
+      layer,
+      env,
+    };
+  }
+
+  return { ok: true, command, args, layer, env };
 }
 
 /** Nome de pasta seguro para o prefixo Wine. */

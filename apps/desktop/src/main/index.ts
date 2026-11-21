@@ -19,6 +19,7 @@ import { registerSavesIpc } from './saves-ipc.js';
 import { registerOfficialImportIpc } from './official-ipc.js';
 import { registerFriendsIpc } from './friends-ipc.js';
 import { registerTelemetryIpc } from './telemetry-ipc.js';
+import { registerOptimizerIpc } from './optimizer-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -119,6 +120,9 @@ function bootstrap(): void {
 
   // Telemetria: leituras reais do sistema (CPU, memória, temperaturas).
   registerTelemetryIpc();
+
+  // Otimizador: limpeza do que o sistema regenera, com ponto de restauro.
+  registerOptimizerIpc();
 
   mainWindow = createMainWindow(config);
 }

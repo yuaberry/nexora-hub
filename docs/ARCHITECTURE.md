@@ -282,6 +282,24 @@ vez de inventar. A memória usa o **disponível** (não o livre, que ignoraria a
 cache recuperável). O que não é medível sem injecção no processo do jogo
 (FPS) fica **planeado**, com o motivo escrito — nunca um número fingido.
 
+## D36 — O otimizador limpa o que o sistema regenera, e declara o que recusa
+
+A Fase 7 pedia "optimizador de SO com ponto de restauração — a optimização
+reverte sem quebrar o SO".A forma honesta de o fazer em Linux: **só apagar o
+que o sistema regenera** (cache de miniaturas, cache de shaders, lixo),
+dentro da pasta do utilizador, nunca com privilégios. O que exige root
+(governor da CPU, swappiness) ou pode deixar o sistema instável
+(desactivar serviços) fica **declarado como recusado**, com o motivo, na
+interface — e o "limpar RAM" é declarado o que é: o Linux já gere a memória,
+e limpá-la só obriga a reler tudo do disco.
+
+O ponto de restauro recria a estrutura de pastas (o jogo espera encontrá-la)
+e diz a verdade: os ficheiros de cache não voltam, são regenerados pelo
+sistema. O tweak de arranque que a ferramenta aplica é o **GameMode**
+(Feral) — governor, prioridade de I/O e escalonador, só enquanto o jogo
+corre, sem privilégios e sem quebrar nada. Sem ele instalado, o plano de
+arranque não muda: nada de optimização fingida.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

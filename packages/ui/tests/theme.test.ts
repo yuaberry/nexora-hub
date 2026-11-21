@@ -11,6 +11,7 @@ import {
   appliedTheme,
   autoScaleFactor,
   clampScale,
+  nextToggleTheme,
   scaleFactor,
   THEME_MODES,
   toggleTheme,
@@ -53,7 +54,18 @@ describe('tokens de tema', () => {
   it('o alternador percorre claro/escuro', () => {
     expect(toggleTheme('dark')).toBe('light');
     expect(toggleTheme('light')).toBe('dark');
-    expect([...THEME_MODES]).toEqual(['light', 'dark', 'auto']);
+    expect([...THEME_MODES]).toEqual(['light', 'dark', 'oled', 'noir', 'auto']);
+  });
+
+  it('os temas especiais são escolha própria, não passo do alternador', () => {
+    expect(appliedTheme('oled', false)).toBe('oled');
+    expect(appliedTheme('noir', false)).toBe('noir');
+    // O alternador rápido só vai e volta entre claro e escuro: de um tema
+    // escuro (incluindo OLED e preto e branco) vai para o claro.
+    expect(nextToggleTheme('oled')).toBe('light');
+    expect(nextToggleTheme('noir')).toBe('light');
+    expect(nextToggleTheme('dark')).toBe('light');
+    expect(nextToggleTheme('light')).toBe('dark');
   });
 
   it('limita a escala aos limites declarados', () => {

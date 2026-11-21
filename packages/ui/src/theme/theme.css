@@ -59,6 +59,59 @@ html {
   --paper-placeholder-ink: #b9b9c9;
 }
 
+/* Tema OLED — preto verdadeiro (#000000).
+ *
+ * Num painel OLED um pixel preto está desligado: o fundo puro poupa energia
+ * e dá contraste infinito. Por isso as superfícies aqui são quase todas
+ * #000000, e a separação entre cartões vem da tinta e da linha, não de
+ * cinzentos — um cinzento no fundo acenderia pixels sem necessidade. */
+[data-theme='oled'] {
+  --paper-surface-deepest: #000000;
+  --paper-surface: #040407;
+  --paper-surface-raised: #101015;
+  --paper-surface-sunken: #000000;
+  --paper-line: #23232c;
+  --paper-ink-strong: #ffffff;
+  --paper-ink: #dadae2;
+  --paper-ink-muted: #93939f;
+  --paper-accent: #5b9bff;
+  --paper-accent-soft: #16294f;
+  --paper-accent-ink: #ffffff;
+  --paper-positive: #4ade80;
+  --paper-warning: #fcd34d;
+  --paper-danger: #fb8989;
+  --paper-neutral: #6b7280;
+  --paper-placeholder-from: #101015;
+  --paper-placeholder-to: #191920;
+  --paper-placeholder-ink: #b9b9c9;
+}
+
+/* Tema preto e branco — zero cor, em qualquer pixel.
+ *
+ * Nenhum token tem matiz: superfícies, tinta e acentos são cinzentos. O
+ * acento é branco com tinta escura, para o foco continuar visível sem
+ * introduzir cor. */
+[data-theme='noir'] {
+  --paper-surface-deepest: #000000;
+  --paper-surface: #0b0b0b;
+  --paper-surface-raised: #151515;
+  --paper-surface-sunken: #060606;
+  --paper-line: #262626;
+  --paper-ink-strong: #ffffff;
+  --paper-ink: #d4d4d4;
+  --paper-ink-muted: #989898;
+  --paper-accent: #ededed;
+  --paper-accent-soft: #2b2b2b;
+  --paper-accent-ink: #0a0a0a;
+  --paper-positive: #c9c9c9;
+  --paper-warning: #b8b8b8;
+  --paper-danger: #f0f0f0;
+  --paper-neutral: #757575;
+  --paper-placeholder-from: #1b1b1b;
+  --paper-placeholder-to: #242424;
+  --paper-placeholder-ink: #b0b0b0;
+}
+
 /* Tema claro — `surface-deepest` é o fundo mais claro. */
 [data-theme='light'] {
   --paper-surface-deepest: #ffffff;
@@ -90,6 +143,18 @@ html {
 [data-contrast='high'][data-theme='dark'] {
   --paper-ink: #ffffff;
   --paper-ink-muted: #cfcfe0;
+  --paper-line: #ffffff;
+}
+
+[data-contrast='high'][data-theme='oled'] {
+  --paper-ink: #ffffff;
+  --paper-ink-muted: #d8d8e4;
+  --paper-line: #ffffff;
+}
+
+[data-contrast='high'][data-theme='noir'] {
+  --paper-ink: #ffffff;
+  --paper-ink-muted: #cfcfcf;
   --paper-line: #ffffff;
 }
 

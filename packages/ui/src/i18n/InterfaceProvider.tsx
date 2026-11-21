@@ -10,8 +10,8 @@ import {
 import { readPreferences, writePreferences, type InterfacePreferences } from '../theme/preferences.js';
 import {
   appliedTheme,
+  nextToggleTheme,
   scaleFactor,
-  toggleTheme,
   type AppliedTheme,
   type Locale,
   type ScaleMode,
@@ -136,7 +136,7 @@ export function InterfaceProvider({
       appliedTheme: theme,
       setTheme,
       toggleTheme: () => {
-        setTheme(toggleTheme(theme));
+        setTheme(nextToggleTheme(theme));
       },
       scale: preferences.scale,
       setScale,

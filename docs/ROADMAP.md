@@ -193,6 +193,30 @@ fase (`docs/LEGAL.md`).
   processos do jogo — o tweak é real, não um selo;
 - `pnpm typecheck` limpo; **508 testes verdes** no total.
 
+
+## Interface — temas OLED e preto e branco (2026-11-21)
+
+### Entregue
+
+- [x] **Tema OLED** — fundo `#000000` verdadeiro (pixel desligado = energia
+      poupada e contraste infinito), separação por tinta e linha em vez de
+      cinzentos;
+- [x] **Tema preto e branco** — nenhum token tem matiz: superfícies, tinta e
+      acentos são cinzentos, e o acento é branco com tinta escura para o foco
+      continuar visível;
+- [x] **Alto contraste** cobre os dois temas novos; o alternador rápido do
+      cabeçalho continua a ciclar só entre claro e escuro (os temas especiais
+      são escolha nas Configurações).
+
+### Prova de execução real (2026-11-21)
+
+- Tema OLED aplicado ao vivo: `data-theme=oled`, fundo **#000000**, cartão
+  `#040407`, tinta `#ffffff` — captura das Configurações e do Início;
+- Tema preto e branco aplicado ao vivo: `data-theme=noir`, fundo `#000000`,
+  acento `#ededed` com tinta `#0a0a0a` — captura do Início sem uma única cor;
+- nenhum componente foi alterado: a prova de que a arquitectura de tokens
+  aguenta temas novos sem divergência.
+
 ## Fase 7 — Desempenho (primeira parte, concluída em 2026-11-21)
 
 Medir o que o sistema realmente tem. O FPS continua planeado — a razão está
@@ -437,6 +461,30 @@ automática depois do checksum, cliente de torrent.
   lançado pelo launcher, o daemon **`/usr/bin/gamemoded`** ficou activo com os
   processos do jogo — o tweak é real, não um selo;
 - `pnpm typecheck` limpo; **508 testes verdes** no total.
+
+
+## Interface — temas OLED e preto e branco (2026-11-21)
+
+### Entregue
+
+- [x] **Tema OLED** — fundo `#000000` verdadeiro (pixel desligado = energia
+      poupada e contraste infinito), separação por tinta e linha em vez de
+      cinzentos;
+- [x] **Tema preto e branco** — nenhum token tem matiz: superfícies, tinta e
+      acentos são cinzentos, e o acento é branco com tinta escura para o foco
+      continuar visível;
+- [x] **Alto contraste** cobre os dois temas novos; o alternador rápido do
+      cabeçalho continua a ciclar só entre claro e escuro (os temas especiais
+      são escolha nas Configurações).
+
+### Prova de execução real (2026-11-21)
+
+- Tema OLED aplicado ao vivo: `data-theme=oled`, fundo **#000000**, cartão
+  `#040407`, tinta `#ffffff` — captura das Configurações e do Início;
+- Tema preto e branco aplicado ao vivo: `data-theme=noir`, fundo `#000000`,
+  acento `#ededed` com tinta `#0a0a0a` — captura do Início sem uma única cor;
+- nenhum componente foi alterado: a prova de que a arquitectura de tokens
+  aguenta temas novos sem divergência.
 
 ## Fase 7 — Desempenho (primeira parte, concluída em 2026-11-21)
 

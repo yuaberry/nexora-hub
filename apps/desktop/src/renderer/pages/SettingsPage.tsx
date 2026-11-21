@@ -182,6 +182,10 @@ function themeLabel(mode: ThemeMode, t: Translator): string {
       return t('settings.theme.light');
     case 'dark':
       return t('settings.theme.dark');
+    case 'oled':
+      return t('settings.theme.oled');
+    case 'noir':
+      return t('settings.theme.noir');
     default:
       return t('settings.theme.auto');
   }

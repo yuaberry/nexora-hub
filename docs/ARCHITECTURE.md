@@ -300,6 +300,18 @@ sistema. O tweak de arranque que a ferramenta aplica é o **GameMode**
 corre, sem privilégios e sem quebrar nada. Sem ele instalado, o plano de
 arranque não muda: nada de optimização fingida.
 
+## D37 — Temas novos são só tokens — nenhum componente precisa de saber
+
+OLED (preto verdadeiro) e preto e branco entraram sem uma linha de mudança
+nos componentes: cada tema é um conjunto de tokens `--paper-*`, e o
+componente que usa papéis desenha-se bem em qualquer um deles. Num painel
+OLED um pixel preto está desligado — por isso o fundo do tema OLED é
+`#000000` puro e a separação entre cartões vem da tinta e da linha, não de
+cinzentos. No tema preto e branco nenhum token tem matiz: o acento é branco
+com tinta escura, para o foco continuar visível sem introduzir cor. O
+alternador rápido do cabeçalho continua a ir e voltar só entre claro e
+escuro — os temas especiais são escolha deliberada nas Configurações.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

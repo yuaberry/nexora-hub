@@ -7,6 +7,8 @@ export const settings = {
   'settings.theme': 'Theme',
   'settings.theme.light': 'Light',
   'settings.theme.dark': 'Dark',
+  'settings.theme.oled': 'OLED (true black)',
+  'settings.theme.noir': 'Black and white',
   'settings.theme.auto': 'Automatic (follows the system)',
   'settings.theme.label': 'Theme switch',
   'settings.language': 'Language',

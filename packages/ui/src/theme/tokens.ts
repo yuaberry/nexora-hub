@@ -9,11 +9,11 @@
  */
 
 /** Modos de tema. `auto` segue o sistema. */
-export const THEME_MODES = ['light', 'dark', 'auto'] as const;
+export const THEME_MODES = ['light', 'dark', 'oled', 'noir', 'auto'] as const;
 export type ThemeMode = (typeof THEME_MODES)[number];
 
 /** Tema efectivamente aplicado ao documento. */
-export type AppliedTheme = 'light' | 'dark';
+export type AppliedTheme = 'light' | 'dark' | 'oled' | 'noir';
 
 /** Idiomas suportados. */
 export const LOCALES = ['pt-BR', 'en'] as const;
@@ -77,6 +77,18 @@ export function appliedTheme(mode: ThemeMode, prefersDark: boolean): AppliedThem
     return prefersDark ? 'dark' : 'light';
   }
   return mode;
+}
+
+/**
+ * Tema que o alternador rápido escolhe a seguir.
+ *
+ * O alternador vai e volta entre claro e escuro — os temas especiais (OLED,
+ * preto e branco) são escolha deliberada nas Configurações, não um passo no
+ * meio de um alternador.
+ */
+export function nextToggleTheme(mode: ThemeMode): ThemeMode {
+  const applied = appliedTheme(mode, false);
+  return applied === 'light' ? 'dark' : 'light';
 }
 
 /** Alterna entre claro e escuro a partir do tema aplicado. */

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { appliedTheme, type AppliedTheme } from '../theme/tokens.js';
+import { appliedTheme, type AppliedTheme, type ThemeMode } from '../theme/tokens.js';
 
 /**
  * Estrutura: barra lateral e alternador de tema animado.
@@ -63,7 +63,7 @@ export function Sidebar({
 }
 
 export interface ThemeSwitchProps {
-  /** Tema aplicado agora (claro ou escuro). */
+  /** Tema aplicado agora (claro, escuro, OLED ou preto e branco). */
   readonly theme: AppliedTheme;
   /** Alterna entre claro e escuro. */
   readonly onToggle: () => void;
@@ -76,7 +76,9 @@ export interface ThemeSwitchProps {
 
 /** Alternador animado — a posição do polegar segue o tema aplicado. */
 export function ThemeSwitch({ theme, onToggle, label, lightLabel, darkLabel }: ThemeSwitchProps): ReactNode {
-  const isDark = theme === 'dark';
+  // Os temas especiais (OLED, preto e branco) são escuros: o polegar
+  // fica do lado escuro neles também.
+  const isDark = theme !== 'light';
   return (
     <button
       type="button"
@@ -96,7 +98,7 @@ export function ThemeSwitch({ theme, onToggle, label, lightLabel, darkLabel }: T
 
 /** Devolve o tema aplicado para uma preferência (helper fino para as apps). */
 export function resolveAppliedTheme(
-  mode: 'light' | 'dark' | 'auto',
+  mode: ThemeMode,
   prefersDark: boolean,
 ): AppliedTheme {
   return appliedTheme(mode, prefersDark);

@@ -375,6 +375,38 @@ export interface ChatRepository {
   }) => Promise<ChatMessageRecord>;
 }
 
+/** Uma entrada do livro de pontos. */
+export interface PointEntryRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly delta: number;
+  /** Motivo declarado (`achievement.ten-hours`, …). */
+  readonly reason: string;
+  /** A entidade que deu os pontos (a conquista), ou `null`. */
+  readonly entityId: string | null;
+  readonly createdAt: Date;
+}
+
+export interface AchievementRepository {
+  /** Conquistas desbloqueadas pelo utilizador, das mais recentes. */
+  readonly listUnlocked: (userId: string) => Promise<readonly { achievementId: string; unlockedAt: Date }[]>;
+  /**
+   * Marca uma conquista como desbloqueada.
+   *
+   * Devolve `false` quando já estava — e é assim que os pontos não são
+   * pagos duas vezes pela mesma conquista.
+   */
+  readonly unlock: (userId: string, achievementId: string, now: Date) => Promise<boolean>;
+  /** Quantos utilizadores têm a conquista (contagem global, não estimativa). */
+  readonly countUnlockedByAchievement: (achievementId: string) => Promise<number>;
+  /** Acrescenta uma entrada ao livro de pontos. */
+  readonly addPoints: (input: { userId: string; delta: number; reason: string; entityId: string | null }) => Promise<PointEntryRecord>;
+  /** As últimas entradas do livro do utilizador. */
+  readonly listPoints: (userId: string, limit: number) => Promise<readonly PointEntryRecord[]>;
+  /** Saldo = a soma das entradas (nunca um campo guardado). */
+  readonly balance: (userId: string) => Promise<number>;
+}
+
 /** Um item da lista de desejos. */
 export interface WishlistRecord {
   readonly id: string;
@@ -475,6 +507,7 @@ export interface Repositories {
   readonly friends: FriendsRepository;
   readonly presence: PresenceRepository;
   readonly chat: ChatRepository;
+  readonly achievements: AchievementRepository;
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;

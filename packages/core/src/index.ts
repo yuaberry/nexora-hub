@@ -29,4 +29,5 @@ export * from './telemetry/procfs.js';
 export * from './optimizer/targets.js';
 export * from './optimizer/report.js';
 export * from './chat/conversations.js';
+export * from './achievements/achievements.js';
 

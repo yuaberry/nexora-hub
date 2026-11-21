@@ -466,6 +466,31 @@ export interface ChatOpenResult {
   readonly message?: string;
 }
 
+/** O progresso de uma conquista (vista do renderer). */
+export interface AchievementProgressView {
+  readonly id: string;
+  readonly labelKey: string;
+  readonly hintKey: string;
+  readonly target: number;
+  readonly value: number;
+  /** Progresso entre 0 e 1. */
+  readonly progress: number;
+  readonly unlocked: boolean;
+  readonly points: number;
+  /** Quantos jogadores têm a conquista. */
+  readonly holders: number;
+}
+
+/** Uma entrada do livro de pontos. */
+export interface PointEntryView {
+  readonly id: string;
+  readonly delta: number;
+  /** Motivo (`achievement.<id>`). */
+  readonly reason: string;
+  readonly entityId: string | null;
+  readonly createdAt: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */

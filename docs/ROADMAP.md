@@ -13,7 +13,7 @@
 | 2b | **Torrent e Wine/Proton** | ⏳ Planejada | cliente torrent real (decisão de dependência nativa) + handoff para launcher oficial |
 | 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | 🟡 Em curso (Família pronta) | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
 | 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ✅ Concluída (push em tempo real fica como passo seguinte) | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
-| 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
+| 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | 🟡 Em curso (pontos e conquistas prontos; cosméticos/tarefas/capturas planeados) | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
 | 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (medidas + otimizador prontos; FPS e overlay planeados) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
@@ -520,6 +520,37 @@ escrita na interface.
   37,4 %);
 - `pnpm typecheck` limpo; **487 testes verdes** no total.
 
+
+
+## Fase 5 — Pontos e conquistas (concluída em 2026-11-21)
+
+Primeira metade da fase da economia. Cosméticos, tarefas e capturas ficam
+como o que são — planeados.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/achievements/`) — catálogo de conquistas
+      com regras puras sobre as sessões reais (primeira sessão, dez e cem
+      horas, cinco jogos distintos, coruja, maratona) e a pontuação de cada
+      uma — 9 testes no core.
+- [x] **API** — `GET /api/v1/achievements` (avalia, desbloqueia o que é novo
+      **uma vez** e paga os pontos) e `GET /api/v1/points` (saldo + livro),
+      com repositórios em memória **e** PostgreSQL (migração 0004: um par
+      utilizador/conquista, e o livro só de acréscimos) — 9 testes na API.
+- [x] **Launcher** — página **Conquistas** com os pontos, as barras de
+      progresso reais, a contagem de jogadores que têm cada conquista e o
+      livro de onde os pontos vieram.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, pela API: uma conta sem sessões não tinha nada desbloqueado; depois
+  de uma sessão real de 30 min (criada e terminada pela API), a conquista
+  **"Primeira sessão"** desbloqueou-se com valor 1, 10 pontos e 1 jogador — e
+  o livro registou a entrada com o motivo;
+- no launcher: a página mostrou **10 de 440 pontos possíveis**, 1 de 6
+  desbloqueadas, a barra dos cinco jogos a **20 %** (1 de 5) e o livro com
+  "+10 · 21/11/2026, 19:24";
+- `pnpm typecheck` limpo; **549 testes verdes** no total.
 
 ## Fase 4 — Chat (concluída em 2026-11-21)
 

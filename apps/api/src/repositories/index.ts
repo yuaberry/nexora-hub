@@ -11,9 +11,11 @@ import { PostgresWishlistRepository } from './postgres-wishlist.js';
 import { MemoryFamilyRepository } from './memory-family.js';
 import { MemoryFriendsRepository, MemoryPresenceRepository } from './memory-friends.js';
 import { MemoryChatRepository } from './memory-chat.js';
+import { MemoryAchievementRepository } from './memory-achievements.js';
 import { PostgresFamilyRepository } from './postgres-family.js';
 import { PostgresFriendsRepository, PostgresPresenceRepository } from './postgres-friends.js';
 import { PostgresChatRepository } from './postgres-chat.js';
+import { PostgresAchievementRepository } from './postgres-achievements.js';
 import { MemoryCommentRepository, MemoryReviewRepository } from './memory-community.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
@@ -46,6 +48,7 @@ export function createMemoryRepositories(): Repositories {
     friends: new MemoryFriendsRepository(),
     presence: new MemoryPresenceRepository(),
     chat: new MemoryChatRepository(),
+    achievements: new MemoryAchievementRepository(),
     sessions: new MemoryPlaySessionRepository(),
     audit: new MemoryAuditRepository(),
     mode: 'memory',
@@ -81,6 +84,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     friends: new PostgresFriendsRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     presence: new PostgresPresenceRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     chat: new PostgresChatRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
+    achievements: new PostgresAchievementRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     mode: 'postgres',
     close: async () => {
       await database.close();

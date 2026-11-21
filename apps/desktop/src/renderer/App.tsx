@@ -14,6 +14,7 @@ import { FamilyPage } from './pages/FamilyPage.js';
 import { FriendsPage } from './pages/FriendsPage.js';
 import { OptimizerPage } from './pages/OptimizerPage.js';
 import { ChatPage } from './pages/ChatPage.js';
+import { AchievementsPage } from './pages/AchievementsPage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
 import type { DesktopGameView } from '../shared/preload-api.js';
@@ -43,6 +44,7 @@ export type Route =
   | { readonly name: 'friends' }
   | { readonly name: 'optimizer' }
   | { readonly name: 'chat'; readonly with?: { readonly userId: string; readonly displayName: string | null; readonly email: string } }
+  | { readonly name: 'achievements' }
   | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
@@ -73,7 +75,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'account') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'account') => {
       navigate({ name: target });
     },
     [navigate],
@@ -111,7 +113,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'account') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -180,6 +182,7 @@ function Shell({
       ) : null}
       {route.name === 'optimizer' ? <OptimizerPage /> : null}
       {route.name === 'chat' ? <ChatPage conversationWith={route.with} /> : null}
+      {route.name === 'achievements' ? <AchievementsPage /> : null}
       {route.name === 'account' ? (
           <LoginPage
             onSkip={() => {
@@ -219,6 +222,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.optimizer');
     case 'chat':
       return t('nav.chat');
+    case 'achievements':
+      return t('nav.achievements');
     case 'account':
       return t('auth.title');
     default:

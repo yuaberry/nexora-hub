@@ -329,6 +329,17 @@ real ensinado por estes testes: a rota devolvia o identificador gerado pelo
 domínio e a base guardava outro — o cliente ficava com um id que não existia.
 Quem manda no identificador é o repositório, que é idempotente pelo par.
 
+## D39 — Conquistas avaliam dados reais, e o saldo é a soma do livro
+
+Uma conquista desbloqueia-se com **sessões reais** — as mesmas que as
+estatísticas — e não por estar com o launcher aberto. A avaliação é uma
+função pura do domínio (`packages/core/achievements`): a API corre-a a cada
+leitura, desbloqueia o que é novo **uma vez** (o par utilizador/conquista é
+chave primária) e acrescenta os pontos ao livro. O saldo é a **soma** das
+entradas (`coalesce(sum(delta), 0)`), nunca um campo guardado: um saldo que
+pudesse ser editado não seria um saldo. A contagem de quantos jogadores têm
+uma conquista é um `count(*)` real, não uma estimativa.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

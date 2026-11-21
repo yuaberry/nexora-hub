@@ -54,4 +54,5 @@ export type AuditAction =
   | 'friends.remove'
   | 'presence.heartbeat'
   | 'chat.open'
-  | 'chat.message';
+  | 'chat.message'
+  | 'achievement.unlocked';

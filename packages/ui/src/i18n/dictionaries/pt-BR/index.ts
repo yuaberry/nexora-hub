@@ -17,6 +17,7 @@ import { friends } from './friends.js';
 import { perf } from './perf.js';
 import { optimizer } from './optimizer.js';
 import { chat } from './chat.js';
+import { achievements } from './achievements.js';
 import { pages } from './pages.js';
 
 /**
@@ -47,5 +48,6 @@ export const ptBR = {
   ...perf,
   ...optimizer,
   ...chat,
+  ...achievements,
   ...pages,
 } as const;

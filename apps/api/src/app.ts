@@ -25,6 +25,7 @@ import { registerFamilyRoutes } from './modules/family/routes.js';
 import { registerFamilyInviteRoutes } from './modules/family/invites.js';
 import { registerFriendsRoutes } from './modules/friends/routes.js';
 import { registerChatRoutes } from './modules/chat/routes.js';
+import { registerAchievementRoutes } from './modules/achievements/routes.js';
 import { registerSessionRoutes } from './modules/sessions/routes.js';
 import { registerAdminRoutes } from './modules/admin/routes.js';
 import { registerGatewayRoutes } from './gateway/socket.js';
@@ -109,6 +110,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerFamilyInviteRoutes(app, repositories);
   registerFriendsRoutes(app, repositories);
   registerChatRoutes(app, repositories);
+  registerAchievementRoutes(app, repositories);
   registerSessionRoutes(app, repositories);
   registerAdminRoutes(app, repositories);
 

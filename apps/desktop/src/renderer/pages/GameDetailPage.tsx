@@ -41,6 +41,23 @@ export function GameDetailPage({
     );
   }, [game, runner, t]);
 
+  /**
+   * Abrir no cliente oficial da Steam.
+   *
+   * O caminho legítimo para jogar como a loja corre: a Steam arranca o
+   * jogo com a licença do utilizador, o Proton escolhido por ela e os
+   * servidores oficiais. Só aparece quando o jogo tem appid — veio de um
+   * manifesto da loja; sem ele, o botão não existiria a fingir.
+   */
+  const onOpenInSteam = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined || game?.steamAppId == null) {
+      return;
+    }
+    const result = await api.steam.open(game.steamAppId);
+    setMessage(result.ok ? t('steam.opened') : t('error.generic'));
+  }, [game, t]);
+
   if (library.loading) {
     return <p>{t('common.loading')}</p>;
   }
@@ -97,6 +114,9 @@ export function GameDetailPage({
             <Button variant="primary" onClick={() => void onPlay()}>
               {t('common.action.play')}
             </Button>
+            {game.steamAppId === null ? null : (
+              <Button onClick={() => void onOpenInSteam()}>{t('steam.open')}</Button>
+            )}
             <Button
               aria-pressed={game.favorite}
               onClick={() => {

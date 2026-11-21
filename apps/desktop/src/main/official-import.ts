@@ -154,6 +154,10 @@ export function importSteamLibrary(
           cover: localCoverFile(installPath),
           installPath,
           executablePath: executable.path,
+          // O appid fica guardado: é o que permite abrir o jogo no cliente
+          // oficial da Steam (o caminho legítimo para jogar como a loja
+          // corre — Proton, Steamworks e servidores oficiais incluídos).
+          steamAppId: manifest.appId === '' ? null : manifest.appId,
         });
         titles.push(manifest.name);
       }
@@ -193,6 +197,24 @@ export function importOfficial(library: LocalLibrary, roots?: readonly string[])
 /** Registra se a Steam está instalada (diagnóstico para a interface). */
 export function steamInstalled(roots: readonly string[] = steamRoots()): boolean {
   return roots.some((root) => existsSync(join(root, 'steamapps', 'libraryfolders.vdf')));
+}
+
+/**
+ * URL do protocolo da Steam para arrancar um jogo pelo appid.
+ *
+ * `steam://rungameid/<id>` é o protocolo que o **próprio cliente** da Steam
+ * registou no sistema: aberto, o jogo corre pela Steam — com a licença do
+ * utilizador, o Proton escolhido por ela, o Steamworks e os servidores
+ * oficiais. É o handoff legítimo para o launcher oficial (Fase 2b): quem
+ * tem o jogo, joga exactamente como jogaria pela loja.
+ *
+ * `null` quando o appid não é um número — um URL inventado não abre nada.
+ */
+export function steamRunUrl(appId: string | null): string | null {
+  if (appId === null || !/^\d+$/.test(appId.trim())) {
+    return null;
+  }
+  return `steam://rungameid/${appId.trim()}`;
 }
 
 /** Nome base de um caminho (reexportado para os testes). */

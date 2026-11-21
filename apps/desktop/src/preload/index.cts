@@ -86,6 +86,11 @@ const api: DesktopApi = {
     // do launcher. O processo principal decide — o renderer não abre URLs.
     openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url) as Promise<void>,
   },
+  steam: {
+    // Handoff para o cliente oficial: o renderer passa o appid, o processo
+    // principal constrói o URL e decide abrir.
+    open: (appId) => ipcRenderer.invoke('steam:open', appId) as Promise<{ ok: boolean }>,
+  },
   store: {
     catalog: (query, platform, hideAdult) => ipcRenderer.invoke('store:catalog', query, platform, hideAdult) as Promise<StoreCatalogResult>,
   },

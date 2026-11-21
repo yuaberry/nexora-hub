@@ -227,6 +227,31 @@ entram no relatório como **formato local por verificar**: não há manifesto
 confirmado para as suas ferramentas em Linux, e a interface diz-o em vez de
 fingir uma importação que não existe.
 
+## D31 — O prefixo Wine tem de existir antes do spawn
+
+O Wine faz `chdir` para a pasta do prefixo e **morre com código 1** se ela
+não existir — e o `spawn` não cria directorias. O plano de arranque
+(`resolveLaunchPlan`) é puro e não faz I/O; quem arrancar cria a pasta
+antes (`ensureWinePrefix`, no desktop). O caminho é construído por
+`winePrefixPath`, exportado do `@nexora/runner`, para que o plano e quem
+prepara o disco calculem a **mesma** pasta. O sintoma sem a correcção era o
+pior possível: o jogo "arrancava", morria em milissegundos, e a sessão
+fechava sem uma única mensagem de erro.
+
+## D32 — Handoff legítimo, não emulação de autenticação
+
+Um jogo comprado numa loja corre nessa loja — e o caminho correcto para
+isso é o **handoff**: `steam://rungameid/<appid>`, o protocolo que o próprio
+cliente da Steam registou no sistema. Aberto, o jogo corre pela loja, com a
+licença do utilizador, o Proton escolhido por ela e os servidores oficiais.
+O que o launcher **não** faz, em nenhuma fase: emular autenticação, fingir
+uma licença, ligar cópias sem licença a servidores oficiais nem usar
+"online-fix" de terceiros — é contorno de protecção técnica (DMCA,
+Directiva 2001/29/CE) e facilita a infracção de direitos de autor. A
+fronteira está escrita em `docs/LEGAL.md`, e a interface só oferece o
+caminho legítimo: jogar com o que o utilizador tem, ou abrir na loja onde
+comprou.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

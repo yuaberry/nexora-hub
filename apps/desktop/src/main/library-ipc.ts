@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import { app, ipcMain } from 'electron';
 import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
 import { DEFAULT_API_BASE_URL } from './config.js';
+import { ensureWinePrefix } from './wine-prefix.js';
 import { installDesktopShortcut } from './shortcuts.js';
 import { openExternal } from './window.js';
 import type {
@@ -79,6 +80,7 @@ function toView(record: {
   readonly cover: string | null;
   readonly installPath: string;
   readonly executablePath: string;
+  readonly steamAppId?: string | null;
   readonly tags: readonly string[];
   readonly favorite: boolean;
   readonly lastPlayedAt: string | null;
@@ -91,6 +93,9 @@ function toView(record: {
     cover: record.cover,
     installPath: record.installPath,
     executablePath: record.executablePath,
+    // Appid da Steam, quando o jogo veio de um manifesto da loja: é o que
+    // permite o handoff para o cliente oficial.
+    steamAppId: record.steamAppId ?? null,
     tags: record.tags,
     favorite: record.favorite,
     lastPlayedAt: record.lastPlayedAt,
@@ -286,6 +291,14 @@ export function registerIpc(dependencies: IpcDependencies): void {
       return { ok: false, reasonKey: plan.reasonKey };
     }
 
+    // O prefixo Wine tem de existir antes do spawn: o Wine faz `chdir` para
+    // ele e morre com código 1 se a pasta não estiver lá. Sem isto, o jogo
+    // "arrancava" e morria em milissegundos, sem erro visível.
+    const prefix = plan.env['WINEPREFIX'];
+    if (typeof prefix === 'string') {
+      ensureWinePrefix(prefix);
+    }
+
     const outcome = await runner.launch({
       gameId: game.externalKey,
       // O executável real (a verificação de existência e a identidade da
@@ -319,7 +332,16 @@ export function registerIpc(dependencies: IpcDependencies): void {
   // Abrir um URL no browser do sistema (usado pelas ligações de compra da
   // loja: a compra acontece na loja oficial, fora do launcher).
   ipcMain.handle('shell:openExternal', async (_event, url: unknown) => {
-    if (typeof url !== 'string' || (!url.startsWith('https://') && !url.startsWith('http://'))) {
+    if (typeof url !== 'string') {
+      return { ok: false };
+    }
+    // Só passam dois esquemas: `http(s)` (as lojas oficiais) e `steam://`
+    // (o protocolo que o cliente da Steam registou no sistema — o handoff
+    // para o launcher oficial). Nada mais: um `file://` ou um esquema
+    // desconhecido nunca é aberto pelo processo principal.
+    const allowed =
+      url.startsWith('https://') || url.startsWith('http://') || url.startsWith('steam://rungameid/');
+    if (!allowed) {
       return { ok: false };
     }
     await openExternal(url);

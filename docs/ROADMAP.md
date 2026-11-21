@@ -336,6 +336,42 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+## Fase 2b — Wine/Proton na prática e handoff para a loja (2026-11-21)
+
+### Entregue
+
+- [x] **Bug real corrigido no arranque** — um jogo Windows (`.exe`) no Linux
+      morria com **código 1** em milissegundos, sem erro visível: o Wine faz
+      `chdir` para a pasta do prefixo e o launcher nunca a criava (o `spawn`
+      não cria directorias). Agora o prefixo é criado antes do arranque
+      (`ensureWinePrefix`, com o caminho construído por `winePrefixPath`,
+      exportado do `@nexora/runner`), por jogo.
+- [x] **Handoff para o launcher oficial** — jogos vindos dos manifestos da
+      Steam guardam o appid na base local; os detalhes do jogo passam a ter
+      **"Abrir na Steam"** (`steam://rungameid/<appid>`, o protocolo que o
+      cliente da Steam regista no sistema). O URL é construído no processo
+      principal — o renderer nunca abre URLs.
+- [x] **A fronteira legal fica escrita** (D32): o launcher oferece o caminho
+      legítimo — jogar com o que o utilizador tem, ou abrir na loja onde
+      comprou. Não há emulação de autenticação nem "online-fix" em nenhuma
+      fase (`docs/LEGAL.md`).
+
+### Prova de execução real (2026-11-21)
+
+- **Causa raiz**, reproduzida à mão: `wine: chdir to
+  ~/.config/NEXORA HUB/wine-prefixes/… : Arquivo ou diretório inexistente`
+  — o prefixo não existia;
+- **Hollow Knight**: lançado pela app, sessão viva **24 s** (`crashed:
+  false`), parada limpa e **24 s gravados** na biblioteca local;
+- **R.E.P.O.**: lançado pela app, sessão viva **14 s** (o diálogo do Wine a
+  inicializar o prefixo aparece na captura — o prefixo passa a ser criado
+  pelo launcher);
+- **Handoff**: após a importação oficial, o botão "Abrir na Steam" aparece
+  nos detalhes do Hollow Knight; o clique abriu o **cliente oficial da
+  Steam** (processo confirmado) com a mensagem "a abrir na Steam";
+- `pnpm typecheck` limpo; **431 testes verdes** no total.
+
 ## Fase 3c — Importação oficial (Steam) (concluída em 2026-11-20)
 
 ### Entregue

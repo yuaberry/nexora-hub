@@ -19,6 +19,8 @@ export interface DesktopGameView {
   readonly cover: string | null;
   readonly installPath: string;
   readonly executablePath: string;
+  /** Appid da Steam, quando o jogo veio de um manifesto da loja. */
+  readonly steamAppId: string | null;
   readonly tags: readonly string[];
   readonly favorite: boolean;
   /** ISO-8601 UTC da última sessão, ou `null`. */
@@ -332,6 +334,16 @@ export interface DesktopApi {
   readonly shell: {
     /** Abre um URL no browser do sistema (usado pelas ligações de compra). */
     readonly openExternal: (url: string) => Promise<void>;
+  };
+  readonly steam: {
+    /**
+     * Abre um jogo no **cliente oficial** da Steam, pelo appid.
+     *
+     * É o handoff legítimo: o jogo corre pela loja, com a licença do
+     * utilizador, o Proton escolhido por ela e os servidores oficiais.
+     * `ok: false` quando o jogo não tem appid da Steam.
+     */
+    readonly open: (appId: string) => Promise<{ readonly ok: boolean }>;
   };
   readonly store: {
     /** Catálogo público (não exige conta — a API é pública). */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveLaunchPlan, type LaunchContext } from '../src/index.js';
+import { resolveLaunchPlan, winePrefixPath, type LaunchContext } from '../src/index.js';
 import type { LaunchRequest } from '../src/index.js';
 
 /**
@@ -86,5 +86,31 @@ describe('resolveLaunchPlan', () => {
       throw new Error('plano deveria ser válido');
     }
     expect(plan.args).toEqual(['--janela', '--cheats']);
+  });
+});
+describe('winePrefixPath', () => {
+  it('dá uma pasta segura por jogo (caminhos viram nome de pasta)', () => {
+    expect(winePrefixPath('/prefixos', '/home/utilizador/Jogos/Hollow Knight')).toBe(
+      '/prefixos/home-utilizador-jogos-hollow-knight',
+    );
+  });
+
+  it('encurta nomes longos e nunca devolve uma pasta vazia', () => {
+    const longo = '/prefixos/' + 'x'.repeat(300);
+    expect(winePrefixPath('/prefixos', 'x'.repeat(300)).length).toBeLessThan(longo.length);
+    expect(winePrefixPath('/prefixos', '///')).toBe('/prefixos/jogo');
+  });
+
+  it('o plano e a pasta preparada usam o mesmo caminho', () => {
+    const plan = resolveLaunchPlan(
+      { gameId: '/jogos/Hollow Knight', executablePath: '/jogos/Hollow Knight/hollow_knight.exe' },
+      linuxWithWine,
+    );
+    expect(plan.ok).toBe(true);
+    if (!plan.ok) {
+      return;
+    }
+    // A correcção do bug: quem cria a pasta tem de criar a que o plano usa.
+    expect(plan.env['WINEPREFIX']).toBe(winePrefixPath('/prefixos', '/jogos/Hollow Knight'));
   });
 });

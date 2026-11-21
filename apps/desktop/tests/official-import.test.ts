@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LocalLibrary } from '../src/main/db.js';
-import { importOfficial, importSteamLibrary, steamInstalled, steamRoots } from '../src/main/official-import.js';
+import { importOfficial, importSteamLibrary, steamInstalled, steamRoots, steamRunUrl } from '../src/main/official-import.js';
 
 /**
  * Importação oficial — leitura dos manifestos da Steam.
@@ -160,5 +160,32 @@ describe('diagnóstico', () => {
 
   it('steamInstalled é falso sem manifestos', () => {
     expect(steamInstalled([join(tmpdir(), 'nao-existe-nexora')])).toBe(false);
+  });
+});
+describe('steamRunUrl', () => {
+  it('constrói o URL do protocolo da Steam', () => {
+    expect(steamRunUrl('367520')).toBe('steam://rungameid/367520');
+  });
+
+  it('recusa o que não é appid', () => {
+    expect(steamRunUrl(null)).toBeNull();
+    expect(steamRunUrl('abc')).toBeNull();
+    expect(steamRunUrl('36 7520')).toBeNull();
+    expect(steamRunUrl('')).toBeNull();
+  });
+
+  it('o appid do manifesto é o que o URL usa', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'nexora-appid-'));
+    try {
+      const root = join(dir, 'Steam');
+      fakeSteam(root, [{ appId: '367520', name: 'Hollow Knight', dir: 'Hollow Knight' }]);
+      const library = new LocalLibrary(join(dir, 'nexora.sqlite'));
+      importSteamLibrary(library, [root]);
+      const entry = library.list()[0];
+      expect(entry?.steamAppId).toBe('367520');
+      expect(steamRunUrl(entry?.steamAppId ?? null)).toBe('steam://rungameid/367520');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

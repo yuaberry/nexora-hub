@@ -22,6 +22,8 @@ export interface LocalGameRecord {
   readonly cover: string | null;
   readonly installPath: string;
   readonly executablePath: string;
+  /** Appid da Steam, quando o jogo veio de um manifesto da loja. */
+  readonly steamAppId: string | null;
   readonly tags: readonly string[];
   readonly adult: boolean;
   readonly favorite: boolean;
@@ -37,6 +39,8 @@ export interface UpsertLocalGameInput {
   readonly cover?: string | null;
   readonly installPath: string;
   readonly executablePath: string;
+  /** Appid da Steam (manifesto da loja); mantém-se quando não é dado. */
+  readonly steamAppId?: string | null;
   readonly tags?: readonly string[];
   readonly adult?: boolean;
 }
@@ -56,6 +60,7 @@ export class LocalLibrary {
         cover text,
         install_path text not null,
         executable_path text not null,
+        steam_app_id text,
         tags text not null default '[]',
         adult integer not null default 0,
         favorite integer not null default 0,
@@ -64,7 +69,19 @@ export class LocalLibrary {
         created_at text not null,
         updated_at text not null
       );
+    `);
 
+    // Migração idempotente: bases criadas antes do appid ganham a coluna sem
+    // perder o que já lá está (o tempo jogado e os favoritos). Nas bases
+    // novas a coluna já vem do `create table` acima, e o ALTER falha com
+    // "coluna duplicada" — um erro esperado, por isso silenciado.
+    try {
+      this.db.exec('alter table games add column steam_app_id text;');
+    } catch {
+      // a coluna já existe — nada a fazer
+    }
+
+    this.db.exec(`
       create table if not exists collections (
         id integer primary key autoincrement,
         name text not null unique,
@@ -99,13 +116,14 @@ export class LocalLibrary {
         // re-detectado com um executável melhor (a heurística mudou) tem de
         // actualizar a entrada, não ficar com a antiga para sempre. O que é do
         // utilizador (favorito, tempo jogado) mantém-se.
-        `insert into games (external_key, title, cover, install_path, executable_path, tags, adult, created_at, updated_at)
-         values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `insert into games (external_key, title, cover, install_path, executable_path, steam_app_id, tags, adult, created_at, updated_at)
+         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          on conflict(external_key) do update set
            title = excluded.title,
            cover = excluded.cover,
            install_path = excluded.install_path,
            executable_path = excluded.executable_path,
+           steam_app_id = coalesce(excluded.steam_app_id, games.steam_app_id),
            tags = excluded.tags,
            adult = excluded.adult,
            favorite = favorite,
@@ -119,6 +137,7 @@ export class LocalLibrary {
         input.cover ?? null,
         input.installPath,
         input.executablePath,
+        input.steamAppId ?? null,
         JSON.stringify(input.tags ?? []),
         input.adult === true ? 1 : 0,
         now,
@@ -330,6 +349,7 @@ function toSnapshotRow(row: Record<string, unknown>): SaveSnapshotRow {
 
 /** Converte uma linha do SQLite no registo do domínio. */
 function toRecord(row: Record<string, unknown>): LocalGameRecord {
+  const steamAppId = row['steam_app_id'];
   return {
     id: Number(row['id']),
     externalKey: String(row['external_key']),
@@ -337,6 +357,7 @@ function toRecord(row: Record<string, unknown>): LocalGameRecord {
     cover: typeof row['cover'] === 'string' ? row['cover'] : null,
     installPath: String(row['install_path']),
     executablePath: String(row['executable_path']),
+    steamAppId: typeof steamAppId === 'string' && steamAppId !== '' ? steamAppId : null,
     tags: parseTags(row['tags']),
     adult: Number(row['adult']) === 1,
     favorite: Number(row['favorite']) === 1,

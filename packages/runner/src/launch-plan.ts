@@ -42,6 +42,19 @@ export interface LaunchContext {
 }
 
 /**
+ * Caminho do prefixo Wine de um jogo.
+ *
+ * Função pura — e o único sítio onde o caminho é construído, para que o
+ * plano e quem prepara o disco calculem a **mesma** pasta. A prova real
+ * ensinou: o Wine faz `chdir` para o prefixo e morre com código 1 se a
+ * pasta não existir, e por isso quem arranca cria-a antes (o spawn não
+ * cria directorias).
+ */
+export function winePrefixPath(prefixRoot: string, gameId: string): string {
+  return `${prefixRoot}/${slug(gameId)}`;
+}
+
+/**
  * Resolve o plano de arranque de um pedido.
  *
  * A decisão é uma função **pura** do contexto: a mesma entrada dá sempre o
@@ -75,7 +88,7 @@ export function resolveLaunchPlan(request: LaunchRequest, context: LaunchContext
     args: [request.executablePath, ...(request.args ?? [])],
     layer: 'wine',
     env: {
-      WINEPREFIX: `${context.winePrefixRoot}/${slug(request.gameId)}`,
+      WINEPREFIX: winePrefixPath(context.winePrefixRoot, request.gameId),
       WINEDLLOVERRIDES: 'winemenubuilder.exe=d',
     },
   };

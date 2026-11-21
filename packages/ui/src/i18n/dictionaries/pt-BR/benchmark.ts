@@ -1,0 +1,23 @@
+/** Dicionário PT-BR — benchmark. */
+export const benchmark = {
+  'nav.benchmark': 'Benchmark',
+  'benchmark.title': 'Benchmark',
+  'benchmark.subtitle': 'Cargas reais em processos filhos, com o tempo medido — nunca estimado.',
+  'benchmark.run': 'Correr benchmark',
+  'benchmark.running': 'A correr as cargas…',
+  'benchmark.estimated': 'Ainda não medido nesta máquina',
+  'benchmark.estimatedHint': 'Corre o benchmark para ver o que a tua máquina faz de verdade. Sem corrida, não há número.',
+  'benchmark.overall': 'Pontuação global',
+  'benchmark.reference': 'Referência {version}',
+  'benchmark.measured': 'Medido',
+  'benchmark.failed': 'Não medido',
+  'benchmark.history': 'Histórico',
+  'benchmark.history.empty': 'Nenhuma corrida ainda.',
+  'benchmark.delta': '{percent} desde a corrida anterior',
+  'benchmark.delta.same': 'igual à corrida anterior',
+  'benchmark.hint': 'Útil para comparar antes e depois de uma optimização: corre antes, corre depois e vê a diferença.',
+  'benchmark.cpuSort': 'Ordenação',
+  'benchmark.hint.cpuSort': 'Ordena 40 × 60 000 números — trabalho de CPU puro.',
+  'benchmark.cpuHash': 'Soma de caracteres',
+  'benchmark.hint.cpuHash': 'Gera e soma 60 × 20 000 caracteres — trabalho de CPU puro.',
+} as const;

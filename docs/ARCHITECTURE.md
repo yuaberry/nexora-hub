@@ -340,6 +340,23 @@ entradas (`coalesce(sum(delta), 0)`), nunca um campo guardado: um saldo que
 pudesse ser editado não seria um saldo. A contagem de quantos jogadores têm
 uma conquista é um `count(*)` real, não uma estimativa.
 
+## D40 — Benchmark: cargas reais, relógio monótono e um binário que existe
+
+Um benchmark que não corre não serve. As cargas são scripts declarados e
+deterministas (a mesma semente, os mesmos dados) corridos em **processos
+filhos** — o processo principal nunca bloqueia — e o tempo é medido dentro do
+filho com `process.hrtime.bigint` (relógio monótono, imune a mudanças de
+hora). Cada carga tem a sua **referência declarada**: semear a referência por
+carga, a pontuação global seria dominada pela carga mais lenta e deixaria de
+dizer seja o que for. A versão da referência fica ao lado do número, porque
+mudar a referência muda a comparabilidade do histórico.
+
+Um bug real apanhado pela prova ao vivo: dentro do Electron,
+`process.execPath` é o binário do **Electron**, que não aceita `-e` — as
+cargas corriam e falhavam todas, e a página mostrava "não medido" sem
+explicação. O binário correcto é o do Node do sistema, encontrado no `PATH`
+como o Wine e o GameMode; sem ele, a corrida recusa com o motivo.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

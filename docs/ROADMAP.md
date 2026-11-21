@@ -17,7 +17,7 @@
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
 | 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (medidas + otimizador prontos; FPS e overlay planeados) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
-| 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | ⏳ Planejada | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
+| 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | 🟡 Em curso (benchmark medido pronto; recomendações planeadas) | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
 | 9 | **Futuro**: Remote Play (Sunshine/Moonlight + sessões Nexora Cloud), Big Picture, widgets VTuber | ⏳ Planejada | latência medida com percentis; botão de streaming desligado enquanto não houver medição |
 
 ## Fase 1 — Detalhamento
@@ -521,6 +521,35 @@ escrita na interface.
 - `pnpm typecheck` limpo; **487 testes verdes** no total.
 
 
+
+
+## Fase 8 — Benchmark medido (concluída em 2026-11-21)
+
+Primeira metade da fase da IA e do benchmark: as medidas existem e são
+honestas. As recomendações e o diagnóstico ficam planeados.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/benchmark/`) — catálogo de cargas
+      deterministas (iterações e semente declaradas) com **referência por
+      carga**, pontuação declarada e versão de referência — 12 testes no core.
+- [x] **Launcher** (`main/benchmark.ts`, `main/benchmark-ipc.ts`) — corre cada
+      carga num processo filho do **Node do sistema**, mede com o relógio
+      monótono, guarda o histórico e recusa com motivo quando não há Node —
+      6 testes no desktop.
+- [x] **Página Benchmark** — pontuação global, pontuação e tempo por carga
+      (ou "não medido" honesto), a versão da referência, a variação face à
+      corrida anterior e o histórico — feito para comparar **antes e depois**
+      de uma optimização.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, no launcher: a primeira corrida correu e **falhou todas as cargas**
+      — a prova apanhou o bug (`process.execPath` é o Electron dentro da app,
+      que não aceita `-e`). Depois da correcção, a página mostrou
+      **pontuação global 997,8** com ordenação a 895,5 (1.675 ms) e soma de
+      caracteres a 1.100,1 (81,8 ms), histórico com as duas corridas;
+- `pnpm typecheck` limpo; **567 testes verdes** no total.
 
 ## Fase 5 — Pontos e conquistas (concluída em 2026-11-21)
 

@@ -21,6 +21,7 @@ import { registerFriendsIpc } from './friends-ipc.js';
 import { registerTelemetryIpc } from './telemetry-ipc.js';
 import { registerOptimizerIpc } from './optimizer-ipc.js';
 import { registerChatIpc } from './chat-ipc.js';
+import { registerBenchmarkIpc } from './benchmark-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -127,6 +128,9 @@ function bootstrap(): void {
 
   // Chat: conversas directas entre amigos (as regras são da API).
   registerChatIpc();
+
+  // Benchmark: cargas reais em processos filhos, com o tempo medido.
+  registerBenchmarkIpc();
 
   mainWindow = createMainWindow(config);
 }

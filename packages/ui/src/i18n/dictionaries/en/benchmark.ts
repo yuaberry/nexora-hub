@@ -1,0 +1,23 @@
+/** EN dictionary — benchmark. */
+export const benchmark = {
+  'nav.benchmark': 'Benchmark',
+  'benchmark.title': 'Benchmark',
+  'benchmark.subtitle': 'Real workloads in child processes, with measured time — never estimated.',
+  'benchmark.run': 'Run benchmark',
+  'benchmark.running': 'Running workloads…',
+  'benchmark.estimated': 'Not measured on this machine yet',
+  'benchmark.estimatedHint': 'Run the benchmark to see what your machine really does. Without a run, there is no number.',
+  'benchmark.overall': 'Overall score',
+  'benchmark.reference': 'Reference {version}',
+  'benchmark.measured': 'Measured',
+  'benchmark.failed': 'Not measured',
+  'benchmark.history': 'History',
+  'benchmark.history.empty': 'No runs yet.',
+  'benchmark.delta': '{percent} since the previous run',
+  'benchmark.delta.same': 'same as the previous run',
+  'benchmark.hint': 'Useful to compare before and after an optimization: run before, run after, see the difference.',
+  'benchmark.cpuSort': 'Sorting',
+  'benchmark.hint.cpuSort': 'Sorts 40 × 60,000 numbers — pure CPU work.',
+  'benchmark.cpuHash': 'Character sum',
+  'benchmark.hint.cpuHash': 'Generates and sums 60 × 20,000 characters — pure CPU work.',
+} as const;

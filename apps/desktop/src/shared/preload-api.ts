@@ -491,6 +491,25 @@ export interface PointEntryView {
   readonly createdAt: string;
 }
 
+/** O resultado de uma carga (vista do renderer). */
+export interface BenchmarkResultView {
+  readonly workloadId: string;
+  /** Tempo medido, em milissegundos. */
+  readonly elapsedMs: number;
+  readonly score: number;
+  /** `false` quando a carga não correu (nada de número fingido). */
+  readonly measured: boolean;
+}
+
+/** Uma corrida do benchmark. */
+export interface BenchmarkRunView {
+  /** ISO-8601 UTC da corrida. */
+  readonly at: string;
+  /** Pontuação global, ou `null` quando nada foi medido. */
+  readonly overall: number | null;
+  readonly results: readonly BenchmarkResultView[];
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -536,6 +555,12 @@ export interface DesktopApi {
     readonly sample: () => Promise<TelemetrySampleView>;
     /** Esquece a leitura anterior da CPU (a próxima não sabe o uso). */
     readonly reset: () => Promise<{ readonly ok: boolean }>;
+  };
+  readonly benchmark: {
+    /** Corre o benchmark completo e guarda a corrida. */
+    readonly run: () => Promise<{ readonly ok: boolean; readonly run?: BenchmarkRunView }>;
+    /** O histórico das corridas. */
+    readonly history: () => Promise<{ readonly ok: boolean; readonly runs: readonly BenchmarkRunView[] }>;
   };
   readonly chat: {
     /** As minhas conversas, da mais recente para a mais antiga. */

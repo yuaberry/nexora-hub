@@ -15,6 +15,7 @@ import type {
   OptimizerScanResult,
   OptimizerRunResult,
   OptimizerHistoryResult,
+  BenchmarkRunView,
   TelemetrySampleView,
   SocialWriteResult,
   StoreCatalogResult,
@@ -142,6 +143,10 @@ const api: DesktopApi = {
     remove: (userId, token) => ipcRenderer.invoke('friends:remove', userId, token) as Promise<SocialWriteResult>,
     presence: (token) => ipcRenderer.invoke('friends:presence', token) as Promise<PresenceView>,
     heartbeat: (gameId, token) => ipcRenderer.invoke('friends:heartbeat', gameId, token) as Promise<SocialWriteResult>,
+  },
+  benchmark: {
+    run: () => ipcRenderer.invoke('benchmark:run') as Promise<{ readonly ok: boolean; readonly run?: BenchmarkRunView }>,
+    history: () => ipcRenderer.invoke('benchmark:history') as Promise<{ readonly ok: boolean; readonly runs: readonly BenchmarkRunView[] }>,
   },
   chat: {
     list: (token) => ipcRenderer.invoke('chat:list', token) as Promise<{ readonly ok: boolean; readonly items?: readonly ChatConversationView[]; readonly message?: string }>,

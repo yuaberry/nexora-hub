@@ -335,6 +335,50 @@ automática depois do checksum, cliente de torrent.
 
 
 
+
+## Fase 3c — Importação oficial (Steam) (concluída em 2026-11-20)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/importers/`) — parser de VDF (Valve
+      KeyValues) e leitura dos manifestos da Steam
+      (`parseSteamLibraryFolders`, `parseSteamAppManifest`,
+      `steamInstallPath`). O parser é escrito contra o **formato real**,
+      verificado numa instalação Steam desta máquina; um manifesto partido
+      lança o erro com a posição, e quem importa salta o ficheiro — 18 testes
+      no core.
+- [x] **Launcher** (`main/disk-scan.ts`, `main/official-import.ts`,
+      `main/official-ipc.ts`) — botão "Importar da Steam" na Biblioteca:
+      lê as bibliotecas declaradas, dá o **título real** a cada jogo,
+      detecta o executável, ignora as ferramentas da própria Steam (Proton,
+      runtimes — a mesma lista do scan de disco) e devolve um relatório
+      honesto por loja; Epic e GOG dizem que o formato local ainda não foi
+      verificado, em vez de fingir.
+- [x] **Bug real corrigido** — a identidade da entrada da biblioteca era o
+      caminho normalizado, sem resolver simlinks: `~/.steam/steam` e
+      `~/.local/share/Steam` são a mesma pasta, e o mesmo jogo entrava duas
+      vezes. O identificador passou a ser o caminho **resolvido**
+      (`externalKeyFor` com `realpath`), com teste do simlink.
+- [x] **Refacção** — a leitura de pastas (`scanForExecutables`,
+      `localCoverFile`, `importFolder`) saiu de `import-service.ts` (que
+      importa Electron) para `disk-scan.ts`, sem Electron: agora é testável
+      fora do runtime e a importação oficial não arrasta o `dialog` para um
+      caminho puro.
+
+### Prova de execução real (2026-11-20)
+
+- Ao vivo, contra a **Steam instalada nesta máquina**: importou
+  **"Hollow Knight"** e **"R.E.P.O."** (títulos dos manifestos — a pasta é
+  `REPO`), ignorou **3** entradas (Proton Experimental, Proton 11.0, Steam
+  Linux Runtime 4.0) e detectou os executáveis reais
+  (`hollow_knight.exe`, `REPO.exe`);
+- no launcher, com a base limpa: o scan de disco importou pelas pastas
+  (Hollow Knight, REPO, League Of Legends, Epic Games Store) e a importação
+  oficial **actualizou as mesmas entradas** — `REPO` passou a `R.E.P.O.` e
+  a biblioteca ficou com **4 jogos, sem duplicados** (a prova do simlink);
+- `pnpm typecheck` limpo; **420 testes verdes** no total (118 verdes contra
+  o PostgreSQL real).
+
 ## Fase 3b — Família (concluída em 2026-11-20)
 
 Grupo familiar com limite de plano e biblioteca partilhada — a primeiro

@@ -11,6 +11,7 @@ import { auth } from './auth.js';
 import { store } from './store.js';
 import { stats } from './stats.js';
 import { family } from './family.js';
+import { official } from './official.js';
 import { pages } from './pages.js';
 
 /**
@@ -35,5 +36,6 @@ export const ptBR = {
   ...store,
   ...stats,
   ...family,
+  ...official,
   ...pages,
 } as const;

@@ -65,6 +65,38 @@ export function LibraryPage({
     library.reload();
   }, [library, t]);
 
+  /**
+   * Importação oficial: os manifestos das lojas no disco.
+   *
+   * O relatório é honesto — quantos títulos entraram, quantas entradas
+   * ficaram de fora (ferramentas da Steam, pastas em falta) e o que as
+   * lojas ainda não suportadas dizem. Nada de contacto com a Internet.
+   */
+  const onOfficialImport = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    const available = await api.scan.officialAvailable();
+    if (!available.available) {
+      setImportMessage(t('official.unavailable'));
+      return;
+    }
+    const result = await api.scan.official();
+    if (!result.ok) {
+      setImportMessage(t('error.generic'));
+      return;
+    }
+    const imported = result.imported ?? [];
+    const skipped = (result.stores ?? []).reduce((total, entry) => total + entry.skipped, 0);
+    setImportMessage(
+      imported.length === 0
+        ? t('official.none')
+        : `${t('official.done', { count: imported.length })}${skipped > 0 ? ` ${t('official.skipped', { count: skipped })}` : ''}`,
+    );
+    library.reload();
+  }, [library, t]);
+
   const hits = useMemo(() => {
     const inCollection =
       activeCollection === null || collectionGames === null
@@ -99,6 +131,8 @@ export function LibraryPage({
         <span className="nx-subtitle">{t('library.count', { count: hits.length })}</span>
         <div className="hub-row">
           <Button onClick={() => void onScan()}>{t('scan.action')}</Button>
+          {/* Importação oficial: lê os manifestos das lojas no disco. */}
+          <Button onClick={() => void onOfficialImport()}>{t('official.action')}</Button>
           <Button variant="primary" onClick={() => void onImport()}>
             {t('import.choose')}
           </Button>

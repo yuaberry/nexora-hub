@@ -16,6 +16,7 @@ import { createMainWindow } from './window.js';
 import { registerIpc } from './library-ipc.js';
 import { registerDownloadsIpc } from './downloads-ipc.js';
 import { registerSavesIpc } from './saves-ipc.js';
+import { registerOfficialImportIpc } from './official-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -105,6 +106,10 @@ function bootstrap(): void {
   // Família: grupo, convites e biblioteca partilhada (a API é a dona das
   // regras — o dono do limite de plano é o servidor).
   registerFamilyIpc();
+
+  // Importação oficial: os manifestos das lojas que o utilizador tem
+  // instaladas (a Steam primeiro; Epic e GOG dizem que falta verificar).
+  registerOfficialImportIpc(library);
 
   mainWindow = createMainWindow(config);
 }

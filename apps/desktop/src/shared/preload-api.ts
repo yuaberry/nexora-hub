@@ -174,6 +174,28 @@ export interface ScanResultView {
   readonly scanned: number;
 }
 
+/** Uma loja verificada na importação oficial. */
+export interface OfficialStoreReportView {
+  /** Identificador da loja (`steam`, `epic`, `gog`). */
+  readonly store: string;
+  /** Chave de tradução do nome da loja. */
+  readonly labelKey: string;
+  /** Títulos importados ou actualizados. */
+  readonly titles: readonly string[];
+  /** Ficheiros ignorados (ferramentas, pastas em falta, manifestos partidos). */
+  readonly skipped: number;
+  /** Motivo quando a loja não deu nada. */
+  readonly reasonKey?: string;
+}
+
+/** Resultado da importação oficial. */
+export interface OfficialImportResult {
+  readonly ok: boolean;
+  readonly imported?: readonly string[];
+  readonly scanned?: number;
+  readonly stores?: readonly OfficialStoreReportView[];
+}
+
 /** Um rating do ProtonDB (dado externo, com data da consulta). */
 export interface ProtonRatingView {
   readonly tier: string;
@@ -354,6 +376,10 @@ export interface DesktopApi {
   };
   readonly scan: {
     readonly disks: () => Promise<ScanResultView>;
+    /** Importa dos manifestos locais das lojas oficiais (Steam). */
+    readonly official: () => Promise<OfficialImportResult>;
+    /** `true` quando há manifestos de loja no sistema. */
+    readonly officialAvailable: () => Promise<{ readonly available: boolean }>;
   };
   readonly library: {
     readonly list: () => Promise<readonly DesktopGameView[]>;

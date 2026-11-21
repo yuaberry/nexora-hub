@@ -4,6 +4,7 @@ import type {
   DesktopApi,
   FamilyResult,
   FamilyGameView,
+  OfficialImportResult,
   ScanResultView,
   ShortcutResultView,
   StoreCatalogResult,
@@ -75,6 +76,10 @@ const api: DesktopApi = {
   },
   scan: {
     disks: () => ipcRenderer.invoke('library:scan') as Promise<ScanResultView>,
+    // A importação oficial lê os manifestos das lojas no disco — o caminho
+    // é do processo principal, nunca do renderer.
+    official: () => ipcRenderer.invoke('library:importOfficial') as Promise<OfficialImportResult>,
+    officialAvailable: () => ipcRenderer.invoke('library:officialAvailable') as Promise<{ available: boolean }>,
   },
   shell: {
     // Abrir no browser do sistema: a compra acontece na loja oficial, fora

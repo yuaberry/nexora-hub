@@ -7,6 +7,7 @@
  * que importar a mesma pasta duas vezes não duplique a entrada.
  */
 
+import { realpathSync } from 'node:fs';
 import { basename, normalize, sep } from 'node:path';
 
 /**
@@ -14,9 +15,22 @@ import { basename, normalize, sep } from 'node:path';
  *
  * Normaliza separadores e caixa: o mesmo jogo encontrado por caminhos
  * diferentes (`C:\Games\X` e `c:/games/x`) é a mesma entrada.
+ *
+ * O caminho é **resolvido** antes de normalizar: `~/.steam/steam` e
+ * `~/.local/share/Steam` são a mesma pasta por simlink, e sem resolver os
+ * dois chegariam como chaves diferentes — o mesmo jogo entraria duas vezes
+ * na biblioteca (aconteceu na prova real da importação oficial, e é por isso
+ * que esta linha existe). Um caminho que não existe fica normalizado: a
+ * importação de uma pasta que desapareceu continua a dar a mesma chave.
  */
 export function externalKeyFor(installPath: string): string {
-  return normalize(installPath).replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
+  let resolved = installPath;
+  try {
+    resolved = realpathSync(installPath);
+  } catch {
+    // A pasta não existe (ou foi desmontada): o caminho normalizado serve.
+  }
+  return normalize(resolved).replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
 }
 
 /**

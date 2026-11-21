@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { detectExecutable, nameMatchesFolder, rankExecutables, scoreExecutable } from '../src/main/scan.js';
 import {
   externalKeyFor,
@@ -113,5 +116,31 @@ describe('scoreExecutable com contexto de pasta', () => {
     const loL = scoreExecutable({ path: '/p/leagueoflegends.exe', name: 'leagueoflegends.exe' }, 0, 'league-of-legends');
     const discord = scoreExecutable({ path: '/p/bridge.exe', name: 'bridge.exe' }, 0, 'league-of-legends');
     expect(loL).toBeGreaterThan(discord);
+  });
+});
+
+describe('externalKeyFor', () => {
+  it('normaliza separadores e caixa', () => {
+    expect(externalKeyFor('C:\\Games\\X\\')).toBe('c:/games/x');
+  });
+
+  it('um caminho que não existe fica normalizado (a chave mantém-se)', () => {
+    expect(externalKeyFor('/jogos/que/nao/existem/X')).toBe('/jogos/que/nao/existem/x');
+  });
+
+  it('um simlink dá a mesma chave que o caminho real', () => {
+    // A prova real apanhou isto: `~/.steam/steam` é simlink de
+    // `~/.local/share/Steam`, e o mesmo jogo entrava duas vezes na
+    // biblioteca porque os dois caminhos davam chaves diferentes.
+    const dir = mkdtempSync(join(tmpdir(), 'nexora-symlink-'));
+    try {
+      const real = join(dir, 'Biblioteca', 'Jogo');
+      mkdirSync(real, { recursive: true });
+      const link = join(dir, 'atalho');
+      symlinkSync(join(dir, 'Biblioteca'), link);
+      expect(externalKeyFor(join(link, 'Jogo'))).toBe(externalKeyFor(real));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

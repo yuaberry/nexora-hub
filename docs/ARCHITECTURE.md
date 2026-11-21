@@ -205,6 +205,28 @@ integração contra uma base real. A migração 0001 criou as tabelas em falta e
 as da família; um teste de integração escreve comunidade, desejos e família
 sobre a base real para que o buraco não volte em silêncio.
 
+## D29 — A identidade da entrada é o caminho resolvido
+
+O identificador estável de um jogo local é o caminho da pasta — mas
+**resolvido** (`realpath`), não apenas normalizado. A prova real apanhou o
+buraco: `~/.steam/steam` é um simlink de `~/.local/share/Steam`, e o mesmo
+jogo chegava por dois caminhos com duas chaves diferentes — a biblioteca
+mostrava "Hollow Knight" e "Hollow Knight", "REPO" e "R.E.P.O.". Um caminho
+que não existe (pasta desmontada) fica normalizado: a chave não muda por a
+pasta ter desaparecido.
+
+## D30 — A importação oficial lê manifestos, não a Internet
+
+A importação oficial lê os ficheiros que a **Steam** escreveu no disco
+(`libraryfolders.vdf` e `appmanifest_<appid>.acf`): o título real do jogo
+(`REPO` → `R.E.P.O.`) e o executável detectado na pasta declarada pelo
+manifesto. O parser (`packages/core/importers`) é escrito contra o formato
+verificado numa instalação real — não contra um formato imaginado — e recusa
+um manifesto partido em vez de inventar metade de uma entrada. Epic e GOG
+entram no relatório como **formato local por verificar**: não há manifesto
+confirmado para as suas ferramentas em Linux, e a interface diz-o em vez de
+fingir uma importação que não existe.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

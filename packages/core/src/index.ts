@@ -21,4 +21,6 @@ export * from './family/types.js';
 export * from './family/limits.js';
 export * from './family/state.js';
 export * from './family/shared-games.js';
+export * from './importers/vdf.js';
+export * from './importers/steam.js';
 

@@ -12,7 +12,7 @@
 | 2 | **Downloads**: motor HTTP multi-conexão com verificação, manifestos de fonte, fila com prioridade, instalação na biblioteca; API de fontes unificada | ✅ Concluída (HTTP) | ciclo completo provado (manifesto → pesquisa → download verificado → biblioteca → jogo lançado → tempo gravado); **torrent e Wine/Proton ficam planeados** |
 | 2b | **Torrent e Wine/Proton** | ⏳ Planejada | cliente torrent real (decisão de dependência nativa) + handoff para launcher oficial |
 | 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | 🟡 Em curso (Família pronta) | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
-| 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | 🟡 Em curso (amigos e presença prontos; chat planeado) | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
+| 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ✅ Concluída (push em tempo real fica como passo seguinte) | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | ⏳ Planejada | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
@@ -519,6 +519,38 @@ escrita na interface.
 - com o jogo lançado, as leituras continuaram reais (CPU 43,7 %, memória
   37,4 %);
 - `pnpm typecheck` limpo; **487 testes verdes** no total.
+
+
+## Fase 4 — Chat (concluída em 2026-11-21)
+
+A fase social fica completa: amigos, presença e chat. O *push* em tempo real
+pelo gateway fica como o próximo passo honesto.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/chat/`) — conversas directas entre amigos:
+      abrir/reutilizar pelo par, enviar mensagem (corpo aparado, limite de
+      2000 caracteres), listar e ordenar pelo mais recente — 11 testes no
+      core.
+- [x] **API** — `GET/POST /api/v1/chat/conversations`,
+      `GET/POST /api/v1/chat/conversations/:id/messages`, com repositórios em
+      memória **e** PostgreSQL (migração 0003, par único por índice) e
+      escritas auditadas — 11 testes na API + integração sobre a base real.
+- [x] **Launcher** — canal IPC do chat, entrada **Chat** na navegação, botão
+      **"Mensagem"** em cada amigo (abre a conversa), página com a lista de
+      conversas (excerto e data), as mensagens com autor e data, e o campo de
+      envio. A página pergunta à API a cada 5 s.
+
+### Prova de execução real (2026-11-21)
+
+- Ao vivo, pela API: Ana e Bruno tornaram-se amigos, a conversa abriu pelo
+  par (a segunda abertura reutilizou a mesma), Ana enviou "Bora jogar REPO?"
+  e Bruno leu com o autor e a data;
+- no launcher: o botão "Mensagem" abriu a conversa, a bolha da Ana apareceu
+  com a data, e o Bruno enviou **"Vamos, estou online!"** pelo launcher — a
+  bolha nova apareceu imediatamente;
+- `pnpm typecheck` limpo; **531 testes verdes** no total (148 verdes contra
+  o PostgreSQL real).
 
 ## Fase 4 — Amigos e presença (concluída em 2026-11-21)
 

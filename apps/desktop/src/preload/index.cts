@@ -9,6 +9,9 @@ import type {
   PresenceView,
   ScanResultView,
   ShortcutResultView,
+  ChatConversationView,
+  ChatMessageView,
+  ChatOpenResult,
   OptimizerScanResult,
   OptimizerRunResult,
   OptimizerHistoryResult,
@@ -139,6 +142,12 @@ const api: DesktopApi = {
     remove: (userId, token) => ipcRenderer.invoke('friends:remove', userId, token) as Promise<SocialWriteResult>,
     presence: (token) => ipcRenderer.invoke('friends:presence', token) as Promise<PresenceView>,
     heartbeat: (gameId, token) => ipcRenderer.invoke('friends:heartbeat', gameId, token) as Promise<SocialWriteResult>,
+  },
+  chat: {
+    list: (token) => ipcRenderer.invoke('chat:list', token) as Promise<{ readonly ok: boolean; readonly items?: readonly ChatConversationView[]; readonly message?: string }>,
+    open: (email, token) => ipcRenderer.invoke('chat:open', email, token) as Promise<ChatOpenResult>,
+    messages: (conversationId, token) => ipcRenderer.invoke('chat:messages', conversationId, token) as Promise<{ readonly ok: boolean; readonly items?: readonly ChatMessageView[]; readonly message?: string }>,
+    send: (conversationId, body, token) => ipcRenderer.invoke('chat:send', conversationId, body, token) as Promise<{ readonly ok: boolean; readonly item?: ChatMessageView; readonly message?: string }>,
   },
   optimizer: {
     scan: (targetIds) => ipcRenderer.invoke('optimizer:scan', targetIds) as Promise<OptimizerScanResult>,

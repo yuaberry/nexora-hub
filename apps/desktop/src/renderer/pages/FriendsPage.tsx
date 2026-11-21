@@ -23,7 +23,12 @@ interface SocialState {
   readonly presence: PresenceView | null;
 }
 
-export function FriendsPage(): ReactNode {
+export function FriendsPage({
+  onMessage,
+}: {
+  /** Abre o chat com um amigo (a App é quem navega). */
+  readonly onMessage: (friend: { userId: string; displayName: string | null; email: string | null }) => void;
+}): ReactNode {
   const { t } = useInterface();
   const api = globalThis.window?.nexora;
 
@@ -201,6 +206,7 @@ export function FriendsPage(): ReactNode {
                     </div>
                     <div className="hub-row">
                       {presence === undefined ? null : <Badge tone="positive">{t('friends.onlineNow')}</Badge>}
+                      <Button onClick={() => void onMessage(friend)}>{t('friends.message')}</Button>
                       <Button onClick={() => void onRemove(friend.userId)}>{t('friends.remove')}</Button>
                     </div>
                   </li>

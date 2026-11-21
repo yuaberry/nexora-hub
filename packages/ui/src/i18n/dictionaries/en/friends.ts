@@ -21,5 +21,6 @@ export const friends = {
   'friends.offline': 'Offline',
   'friends.playing': 'Playing {game}',
   'friends.remove': 'Remove',
+  'friends.message': 'Message',
   'friends.presenceHint': 'Presence lasts {seconds} s: after that without a beat, the friend shows as offline.',
 } as const;

@@ -13,6 +13,7 @@ import { StatsPage } from './pages/StatsPage.js';
 import { FamilyPage } from './pages/FamilyPage.js';
 import { FriendsPage } from './pages/FriendsPage.js';
 import { OptimizerPage } from './pages/OptimizerPage.js';
+import { ChatPage } from './pages/ChatPage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
 import type { DesktopGameView } from '../shared/preload-api.js';
@@ -41,6 +42,7 @@ export type Route =
   | { readonly name: 'family' }
   | { readonly name: 'friends' }
   | { readonly name: 'optimizer' }
+  | { readonly name: 'chat'; readonly with?: { readonly userId: string; readonly displayName: string | null; readonly email: string } }
   | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule };
 
@@ -71,7 +73,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'account') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'account') => {
       navigate({ name: target });
     },
     [navigate],
@@ -109,7 +111,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'account') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -162,8 +164,22 @@ function Shell({
       {route.name === 'store' ? <StorePage /> : null}
       {route.name === 'stats' ? <StatsPage /> : null}
       {route.name === 'family' ? <FamilyPage /> : null}
-      {route.name === 'friends' ? <FriendsPage /> : null}
+      {route.name === 'friends' ? (
+        <FriendsPage
+          onMessage={(friend) =>
+            navigate({
+              name: 'chat',
+              with: {
+                userId: friend.userId,
+                displayName: friend.displayName,
+                email: friend.email ?? '',
+              },
+            })
+          }
+        />
+      ) : null}
       {route.name === 'optimizer' ? <OptimizerPage /> : null}
+      {route.name === 'chat' ? <ChatPage conversationWith={route.with} /> : null}
       {route.name === 'account' ? (
           <LoginPage
             onSkip={() => {
@@ -201,6 +217,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.friends');
     case 'optimizer':
       return t('nav.optimizer');
+    case 'chat':
+      return t('nav.chat');
     case 'account':
       return t('auth.title');
     default:

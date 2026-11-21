@@ -329,6 +329,52 @@ export interface FamilyRepository {
   readonly deleteGroup: (groupId: string) => Promise<boolean>;
 }
 
+/** Uma conversa directa. */
+export interface ConversationRecord {
+  readonly id: string;
+  /** Os dois participantes (a ordem é a da base). */
+  readonly userIdA: string;
+  readonly userIdB: string;
+  readonly createdAt: Date;
+  readonly lastMessageAt: Date | null;
+  /** Excerto da última mensagem, ou `null`. */
+  readonly lastMessageExcerpt: string | null;
+}
+
+/** Uma mensagem. */
+export interface ChatMessageRecord {
+  readonly id: string;
+  readonly conversationId: string;
+  readonly authorId: string;
+  readonly body: string;
+  readonly createdAt: Date;
+}
+
+export interface ChatRepository {
+  /**
+   * Abre (ou reutiliza) a conversa directa entre duas pessoas.
+   *
+   * O par é **normalizado** (o id menor primeiro), para que (ana, bruno) e
+   * (bruno, ana) sejam a mesma conversa — e o índice único impede a
+   * duplicação mesmo com dois pedidos em paralelo.
+   */
+  readonly openDirect: (userId: string, otherId: string) => Promise<ConversationRecord>;
+  /** Conversas de um utilizador, da mais recente para a mais antiga. */
+  readonly listForUser: (userId: string) => Promise<readonly ConversationRecord[]>;
+  /** Conversa por identificador, ou `null`. */
+  readonly findById: (conversationId: string) => Promise<ConversationRecord | null>;
+  /** Mensagens de uma conversa, da mais antiga para a mais recente. */
+  readonly listMessages: (conversationId: string, limit: number) => Promise<readonly ChatMessageRecord[]>;
+  /** Grava uma mensagem e actualiza o excerto da conversa. */
+  readonly addMessage: (input: {
+    conversationId: string;
+    authorId: string;
+    body: string;
+    excerpt: string;
+    now: Date;
+  }) => Promise<ChatMessageRecord>;
+}
+
 /** Um item da lista de desejos. */
 export interface WishlistRecord {
   readonly id: string;
@@ -428,6 +474,7 @@ export interface Repositories {
   readonly family: FamilyRepository;
   readonly friends: FriendsRepository;
   readonly presence: PresenceRepository;
+  readonly chat: ChatRepository;
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;

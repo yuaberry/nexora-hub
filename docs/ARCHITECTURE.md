@@ -312,6 +312,23 @@ com tinta escura, para o foco continuar visível sem introduzir cor. O
 alternador rápido do cabeçalho continua a ir e voltar só entre claro e
 escuro — os temas especiais são escolha deliberada nas Configurações.
 
+## D38 — Chat: só amigos conversam, e um par tem uma conversa só
+
+A conversa directa é entre **amigos** — quem não é amigo não conversa, e uma
+conversa de outras duas pessoas devolve 404 (não confirma que existe). Um par
+de pessoas tem **uma** conversa: o par é normalizado na base (o id menor
+primeiro) e o índice único impede a duplicação, por isso mandar segunda
+mensagem à mesma pessoa continua na mesma conversa — a lista nunca mostra
+dois cartões para a mesma pessoa.
+
+O histórico vive na **API**; o launcher não guarda conversas em disco. A
+página pergunta à API a cada 5 s — o *push* em tempo real pelo gateway
+(Socket.IO, que já existe como esqueleto) é o passo seguinte, e até lá a
+actualização é dita: a data da última mensagem está sempre à vista. Um erro
+real ensinado por estes testes: a rota devolvia o identificador gerado pelo
+domínio e a base guardava outro — o cliente ficava com um id que não existia.
+Quem manda no identificador é o repositório, que é idempotente pelo par.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

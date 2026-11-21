@@ -295,6 +295,64 @@ describeIfDatabase('integração com PostgreSQL real', () => {
 
     await app.close();
   });
+
+  it('o chat escreve nas tabelas reais e o par não duplica', async () => {
+    // Regressão: as tabelas do chat são novas — o teste garante que abrir,
+    // enviar e ler funcionam sobre a base real, e que o índice único do par
+    // impediria uma segunda conversa para as mesmas duas pessoas.
+    await runMigrations(DATABASE_URL as string);
+    const env = loadEnv({ DATABASE_URL, NODE_ENV: 'test' } as NodeJS.ProcessEnv);
+    const app = await buildApp({ env, logger: false });
+
+    const stamp = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+    const ana = await registerUser(app, `chat-pg-ana-${stamp}@nexora.local`, 'senha-de-teste-123', 'Ana');
+    const bruno = await registerUser(app, `chat-pg-bruno-${stamp}@nexora.local`, 'senha-de-teste-123', 'Bruno');
+
+    const pedido = await app.inject({
+      method: 'POST',
+      url: '/api/v1/friends',
+      payload: { email: bruno.email },
+      headers: { authorization: `Bearer ${accessTokenOf(ana)}` },
+    });
+    expect(pedido.statusCode).toBe(201);
+    const entrada = (await app.inject({ method: 'GET', url: '/api/v1/friends', headers: { authorization: `Bearer ${accessTokenOf(bruno)}` } })).json() as { incoming: { id: string }[] };
+    expect((await app.inject({
+      method: 'POST',
+      url: `/api/v1/friends/requests/${entrada.incoming[0]!.id}/accept`,
+      headers: { authorization: `Bearer ${accessTokenOf(bruno)}` },
+    })).statusCode).toBe(200);
+
+    // Ana abre a conversa; Bruno abre "a mesma" — o par reutiliza.
+    const conversa = (await app.inject({
+      method: 'POST',
+      url: '/api/v1/chat/conversations',
+      payload: { email: bruno.email },
+      headers: { authorization: `Bearer ${accessTokenOf(ana)}` },
+    })).json() as { id: string };
+    const mesma = (await app.inject({
+      method: 'POST',
+      url: '/api/v1/chat/conversations',
+      payload: { email: ana.email },
+      headers: { authorization: `Bearer ${accessTokenOf(bruno)}` },
+    })).json() as { id: string };
+    expect(mesma.id).toBe(conversa.id);
+
+    const mensagem = await app.inject({
+      method: 'POST',
+      url: `/api/v1/chat/conversations/${conversa.id}/messages`,
+      payload: { body: 'Mensagem sobre a base real.' },
+      headers: { authorization: `Bearer ${accessTokenOf(bruno)}` },
+    });
+    expect(mensagem.statusCode).toBe(201);
+    const lidas = (await app.inject({
+      method: 'GET',
+      url: `/api/v1/chat/conversations/${conversa.id}/messages`,
+      headers: { authorization: `Bearer ${accessTokenOf(ana)}` },
+    })).json() as { items: { body: string }[] };
+    expect(lidas.items[0]?.body).toBe('Mensagem sobre a base real.');
+
+    await app.close();
+  });
 });
 
 describe('modo de persistência reportado', () => {
@@ -308,4 +366,5 @@ describe('modo de persistência reportado', () => {
     expect(body.status).toBe('degraded');
     await app.close();
   });
+
 });

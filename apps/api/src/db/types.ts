@@ -52,4 +52,6 @@ export type AuditAction =
   | 'friends.decline'
   | 'friends.cancel'
   | 'friends.remove'
-  | 'presence.heartbeat';
+  | 'presence.heartbeat'
+  | 'chat.open'
+  | 'chat.message';

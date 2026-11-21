@@ -21,6 +21,7 @@ export default defineConfig({
     './src/db/wishlist-schema.ts',
     './src/db/family-schema.ts',
     './src/db/friends-schema.ts',
+    './src/db/chat-schema.ts',
   ],
   out: './drizzle',
   dbCredentials: {

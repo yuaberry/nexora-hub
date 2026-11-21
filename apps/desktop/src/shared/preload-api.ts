@@ -432,6 +432,40 @@ export interface OptimizerHistoryResult {
   readonly message?: string;
 }
 
+/** Uma conversa directa (vista do renderer). */
+export interface ChatConversationView {
+  readonly id: string;
+  /** O outro lado da conversa. */
+  readonly other: {
+    readonly userId: string;
+    readonly displayName: string | null;
+    readonly email: string | null;
+  };
+  /** ISO-8601 UTC da última mensagem, ou `null`. */
+  readonly lastMessageAt: string | null;
+  /** Excerto da última mensagem, ou `null`. */
+  readonly lastMessageExcerpt: string | null;
+  readonly createdAt: string;
+}
+
+/** Uma mensagem (vista do renderer). */
+export interface ChatMessageView {
+  readonly id: string;
+  readonly authorId: string;
+  readonly authorName: string | null;
+  readonly body: string;
+  readonly createdAt: string;
+  /** `true` quando a mensagem é minha. */
+  readonly mine: boolean;
+}
+
+/** Resultado da abertura de uma conversa. */
+export interface ChatOpenResult {
+  readonly ok: boolean;
+  readonly id?: string;
+  readonly message?: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -477,6 +511,16 @@ export interface DesktopApi {
     readonly sample: () => Promise<TelemetrySampleView>;
     /** Esquece a leitura anterior da CPU (a próxima não sabe o uso). */
     readonly reset: () => Promise<{ readonly ok: boolean }>;
+  };
+  readonly chat: {
+    /** As minhas conversas, da mais recente para a mais antiga. */
+    readonly list: (token: string) => Promise<{ readonly ok: boolean; readonly items?: readonly ChatConversationView[]; readonly message?: string }>;
+    /** Abre (ou reutiliza) a conversa com alguém, por email. */
+    readonly open: (email: string, token: string) => Promise<ChatOpenResult>;
+    /** As mensagens de uma conversa. */
+    readonly messages: (conversationId: string, token: string) => Promise<{ readonly ok: boolean; readonly items?: readonly ChatMessageView[]; readonly message?: string }>;
+    /** Envia uma mensagem. */
+    readonly send: (conversationId: string, body: string, token: string) => Promise<{ readonly ok: boolean; readonly item?: ChatMessageView; readonly message?: string }>;
   };
   readonly optimizer: {
     /** Varre os alvos (quanto espaço cada um tem). */

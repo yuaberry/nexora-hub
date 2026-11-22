@@ -104,3 +104,58 @@ describe('medida de sessão', () => {
     expect(isCrashExitCode(null)).toBe(false);
   });
 });
+
+describe('sessão e grupo de processos', () => {
+  /**
+   * O `wine` arranca o jogo pelo `wineserver` e **sai**: o jogo corre como
+   * neto. Se a sessão medisse só o filho directo, o tempo jogado acabava
+   * a meio — e a prova real apanhou isto (com GameMode, a sessão morria aos
+   * 6 s e o jogo continuava).
+   */
+  it('a sessão sobrevive à saída do filho quando o jogo corre como neto', async () => {
+    const runner = new LocalGameRunner();
+    // O neto é um executável com nome único: a marca na tabela de processos
+    // tem de ser única, ou um teste paralelo com a mesma marca manteria a
+    // sessão viva (a tabela de processos é partilhada por toda a máquina).
+    const neto = makeExecutable(`neto-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, 0, 5_000);
+    const marca = neto.split('/').pop() ?? neto;
+    // O filho directo sai em 1 s e deixa um neto de 5 s no mesmo grupo — é o
+    // que o `wine` faz: arranca o jogo pelo `wineserver` e sai.
+    const outcome = await runner.launch({
+      gameId: 'jogo-com-netos',
+      executablePath: '/bin/sh',
+      args: ['-c', `${neto} & exec sleep 1`],
+      // A marca do jogo na tabela de processos: é ela que diz se o jogo corre
+      // (o `wine` arranca o jogo por outro grupo — a marca é que o encontra).
+      processMatch: marca,
+    });
+    expect(outcome.ok).toBe(true);
+    if (!outcome.ok) {
+      return;
+    }
+    // Passados 3 s, o filho já saiu — mas a sessão continua viva.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 3000);
+    });
+    expect(runner.running()).toHaveLength(1);
+    // E o tempo medido já passa do filho directo (1 s): a medida é do grupo.
+    const estado = runner.status(outcome.session.sessionId);
+    expect(estado?.durationSeconds ?? 0).toBeGreaterThanOrEqual(2);
+    // Parar fecha o grupo inteiro — e a sessão com ele.
+    const parado = runner.stop(outcome.session.sessionId);
+    expect(parado?.endedAt).not.toBeNull();
+    expect(runner.running()).toHaveLength(0);
+  }, 15_000);
+
+  it('um processo sem netos termina a sessão quando sai', async () => {
+    const runner = new LocalGameRunner();
+    const outcome = await runner.launch({ gameId: 'jogo-simples', executablePath: '/bin/sh', args: ['-c', 'exit 0'] });
+    expect(outcome.ok).toBe(true);
+    if (!outcome.ok) {
+      return;
+    }
+    const summary = await runner.wait(outcome.session.sessionId);
+    expect(summary?.exitCode).toBe(0);
+    expect(runner.running()).toHaveLength(0);
+  });
+});

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- CSP restritiva: a mesma do protocolo, servida junto do documento. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'"
+    />
+    <title>NEXORA HUB — overlay</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./overlay.tsx"></script>
+  </body>
+</html>

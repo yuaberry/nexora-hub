@@ -388,6 +388,20 @@ isso a recomendação é apresentada como "pelas etiquetas do que joga", nunca
 como uma promessa de variedade. Sem biblioteca não há preferências: a rota
 devolve vazio com a razão `no-library`, e a interface explica o que falta.
 
+## D43 — A sessão dura enquanto o jogo corre, não enquanto o filho vive
+
+O `wine` arranca o jogo por um `wineserver` persistente — que vive noutro
+grupo de processos — e o processo arrancado sai. Medir a sessão pelo filho
+directo perdia o tempo jogado a meio (a prova real apanhou-o: com GameMode, a
+sessão morria aos 6 s e o jogo continuava a correr).
+
+Orunner passa a aceitar uma **marca de processo** (`processMatch`, o nome do
+executável do jogo): quando o filho directo sai, a sessão só acaba quando
+nenhum processo com essa marca existe na tabela. Parar a sessão mata o
+**grupo** inteiro — um jogo com o filho já saído e netos a correr não pode
+ficar ligado. O overlay usa o mesmo observador de telemetria do cartão: a
+mesma medida, na mesma fonte.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

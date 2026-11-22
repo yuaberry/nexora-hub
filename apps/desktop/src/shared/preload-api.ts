@@ -554,6 +554,22 @@ export interface RecommendationsView {
   readonly message?: string;
 }
 
+/** Os dados que o processo principal empurra para o overlay. */
+export interface OverlayData {
+  /** Uso da CPU desde a amostra anterior (`null` na primeira). */
+  readonly cpuPercent: number | null;
+  /** Percentagem de memória em uso. */
+  readonly memoryPercent: number | null;
+  /** Temperatura do sensor mais quente, ou `null`. */
+  readonly temperatureCelsius: number | null;
+  /** Chip do sensor mais quente (com o rótulo), ou `null`. */
+  readonly temperatureChip: string | null;
+  /** Jogo em curso, ou `null`. */
+  readonly gameTitle: string | null;
+  /** Segundos desde o início da sessão, ou `null`. */
+  readonly elapsedSeconds: number | null;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -605,6 +621,14 @@ export interface DesktopApi {
     readonly similar: (gameId: string) => Promise<RecommendationsView>;
     /** Recomendado para si (exige conta). */
     readonly forYou: (token: string) => Promise<RecommendationsView>;
+  };
+  readonly overlay: {
+    /** Assina os dados empurrados pelo processo principal. */
+    readonly onData: (listener: (data: OverlayData) => void) => () => void;
+    /** O último dado empurrado (`null` antes do primeiro). */
+    readonly last: () => OverlayData | null;
+    /** Abre ou fecha o overlay (o atalho Shift+Tab faz o mesmo). */
+    readonly toggle: () => Promise<{ readonly ok: boolean; readonly visible: boolean }>;
   };
   readonly mods: {
     /** Procura os modos na pasta de instalação de um jogo. */

@@ -9,12 +9,13 @@
 
 import { existsSync, readdirSync, type Dirent } from 'node:fs';
 import { accessSync, constants } from 'node:fs';
-import { join } from 'node:path';
-import { app, ipcMain } from 'electron';
+import { basename, join } from 'node:path';
+import { app, globalShortcut, ipcMain } from 'electron';
 import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
 import { DEFAULT_API_BASE_URL } from './config.js';
 import { ensureWinePrefix } from './wine-prefix.js';
 import { startSessionPresence } from './friends-ipc.js';
+import { registerOverlayShortcut, setCurrentGame, unregisterOverlayShortcut } from './overlay.js';
 import { findGameMode } from './optimizer.js';
 import { installDesktopShortcut } from './shortcuts.js';
 import { openExternal } from './window.js';
@@ -310,6 +311,10 @@ export function registerIpc(dependencies: IpcDependencies): void {
       args: plan.args,
       env: plan.env,
       cwd: game.installPath,
+      // A marca do jogo na tabela de processos. Com Wine, o processo
+      // arrancado sai e o jogo corre noutro grupo (o `wineserver`): sem a
+      // marca, a sessão — e o tempo jogado — acabaria a meio.
+      processMatch: basename(game.executablePath),
     });
     if (!outcome.ok) {
       return { ok: false, reasonKey: outcome.reasonKey };
@@ -317,6 +322,13 @@ export function registerIpc(dependencies: IpcDependencies): void {
 
     // Presença: com conta, os amigos vêem o jogo a correr — e vêem-no
     // acabar quando a sessão acaba. O token vive só dentro da sessão.
+    // O atalho do overlay (Shift+Tab) só existe enquanto há jogo a correr:
+    // registá-lo sem jogo seria tomar um atalho do sistema sem motivo.
+    if (!globalShortcut.isRegistered('Shift+Tab')) {
+      registerOverlayShortcut();
+    }
+    setCurrentGame({ title: game.title, startedAt: outcome.session.startedAt });
+
     const sessionEnd = runner.wait(outcome.session.sessionId);
     if (typeof launchToken === 'string' && launchToken !== '') {
       startSessionPresence(launchToken, game.externalKey, sessionEnd);
@@ -325,6 +337,9 @@ export function registerIpc(dependencies: IpcDependencies): void {
     // O tempo jogado é gravado quando a sessão termina — incluindo o código
     // de saída, para que um crash não seja confundido com uma sessão normal.
     void sessionEnd.then((summary) => {
+      // O jogo acabou: o overlay perde o jogo em curso e o atalho sai.
+      setCurrentGame(null);
+      unregisterOverlayShortcut();
       if (summary !== null && !summary.crashed) {
         library.addPlayedSeconds(game.externalKey, summary.durationSeconds, summary.endedAt ?? new Date().toISOString());
       }

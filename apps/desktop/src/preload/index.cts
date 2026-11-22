@@ -18,6 +18,7 @@ import type {
   BenchmarkRunView,
   RecommendationsView,
   ModsScanView,
+  OverlayData,
   TelemetrySampleView,
   SocialWriteResult,
   StoreCatalogResult,
@@ -150,6 +151,15 @@ const api: DesktopApi = {
     similar: (gameId) => ipcRenderer.invoke('recommend:similar', gameId) as Promise<RecommendationsView>,
     forYou: (token) => ipcRenderer.invoke('recommend:forYou', token) as Promise<RecommendationsView>,
   },
+  overlay: {
+    onData: (listener) => {
+      const handler = (_event: unknown, data: OverlayData) => listener(data);
+      ipcRenderer.on('overlay:data', handler);
+      return () => { ipcRenderer.removeListener('overlay:data', handler); };
+    },
+    last: () => (globalThis as unknown as { __nexoraOverlayLast?: OverlayData }).__nexoraOverlayLast ?? null,
+    toggle: () => ipcRenderer.invoke('overlay:toggle') as Promise<{ ok: boolean; visible: boolean }>,
+  },
   mods: {
     scan: (installPath) => ipcRenderer.invoke('mods:scan', installPath) as Promise<ModsScanView>,
   },
@@ -183,5 +193,9 @@ const api: DesktopApi = {
     cancel: (taskId) => ipcRenderer.invoke('downloads:cancel', taskId) as Promise<boolean>,
   },
 };
+
+ipcRenderer.on('overlay:data', (_event, data) => {
+  (globalThis as unknown as { __nexoraOverlayLast?: OverlayData }).__nexoraOverlayLast = data;
+});
 
 contextBridge.exposeInMainWorld('nexora', api);

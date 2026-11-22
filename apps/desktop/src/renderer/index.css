@@ -591,3 +591,21 @@ body {
   display: grid;
   gap: 1.5rem;
 }
+
+/* Overlay — a janela por cima do jogo.
+ *
+ * A janela é transparente (o jogo vê-se por trás), e o painel é um cartão
+ * opaco o suficiente para ler sem esconder o que importa. Nada de cor
+ * própria: só tokens de papel. */
+.nx-overlay {
+  padding: var(--paper-space-4);
+  border-radius: var(--paper-radius-lg);
+  background: color-mix(in srgb, var(--paper-surface-deepest) 88%, transparent);
+  border: var(--paper-line-width) solid var(--paper-line);
+  -webkit-app-region: drag;
+}
+
+.nx-overlay button,
+.nx-overlay input {
+  -webkit-app-region: no-drag;
+}

@@ -95,6 +95,11 @@ código de saída, tempo gravado).
 - Um modo desligado (`.jar.disabled`) **não conta**, e um jar sem marcador
   fica **desconhecido** — o total diz a verdade
 
+### 🖥️ Overlay
+- **Overlay por cima do jogo** (Shift+Tab) — CPU, memória e temperatura
+  **medidos** a cada 2 s, e a sessão em curso; o FPS é declarado **Planejado**
+  (medir FPS exige injecção no processo do jogo)
+
 ### 🎨 Interface
 - **Tema OLED** (preto `#000000` verdadeiro) e **preto e branco**
 - Tokens de papel, alto contraste, "reduzir movimento", PT-BR e EN
@@ -163,6 +168,10 @@ Os ficheiros de cada lançamento estão em
 </tr>
 <tr>
 <td><img src="docs/screenshots/mods.png" alt="Modos"/><br/><sub><b>Modos</b> — 42 modos detectados, com o carregador de cada um.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/overlay.png" alt="Overlay"/><br/><sub><b>Overlay</b> — medidas reais por cima do jogo (Shift+Tab).</sub></td>
+<td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
 </tr>
 </table>

@@ -23,6 +23,15 @@ export interface LaunchRequest {
   readonly env?: Readonly<Record<string, string>>;
   /** Directório de trabalho. */
   readonly cwd?: string;
+  /**
+   * Texto a procurar na tabela de processos para saber se o jogo corre.
+   *
+   * O `wine` arranca o jogo por um `wineserver` persistente, que vive noutro
+   * grupo de processos: seguir o grupo do processo arrancado não basta. Com
+   * esta marca (o nome do executável do jogo), a sessão dura enquanto houver
+   * um processo com esse nome — que é o que "o jogo está a correr" quer dizer.
+   */
+  readonly processMatch?: string;
 }
 
 /** Motivo de recusa de arranque (chave de tradução + texto). */

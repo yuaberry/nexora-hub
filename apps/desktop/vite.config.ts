@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -15,5 +16,13 @@ export default defineConfig({
     outDir: '../../dist/renderer',
     emptyOutDir: true,
     sourcemap: true,
+    // Duas entradas: a aplicação principal e o overlay (a janela por cima do
+    // jogo, servida pelo mesmo esquema interno).
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'src/renderer/index.html'),
+        overlay: resolve(__dirname, 'src/renderer/overlay.html'),
+      },
+    },
   },
 });

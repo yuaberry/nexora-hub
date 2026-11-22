@@ -525,6 +525,36 @@ escrita na interface.
 
 
 
+
+## Fase 7 — Overlay e correcção da medida da sessão (concluída em 2026-11-22)
+
+### Entregue
+
+- [x] **Bug real corrigido na medida do tempo jogado** — o `wine` arranca o
+      jogo por um `wineserver` persistente noutro grupo de processos e o
+      processo arrancado **sai**: a sessão (e o tempo jogado) acabava a meio.
+      O runner passou a aceitar uma marca de processo e a sessão dura enquanto
+      o jogo corre; parar mata o grupo inteiro — 1 teste novo no runner.
+- [x] **Overlay** (`main/overlay.ts`, `renderer/overlay.html` +
+      `OverlayApp.tsx`) — janela transparente, sem moldura e sempre ao topo,
+      servida pelo mesmo esquema interno, com **CPU, memória, temperatura e
+      sessão** medidos a cada 2 s pelo mesmo observador do cartão de
+      desempenho; atalho **Shift+Tab** registado só enquanto há jogo a correr.
+- [x] **Honestidade no overlay** — o FPS aparece como **Planejado** (medir FPS
+      exige injecção no processo do jogo) e amigos/chat ficam na janela do
+      launcher, com a razão escrita.
+
+### Prova de execução real (2026-11-22)
+
+- A prova ao vivo apanhou **três** bugs: a sessão que morria aos 6 s com o
+      jogo a correr (corrigido pela marca de processo — a sessão manteve-se
+      viva aos 3 s, 6 s e 10 s), o `preload` do overlay que apontava para o
+      cwd (`/tmp/elec-test/dist/...`) em vez da pasta da app, e o `stop()`
+      que matava só o filho directo;
+- o overlay abriu (620 × 360, sempre ao topo) e mostrou **CPU 94 %, memória
+      65 %, 70 °C (dell_smm · GPU)** — medidas reais do sistema;
+- `pnpm typecheck` limpo; testes verdes no total.
+
 ## Fase 8 — Recomendações (concluída em 2026-11-22)
 
 Segunda peça da fase da IA e do benchmark: as recomendações existem e são

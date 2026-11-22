@@ -21,6 +21,7 @@ import { achievements } from './achievements.js';
 import { benchmark } from './benchmark.js';
 import { mods } from './mods.js';
 import { recommend } from './recommend.js';
+import { overlay } from './overlay.js';
 import { pages } from './pages.js';
 
 /**
@@ -53,5 +54,6 @@ export const en = {
   ...benchmark,
   ...mods,
   ...recommend,
+  ...overlay,
   ...pages,
 };

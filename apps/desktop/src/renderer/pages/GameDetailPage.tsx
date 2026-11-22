@@ -6,6 +6,7 @@ import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import { CommunitySection } from '../components/CommunitySection.js';
 import { PerformanceCard } from '../components/PerformanceCard.js';
+import { ModsSection } from '../components/ModsSection.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
 /**
@@ -160,6 +161,9 @@ export function GameDetailPage({
       <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
 
       <CommunitySection gameId={game.externalKey} />
+
+      {/* Modos instalados: a leitura é local (os .jar da pasta mods). */}
+      <ModsSection installPath={game.installPath} />
 
       {/* Leituras reais do sistema: o cartão mede enquanto a página está
           aberta — o jogo a correr é quando ele mais interessa. */}

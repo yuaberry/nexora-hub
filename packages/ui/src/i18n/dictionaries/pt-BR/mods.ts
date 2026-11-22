@@ -1,0 +1,21 @@
+/** Dicionário PT-BR — detector de modos. */
+export const mods = {
+  'nav.mods': 'Mods',
+  'mods.title': 'Mods',
+  'mods.subtitle': 'Os modos que o jogo tem instalados, com o carregador de cada um.',
+  'mods.noFolder': 'Nenhuma pasta de modos encontrada',
+  'mods.noFolder.hint': 'Este jogo não tem uma pasta mods — nada é inventado.',
+  'mods.noMods': 'Pasta de modos vazia',
+  'mods.noMods.hint': 'A pasta existe, mas não tem modos instalados.',
+  'mods.count': '{count} modos',
+  'mods.unknown': '{count} sem carregador conhecido',
+  'mods.loader.fabric': 'Fabric',
+  'mods.loader.quilt': 'Quilt',
+  'mods.loader.forge': 'Forge',
+  'mods.loader.neoforge': 'NeoForge',
+  'mods.loader.unknown': 'Desconhecido',
+  'mods.noVersion': 'sem versão',
+  'mods.rescan': 'Procurar novamente',
+  'mods.disabled': 'Os ficheiros .jar.disabled não contam — um modo desligado não corre.',
+  'mods.noManifest': 'sem nome',
+} as const;

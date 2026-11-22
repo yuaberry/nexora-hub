@@ -1,0 +1,21 @@
+/** EN dictionary — mod detector. */
+export const mods = {
+  'nav.mods': 'Mods',
+  'mods.title': 'Mods',
+  'mods.subtitle': 'The mods installed in the game, with the loader of each one.',
+  'mods.noFolder': 'No mods folder found',
+  'mods.noFolder.hint': 'This game has no mods folder — nothing is invented.',
+  'mods.noMods': 'Empty mods folder',
+  'mods.noMods.hint': 'The folder exists, but has no mods installed.',
+  'mods.count': '{count} mods',
+  'mods.unknown': '{count} without a known loader',
+  'mods.loader.fabric': 'Fabric',
+  'mods.loader.quilt': 'Quilt',
+  'mods.loader.forge': 'Forge',
+  'mods.loader.neoforge': 'NeoForge',
+  'mods.loader.unknown': 'Unknown',
+  'mods.noVersion': 'no version',
+  'mods.rescan': 'Scan again',
+  'mods.disabled': '.jar.disabled files do not count — a disabled mod does not run.',
+  'mods.noManifest': 'no name',
+} as const;

@@ -357,6 +357,22 @@ cargas corriam e falhavam todas, e a página mostrava "não medido" sem
 explicação. O binário correcto é o do Node do sistema, encontrado no `PATH`
 como o Wine e o GameMode; sem ele, a corrida recusa com o motivo.
 
+## D41 — O detector de modos lê os jars, não adivinha
+
+Cada `.jar` de uma pasta `mods` é um zip, e o carregador declara-se por um
+**ficheiro dentro dele**: `fabric.mod.json`, `quilt.mod.json`,
+`META-INF/mods.toml` (Forge) ou `META-INF/neoforge.mods.toml`. A decisão é
+uma função pura do domínio (`packages/core/mods`) sobre os **nomes** das
+entradas; o nome e a versão do modo vêm do manifesto, quando ele é legível.
+O NeoForge é testado antes do Forge porque um pacote NeoForge contém os dois
+marcadores.
+
+O que não conta é dito: um `mod.jar.disabled` é um modo **desligado** e não
+entra no total, e um jar sem marcador fica **desconhecido** — o total conta-o,
+porque um total que escondesse os desconhecidos mentiria. A leitura usa as
+ferramentas do sistema (`unzip -Z1` e `unzip -p`), a mesma aparalhagem da
+extracção de downloads, sem uma dependência nova.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

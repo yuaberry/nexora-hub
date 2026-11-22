@@ -16,6 +16,7 @@ import type {
   OptimizerRunResult,
   OptimizerHistoryResult,
   BenchmarkRunView,
+  ModsScanView,
   TelemetrySampleView,
   SocialWriteResult,
   StoreCatalogResult,
@@ -143,6 +144,9 @@ const api: DesktopApi = {
     remove: (userId, token) => ipcRenderer.invoke('friends:remove', userId, token) as Promise<SocialWriteResult>,
     presence: (token) => ipcRenderer.invoke('friends:presence', token) as Promise<PresenceView>,
     heartbeat: (gameId, token) => ipcRenderer.invoke('friends:heartbeat', gameId, token) as Promise<SocialWriteResult>,
+  },
+  mods: {
+    scan: (installPath) => ipcRenderer.invoke('mods:scan', installPath) as Promise<ModsScanView>,
   },
   benchmark: {
     run: () => ipcRenderer.invoke('benchmark:run') as Promise<{ readonly ok: boolean; readonly run?: BenchmarkRunView }>,

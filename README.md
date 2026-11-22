@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.1.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-567%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-588%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -81,6 +81,13 @@ código de saída, tempo gravado).
   maratona…) com barras de progresso honestas
 - **Pontos** com **livro auditável**: o saldo é a soma das entradas
 
+### 🧩 Modos
+- **Detector de modos** — lê a pasta `mods` do jogo e diz **quantos são e de
+  que carregador** (Fabric, Quilt, Forge, NeoForge), com o nome e a versão de
+  cada um lidos do manifesto dentro do `.jar`
+- Um modo desligado (`.jar.disabled`) **não conta**, e um jar sem marcador
+  fica **desconhecido** — o total diz a verdade
+
 ### 🎨 Interface
 - **Tema OLED** (preto `#000000` verdadeiro) e **preto e branco**
 - Tokens de papel, alto contraste, "reduzir movimento", PT-BR e EN
@@ -146,6 +153,10 @@ Os ficheiros de cada lançamento estão em
 <td><img src="docs/screenshots/benchmark.png" alt="Benchmark"/><br/><sub><b>Benchmark</b> — pontuação medida, nunca estimada (997,8 nesta máquina).</sub></td>
 <td><img src="docs/screenshots/familia.png" alt="Família"/><br/><sub><b>Família</b> — grupo com limite de plano e biblioteca partilhada.</sub></td>
 </tr>
+<tr>
+<td><img src="docs/screenshots/mods.png" alt="Modos"/><br/><sub><b>Modos</b> — 42 modos detectados, com o carregador de cada um.</sub></td>
+<td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
+</tr>
 </table>
 
 ---
@@ -203,7 +214,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **567 verdes** (157 contra PostgreSQL real) |
+| **Testes** | **588 verdes** (151 contra PostgreSQL real) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real |
 | **Build** | Linux + Windows empacotados a cada versão |

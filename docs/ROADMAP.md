@@ -14,7 +14,7 @@
 | 3 | **Nuvem e perfis**: saves versionados com conflito, backup completo, cross-save, perfis animados, Família (6 membros), coleções, importação oficial (Steam/Epic/GOG) | 🟡 Em curso (Família pronta) | save sobe/desce entre dois dispositivos; conflito mostra as duas versões; cota do plano recusa upload além do limite |
 | 4 | **Social e loja**: amigos, presença (heartbeat), status, chat; loja (comprar / comprar via), desejos, comentários, reviews | ✅ Concluída (push em tempo real fica como passo seguinte) | amigo vê "jogando X" em tempo real; loja filtra adulto; review 1–10 persiste |
 | 5 | **Economia e estatísticas**: Pontos, cosméticos, tarefas, timeline, conquistas globais, capturas | 🟡 Em curso (pontos e conquistas prontos; cosméticos/tarefas/capturas planeados) | saldo auditado; timeline agrega eventos reais; screenshot sobe na nuvem |
-| 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de mods (Minecraft), clãs, eventos, reputação | ⏳ Planejada | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
+| 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de modos (Minecraft), clãs, eventos, reputação | 🟡 Em curso (detector pronto; o resto planeado) | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
 | 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (medidas + otimizador prontos; FPS e overlay planeados) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
 | 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | 🟡 Em curso (benchmark medido pronto; recomendações planeadas) | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
@@ -522,6 +522,40 @@ escrita na interface.
 
 
 
+
+
+## Fase 5b — Detector de modos (concluída em 2026-11-21)
+
+Primeira peça da comunidade pesada: o que a instância do jogador tem
+instalado. Fóruns, marketplace de mods, clãs, eventos e reputação ficam
+planeados.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/mods/`) — detecção do carregador pelos
+      marcadores dentro de cada `.jar` (Fabric, Quilt, Forge, NeoForge — o
+      NeoForge antes do Forge, porque o pacote contém os dois), leitura do
+      nome e da versão do manifesto (JSON e TOML) e o resumo por carregador —
+      12 testes no core.
+- [x] **Launcher** (`main/mods.ts`, `main/mods-ipc.ts`) — encontra a pasta
+      `mods` nas formas que os jogos usam (ao lado do executável,
+      `.minecraft/mods`, um nível abaixo), lê as entradas com o `unzip` do
+      sistema e só conta `.jar` (um `.disabled` está desligado) — 9 testes no
+      desktop, com jars zip de verdade.
+- [x] **Interface** — secção **Mods** nos detalhes do jogo: total, quantidade
+      por carregador, a lista com nome e versão, e os estados honestos
+      ("nenhuma pasta de modos" / "pasta vazia").
+
+### Prova de execução real (2026-11-21)
+
+- Um modpack de prova com **42 jars** (35 Fabric, 5 Forge, 2 sem marcador):
+      o detector deu **42 modos, 35 Fabric, 5 Forge, 2 desconhecidos**, com
+      nomes e versões lidos dos manifestos;
+- no launcher: os detalhes do "Minecraft Modpack" mostraram a secção Modos
+      com **42 modos**, os três carregadores e a lista (Ae2 2.3.0 Forge,
+      Animatica 1.0.26 Fabric, …), com `core-shaders.jar` honestamente
+      **Desconhecido**;
+- `pnpm typecheck` limpo; **588 testes verdes** no total.
 
 ## Fase 8 — Benchmark medido (concluída em 2026-11-21)
 

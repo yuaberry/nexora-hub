@@ -510,6 +510,28 @@ export interface BenchmarkRunView {
   readonly results: readonly BenchmarkResultView[];
 }
 
+/** Um modo detectado (vista do renderer). */
+export interface ModView {
+  readonly fileName: string;
+  readonly sizeBytes: number;
+  readonly loader: 'fabric' | 'quilt' | 'forge' | 'neoforge' | 'unknown';
+  readonly displayName: string | null;
+  readonly version: string | null;
+}
+
+/** O que a varredura de modos devolve. */
+export interface ModsScanView {
+  /** A pasta de modos encontrada (`null` quando o jogo não tem). */
+  readonly folder: string | null;
+  readonly total: number;
+  /** Quantidade por carregador. */
+  readonly byLoader: readonly { readonly loader: string; readonly count: number }[];
+  /** Arquivos sem marcador conhecido. */
+  readonly unknown: number;
+  readonly totalBytes: number;
+  readonly mods: readonly ModView[];
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -555,6 +577,10 @@ export interface DesktopApi {
     readonly sample: () => Promise<TelemetrySampleView>;
     /** Esquece a leitura anterior da CPU (a próxima não sabe o uso). */
     readonly reset: () => Promise<{ readonly ok: boolean }>;
+  };
+  readonly mods: {
+    /** Procura os modos na pasta de instalação de um jogo. */
+    readonly scan: (installPath: string) => Promise<ModsScanView>;
   };
   readonly benchmark: {
     /** Corre o benchmark completo e guarda a corrida. */

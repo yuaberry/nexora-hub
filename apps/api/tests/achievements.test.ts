@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { buildTestApp, authHeader } from './helpers.js';
 import { registerUser } from './fixtures.js';
 
@@ -9,6 +9,21 @@ import { registerUser } from './fixtures.js';
  * entram no livro **uma vez** por conquista (ler duas vezes não repete), e o
  * saldo é a soma das entradas — nunca um campo que possa divergir.
  */
+
+/**
+ * O relógio é congelado às 12:00 UTC.
+ *
+ * As sessões começam "agora" (o relógio do servidor) e a regra da coruja
+ * dispara entre a meia-noite e as 5 da manhã: sem o relógio congelado, o
+ * teste passava de dia e falhava de noite — e a prova correu às 01:30 UTC.
+ */
+beforeAll(() => {
+  vi.setSystemTime(new Date('2026-01-01T12:00:00.000Z'));
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 /** App e repositórios partilhados. */
 interface World {

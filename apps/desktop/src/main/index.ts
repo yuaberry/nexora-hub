@@ -22,6 +22,7 @@ import { registerTelemetryIpc } from './telemetry-ipc.js';
 import { registerOptimizerIpc } from './optimizer-ipc.js';
 import { registerChatIpc } from './chat-ipc.js';
 import { registerBenchmarkIpc } from './benchmark-ipc.js';
+import { registerModsIpc } from './mods-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -131,6 +132,9 @@ function bootstrap(): void {
 
   // Benchmark: cargas reais em processos filhos, com o tempo medido.
   registerBenchmarkIpc();
+
+  // Detector de modos: lê os .jar da pasta mods com as ferramentas do sistema.
+  registerModsIpc();
 
   mainWindow = createMainWindow(config);
 }

@@ -32,4 +32,5 @@ export * from './chat/conversations.js';
 export * from './achievements/achievements.js';
 export * from './benchmark/spec.js';
 export * from './benchmark/workloads.js';
+export * from './mods/detect.js';
 

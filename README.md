@@ -6,7 +6,7 @@
 
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
-[![Versão](https://img.shields.io/badge/versão-0.1.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
+[![Versão](https://img.shields.io/badge/versão-0.2.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
 [![Testes](https://img.shields.io/badge/testes-607%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
@@ -128,12 +128,13 @@ de IA · Remote Play. Cada um aparece na interface com o selo **Planejado**.
 
 | Formato | Ficheiro | Instalação |
 | --- | --- | --- |
-| **Instalador NSIS** (x64) | `nexora-hub-0.1.0-x64.exe` | executar e seguir o assistente |
+| **Instalador NSIS** (x64) | `nexora-hub-0.2.0-x64.exe` | executar e seguir o assistente |
 
 > O macOS **não** é suportado nesta fase.
 
 Os ficheiros de cada lançamento estão em
-[**Releases**](https://github.com/yuaberry/nexora-hub/releases).
+[**Releases**](https://github.com/yuaberry/nexora-hub/releases) — o mais recente é o
+**0.2.0**:
 
 ---
 

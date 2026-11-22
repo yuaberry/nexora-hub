@@ -61,6 +61,7 @@ const api: DesktopApi = {
     detectFolders: () => ipcRenderer.invoke('library:detectFolders') as Promise<DetectedFolders>,
     toggleFavorite: (id) => ipcRenderer.invoke('library:toggleFavorite', id) as Promise<DesktopGameView | null>,
     remove: (id) => ipcRenderer.invoke('library:remove', id) as Promise<boolean>,
+    addCatalog: (appId) => ipcRenderer.invoke('library:addCatalog', appId) as Promise<{ readonly ok: boolean; readonly duplicate?: boolean; readonly gameId?: string; readonly title?: string; readonly message?: string }>,
   },
   runner: {
     // O token (opcional) liga a presença: com conta, os amigos vêem o jogo a correr.
@@ -105,6 +106,9 @@ const api: DesktopApi = {
     // Handoff para o cliente oficial: o renderer passa o appid, o processo
     // principal constrói o URL e decide abrir.
     open: (appId) => ipcRenderer.invoke('steam:open', appId) as Promise<{ ok: boolean }>,
+    lookup: (appId) => ipcRenderer.invoke('steam:lookup', appId) as Promise<{ readonly ok: boolean; readonly app?: import('@nexora/core').SteamAppSummary; readonly message?: string }>,
+    search: (term) => ipcRenderer.invoke('steam:search', term) as Promise<{ readonly ok: boolean; readonly items?: readonly import('@nexora/core').SteamAppSummary[]; readonly message?: string }>,
+    dlcs: (gameId) => ipcRenderer.invoke('steam:dlcs', gameId) as Promise<{ readonly ok: boolean; readonly items?: readonly import('../shared/preload-api.js').DlcView[]; readonly truncated?: number; readonly message?: string }>,
     sync: () => ipcRenderer.invoke('steam:sync') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly added?: number; readonly unchanged?: number; readonly titles?: readonly string[]; readonly message?: string }>,
     coverOptions: (gameId) => ipcRenderer.invoke('steam:coverOptions', gameId) as Promise<{ readonly ok: boolean; readonly options?: readonly { path: string; label: string }[]; readonly message?: string }>,
   },

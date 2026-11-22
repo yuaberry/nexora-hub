@@ -224,6 +224,7 @@ export function LibraryPage({
               key={game.externalKey}
               game={toLibraryGame(game)}
               favorite={game.favorite}
+              installed={game.installed}
               playTimeLabel={formatPlayTime(game.totalSeconds, locale, t)}
               metaLabel={game.tags.join(' · ')}
               playLabel={t('common.action.play')}

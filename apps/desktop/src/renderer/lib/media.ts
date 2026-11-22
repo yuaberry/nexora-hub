@@ -34,3 +34,27 @@ export function coverUrl(path: string | null): string | null {
   }
   return `${APP_ORIGIN}/cover/${encodeURIComponent(path)}`;
 }
+
+/**
+ * Como uma capa se deve encaixar na moldura.
+ *
+ * A Steam guarda dois tipos de arte, e os dois precisam de tratamentos
+ * diferentes:
+ *
+ * - o **logo** e o **cabeçalho** são arte com margens (transparentes ou
+ *   escuras) desenhada para flutuar sobre um fundo — forçá-la a encher a
+ *   caixa corta o nome e desalinha a imagem (foi o que a prova ao vivo
+ *   mostrou: o logo 640×360 numa moldura 3:4 saía cortado);
+ * - o **herói** e a **cápsula** são arte de canto a canto — enchêm a
+ *   moldura e o excedente é cortado, que é o que se quer.
+ *
+ * Uma capa escolhida pelo utilizador é um ficheiro desconhecido: encher a
+ * moldura é o tratamento seguro (o nome do ficheiro não decide por ele).
+ */
+export function coverFit(path: string | null): 'cover' | 'contain' {
+  if (path === null) {
+    return 'cover';
+  }
+  const name = path.toLowerCase();
+  return name.includes('logo') || name.includes('header') ? 'contain' : 'cover';
+}

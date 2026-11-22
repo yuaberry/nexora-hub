@@ -81,8 +81,8 @@ function toView(record: {
   readonly externalKey: string;
   readonly title: string;
   readonly cover: string | null;
-  readonly installPath: string;
-  readonly executablePath: string;
+  readonly installPath: string | null;
+  readonly executablePath: string | null;
   readonly steamAppId?: string | null;
   readonly tags: readonly string[];
   readonly favorite: boolean;
@@ -99,6 +99,9 @@ function toView(record: {
     // Appid da Steam, quando o jogo veio de um manifesto da loja: é o que
     // permite o handoff para o cliente oficial.
     steamAppId: record.steamAppId ?? null,
+    // Entrada de catálogo: há metadado mas não há disco. A interface mostra
+    // o link da loja em vez de um botão que não arranca nada.
+    installed: record.executablePath !== null,
     tags: record.tags,
     favorite: record.favorite,
     lastPlayedAt: record.lastPlayedAt,
@@ -258,11 +261,12 @@ export function registerIpc(dependencies: IpcDependencies): void {
 
   ipcMain.handle('storage:usage', (): DiskUsageView => {
     const games = library.list();
+    // Entradas de catálogo não ocupam disco: não contam para o volume.
     const gamesBytes = games.reduce(
-      (total, game) => total + directorySize(game.installPath, 5_000, 3),
+      (total, game) => total + (game.installPath === null ? 0 : directorySize(game.installPath, 5_000, 3)),
       0,
     );
-    const root = games[0]?.installPath ?? process.cwd();
+    const root = games.find((game) => game.installPath !== null)?.installPath ?? process.cwd();
     const volume = volumeSpace(root);
     return {
       totalBytes: volume.totalBytes,
@@ -282,6 +286,12 @@ export function registerIpc(dependencies: IpcDependencies): void {
     const game = library.findById(numericId);
     if (game === null) {
       return { ok: false, reasonKey: 'not-found' };
+    }
+    // Entrada de catálogo: há metadado, não há disco. O arranque é recusado
+    // com o motivo — e a interface mostra o link da loja (o jogo tem de ser
+    // instalado pela loja oficial, não pelo launcher).
+    if (game.executablePath === null || game.installPath === null) {
+      return { ok: false, reasonKey: 'not-installed' };
     }
 
     // O plano de arranque decide a camada (nativo ou Wine/Proton) — e sem
@@ -404,6 +414,9 @@ export function registerIpc(dependencies: IpcDependencies): void {
     }
     if (process.platform !== 'linux') {
       return { ok: false, reasonKey: 'unsupported-platform' };
+    }
+    if (game.executablePath === null || game.installPath === null) {
+      return { ok: false, reasonKey: 'not-installed' };
     }
     const result = installDesktopShortcut(
       { name: game.title, exec: game.executablePath, icon: game.cover ?? undefined },

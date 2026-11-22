@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
+import { steamStoreUrl } from '@nexora/core';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import { accessToken } from '../lib/api.js';
-import { coverUrl } from '../lib/media.js';
+import { coverFit, coverUrl } from '../lib/media.js';
 import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import { CommunitySection } from '../components/CommunitySection.js';
 import { PerformanceCard } from '../components/PerformanceCard.js';
 import { ModsSection } from '../components/ModsSection.js';
+import { DlcSection } from '../components/DlcSection.js';
+import { GameImage } from '../components/GameImage.js';
 import { CoverSection } from '../components/CoverSection.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
@@ -42,7 +45,11 @@ export function GameDetailPage({
     setMessage(
       result.ok
         ? t('runner.session.started')
-        : t(result.reasonKey === 'missing-executable' ? 'details.executable.missing' : 'runner.launch.error'),
+        : result.reasonKey === 'missing-executable'
+          ? t('details.executable.missing')
+          : result.reasonKey === 'not-installed'
+            ? t('details.notInstalled')
+            : t('runner.launch.error'),
     );
   }, [game, runner, t]);
 
@@ -62,6 +69,22 @@ export function GameDetailPage({
     const result = await api.steam.open(game.steamAppId);
     setMessage(result.ok ? t('steam.opened') : t('error.generic'));
   }, [game, t]);
+
+  /**
+   * Abrir a página do jogo na loja.
+   *
+   * Para uma entrada que não está instalada, este é o caminho honesto: a
+   * compra e a instalação acontecem na loja, nunca no launcher. O URL é
+   * construído pelo domínio (o appid é a chave) e aberto pelo processo
+   * principal — o renderer não abre endereços.
+   */
+  const onOpenInStore = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined || game?.steamAppId == null) {
+      return;
+    }
+    await api.shell.openExternal(steamStoreUrl(game.steamAppId));
+  }, [game]);
 
   if (library.loading) {
     return <p>{t('common.loading')}</p>;
@@ -84,11 +107,12 @@ export function GameDetailPage({
 
       <div className="hub-detail">
         <div className="nx-cover hub-cover-large">
-          {game.cover === null ? (
-            <span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>
-          ) : (
-            <img src={coverUrl(game.cover) ?? undefined} alt="" />
-          )}
+          <GameImage
+            src={coverUrl(game.cover)}
+            fit={coverFit(game.cover)}
+            alt=""
+            fallback={<span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>}
+          />
         </div>
 
         <div className="nx-stack">
@@ -107,16 +131,16 @@ export function GameDetailPage({
             </div>
             <div className="hub-kv__row">
               <dt className="hub-kv__key">{t('details.installPath')}</dt>
-              <dd className="hub-break" style={{ margin: 0 }}>{game.installPath}</dd>
+              <dd className="hub-break" style={{ margin: 0 }}>{game.installPath ?? t('catalog.notInstalled')}</dd>
             </div>
             <div className="hub-kv__row">
               <dt className="hub-kv__key">{t('details.executablePath')}</dt>
-              <dd className="hub-break" style={{ margin: 0 }}>{game.executablePath}</dd>
+              <dd className="hub-break" style={{ margin: 0 }}>{game.executablePath ?? t('catalog.notInstalled')}</dd>
             </div>
           </dl>
 
           <div className="hub-row">
-            <Button variant="primary" onClick={() => void onPlay()}>
+            <Button variant="primary" onClick={() => void onPlay()} disabled={!game.installed}>
               {t('common.action.play')}
             </Button>
             {game.steamAppId === null ? null : (
@@ -160,12 +184,22 @@ export function GameDetailPage({
         </div>
       </div>
 
+      {game.installed ? null : (
+        <p className="nx-banner">
+          <span>{t('details.notInstalled')}</span>{' '}
+          <Button onClick={() => void onOpenInStore()}>{t('catalog.store')}</Button>
+        </p>
+      )}
+
       <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
 
       <CommunitySection gameId={game.externalKey} />
 
       {/* Capa: a automática (a da Steam) e a personalização do utilizador. */}
       <CoverSection game={game} onChanged={() => library.reload()} />
+
+      {/* DLCs: nomes da loja, instaladas do disco. */}
+      <DlcSection game={game} />
 
       {/* Modos instalados: a leitura é local (os .jar da pasta mods). */}
       <ModsSection installPath={game.installPath} />
@@ -189,7 +223,8 @@ function SavesCard({
   onMessage,
 }: {
   readonly gameKey: string;
-  readonly savePath: string;
+  /** `null` numa entrada de catálogo: o jogo não está no disco. */
+  readonly savePath: string | null;
   readonly onMessage: (message: string) => void;
 }): ReactNode {
   const { t, locale } = useInterface();
@@ -209,7 +244,7 @@ function SavesCard({
 
   const onCreate = useCallback(async () => {
     const api = globalThis.window?.nexora;
-    if (api === undefined) {
+    if (api === undefined || savePath === null) {
       return;
     }
     await api.saves.create(gameKey, savePath, t('saves.defaultLabel'));
@@ -220,7 +255,7 @@ function SavesCard({
   const onRestore = useCallback(
     async (snapshotId: string) => {
       const api = globalThis.window?.nexora;
-      if (api === undefined) {
+      if (api === undefined || savePath === null) {
         return;
       }
       const result = await api.saves.restore(snapshotId, savePath);
@@ -235,12 +270,12 @@ function SavesCard({
         <div className="hub-row hub-row--between">
           <strong>{t('saves.title')}</strong>
           <span className="nx-subtitle hub-break">
-            {t('saves.folder')}: {savePath}
+            {t('saves.folder')}: {savePath ?? t('saves.noFolder')}
           </span>
         </div>
 
         <div className="hub-row">
-          <Button variant="primary" onClick={() => void onCreate()}>
+          <Button variant="primary" onClick={() => void onCreate()} disabled={savePath === null}>
             {t('saves.create')}
           </Button>
           <Badge tone="planned">{t('planned.badge')}</Badge>

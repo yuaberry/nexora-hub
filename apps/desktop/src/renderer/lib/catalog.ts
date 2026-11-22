@@ -32,7 +32,8 @@ export function toCatalogEntry(view: DesktopGameView): Game {
     (game) => game.title.toLowerCase() === view.title.toLowerCase(),
   );
   const aliases = new Set<string>(curated?.aliases ?? []);
-  aliases.add(lastSegment(view.installPath));
+  // Entrada de catálogo não tem pasta: o alias é a chave externa.
+  aliases.add(view.installPath === null ? view.externalKey : lastSegment(view.installPath));
   return {
     id: view.externalKey,
     title: view.title,

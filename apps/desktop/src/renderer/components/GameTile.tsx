@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { LibraryGame } from '@nexora/protocol';
-import { coverUrl } from '../lib/media.js';
+import { coverFit, coverUrl } from '../lib/media.js';
+import { GameImage } from './GameImage.js';
 
 /**
  * Cartão de jogo da biblioteca — a peça central da grelha.
@@ -27,6 +28,11 @@ export interface GameTileProps {
   /** Texto da meta (última vez jogado, favorito…). */
   readonly metaLabel: string;
   readonly favorite: boolean;
+  /**
+   * O jogo está no disco? O desktop sabe (biblioteca local); a web não.
+   * `false` desactiva o botão — uma entrada de catálogo não arranca nada.
+   */
+  readonly installed?: boolean;
   /** Texto do botão de jogar. */
   readonly playLabel: string;
   readonly onSelect: (gameId: string) => void;
@@ -36,6 +42,7 @@ export interface GameTileProps {
 
 export function GameTile({
   game,
+  installed = true,
   playTimeLabel,
   metaLabel,
   favorite,
@@ -54,11 +61,12 @@ export function GameTile({
           onSelect(game.id);
         }}
       >
-        {game.cover === null ? (
-          <span aria-hidden="true">{initials(game.title)}</span>
-        ) : (
-          <img src={coverUrl(game.cover) ?? undefined} alt="" loading="lazy" />
-        )}
+        <GameImage
+          src={coverUrl(game.cover)}
+          fit={coverFit(game.cover)}
+          alt=""
+          fallback={<span aria-hidden="true">{initials(game.title)}</span>}
+        />
         <span className="hub-tile__play" aria-hidden="true">
           ▶ {playLabel}
         </span>
@@ -87,6 +95,9 @@ export function GameTile({
       <div style={{ padding: '0 0.75rem 0.75rem' }}>
         <button
           type="button"
+          // Entrada de catálogo: não há executável. O botão fica desactivado
+          // — a página do jogo explica e mostra o link da loja oficial.
+          disabled={!installed}
           className="nx-button nx-button--primary nx-button--block"
           onClick={() => {
             onPlay(game.id);

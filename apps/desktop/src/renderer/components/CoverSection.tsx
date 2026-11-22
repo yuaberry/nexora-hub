@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, useInterface } from '@nexora/ui';
 import type { DesktopGameView } from '../../shared/preload-api.js';
-import { coverUrl } from '../lib/media.js';
+import { GameImage } from './GameImage.js';
+import { coverFit, coverUrl } from '../lib/media.js';
 
 /**
  * Capa do jogo — a personalização do utilizador.
@@ -87,11 +88,12 @@ export function CoverSection({
 
         <div className="hub-row" style={{ alignItems: 'flex-start', gap: '1rem' }}>
           <div className="nx-cover" style={{ width: '9rem', height: '12rem', flex: '0 0 auto' }}>
-            {chosen === null ? (
-              <span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>
-            ) : (
-              <img src={coverUrl(chosen) ?? undefined} alt="" />
-            )}
+            <GameImage
+              src={coverUrl(chosen)}
+              fit={coverFit(chosen)}
+              alt=""
+              fallback={<span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>}
+            />
           </div>
           <div className="nx-stack" style={{ flex: 1 }}>
             <span className="nx-subtitle">
@@ -123,7 +125,12 @@ export function CoverSection({
                   void setCover(option.path);
                 }}
               >
-                <img src={coverUrl(option.path) ?? undefined} alt={option.label} loading="lazy" />
+                <GameImage
+                  src={coverUrl(option.path)}
+                  fit={coverFit(option.path)}
+                  alt={option.label}
+                  fallback={<span className="nx-subtitle">{option.label}</span>}
+                />
               </button>
             ))}
           </div>

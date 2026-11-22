@@ -39,6 +39,7 @@ export const library = {
   'details.notFavorite': 'Add to favorites',
   'details.installPath': 'Install folder',
   'details.executablePath': 'Executable',
+  'details.notInstalled': 'This game is not installed on this computer — install it from the official store and sync the library.',
   'details.executable.missing': 'No executable detected — import the folder again.',
   'details.lastPlayed': 'Last played',
   'details.neverPlayed': 'Never played',

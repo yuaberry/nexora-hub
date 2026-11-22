@@ -585,7 +585,51 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 - `pnpm typecheck` limpo; **607 testes verdes** no total.
 
 
-## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
+## Fase 3d — Catálogo público, DLCs e enquadramento das capas (2026-11-22)
+
+### Entregue
+
+- [x] **Catálogo pela loja pública** (`packages/core/steam/catalog.ts`) —
+      mapeadores puros de `appdetails` e `storesearch` (o appid da loja é um
+      **número**, não texto — a fixture real apanhou o engano) — 8 testes no
+      core.
+- [x] **Adicionar pelo AppID ou pelo nome** (`main/steam-catalog.ts` +
+      `catalog-ipc.ts`) — a entrada nasce com metadado e **sem caminho de
+      instalação** (a base local ganhou colunas opcionais, com migração que
+      recria a tabela sem perder favoritos nem tempo jogado); o mesmo jogo
+      encontrado duas vezes não duplica (`bySteamAppId`) — 11 testes no
+      desktop, com rede falsa.
+- [x] **DLCs** — secção "Conteúdo adicional" nos detalhes: nomes da loja
+      (um pedido por DLC, com limite honesto de 25) e a marca de instalada
+      dos manifestos no disco; o resultado fica guardado em `game_dlcs`.
+- [x] **Enquadramento** (`renderer/lib/media.ts`) — logo e cabeçalho assentam
+      contidos (`contain`), herói e cápsula enchem (`cover`); `GameImage`
+      trata da falha: placeholder do tema, nunca moldura vazia.
+- [x] **Cache das cápsulas** (`main/cover-cache.ts`) — o renderer não carrega
+      a imagem da loja (CSP + user-agent do Electron recusado pela Akamai); o
+      processo principal busca-a e guarda-a no disco, servida depois pelo
+      `nexora://cover/` — 6 testes.
+- [x] **Recusa honesta no arranque** — um jogo sem executável não arranca
+      (`not-installed`), e a página mostra o link da loja.
+
+### Prova de execução real (2026-11-22)
+
+- busca real: "hollow knight" → 5 resultados, o primeiro `Hollow Knight`
+      (367520);
+- adicionar o AppID **440** (Team Fortress 2): entrada nova, e a cápsula
+      ficou em cache no disco (`.dev-data/cover-cache/008028b0….jpg`);
+- a segunda chamada e o R.E.P.O. (já importado do disco) devolveram
+      `duplicate: true` — nenhuma duplicação;
+- **R.E.P.O. lançado de verdade**: sessão em curso pelo runner (wine),
+      9 segundos medidos, sem crash, e paragem limpa;
+- DLCs do Hollow Knight: os dois nomes reais da loja (Official Soundtrack,
+      Gods & Nightmares), nenhuma instalada — como é verdade no disco;
+- biblioteca: 7 jogos, 3 imagens carregadas com o enquadramento certo
+      (herói 1920 `cover`, logo 640 `contain`, cápsula 460 `cover`), e as
+      entradas remotas sem imagem mostram o placeholder;
+- bug apanhado pelos testes: `writeFile` perdeu o import na refacção —
+      a excepção era engolida pelo `catch` e a capa nunca era guardada;
+- `pnpm typecheck` limpo; **655 testes verdes** no total.\n\n## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
 
 ### Entregue
 

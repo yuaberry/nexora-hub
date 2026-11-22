@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface, type Translator } from '@nexora/ui';
 import { accessToken } from '../lib/api.js';
-import { coverUrl } from '../lib/media.js';
+import { coverFit, coverUrl } from '../lib/media.js';
+import { DiscoverPanel } from '../components/DiscoverPanel.js';
+import { GameImage } from '../components/GameImage.js';
 import type { RecommendationItemView } from '../../shared/preload-api.js';
 import { useAuth } from '../state/auth.js';
 import type { StoreGameView } from '../../shared/preload-api.js';
@@ -110,6 +112,9 @@ export function StorePage(): ReactNode {
 
       {message === null ? null : <p className="nx-banner"><span>{message}</span></p>}
 
+      {/* Descobrir: procurar pelo nome ou pelo AppID e guardar metadados. */}
+      <DiscoverPanel />
+
       <div className="hub-row">
         <input
           className="nx-input"
@@ -187,11 +192,12 @@ export function StorePage(): ReactNode {
               <Card key={game.id}>
                 <div className="nx-stack">
                   <div className="nx-cover">
-                    {game.cover === null ? (
-                      <span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>
-                    ) : (
-                      <img src={coverUrl(game.cover) ?? undefined} alt="" loading="lazy" />
-                    )}
+                    <GameImage
+                      src={coverUrl(game.cover)}
+                      fit={coverFit(game.cover)}
+                      alt=""
+                      fallback={<span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>}
+                    />
                   </div>
                   <strong className="hub-tile__title">{game.title}</strong>
                   <span className="nx-subtitle">{game.tagline}</span>

@@ -39,6 +39,7 @@ export const library = {
   'details.notFavorite': 'Adicionar aos favoritos',
   'details.installPath': 'Pasta de instalação',
   'details.executablePath': 'Executável',
+  'details.notInstalled': 'Este jogo não está instalado neste computador — instala-o pela loja oficial e sincroniza a biblioteca.',
   'details.executable.missing': 'Executável não detetado — importe a pasta novamente.',
   'details.lastPlayed': 'Última vez jogado',
   'details.neverPlayed': 'Nunca jogado',

@@ -44,7 +44,7 @@ const MIME_TYPES: Record<string, string> = {
  */
 const CONTENT_SECURITY_POLICY = [
   "default-src 'none'",
-  "img-src 'self' data: blob:",
+  "img-src 'self' data: blob: https://cdn.akamai.steamstatic.com",
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self'",
   "font-src 'self'",

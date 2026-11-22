@@ -16,7 +16,8 @@ const MAX_LISTED = 12;
 export function ModsSection({
   installPath,
 }: {
-  readonly installPath: string;
+  /** `null` numa entrada de catálogo: o jogo não está no disco. */
+  readonly installPath: string | null;
 }): ReactNode {
   const { t, locale } = useInterface();
   const api = globalThis.window?.nexora;
@@ -25,7 +26,7 @@ export function ModsSection({
   const [message, setMessage] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
-    if (api === undefined) {
+    if (api === undefined || installPath === null) {
       return;
     }
     const result = await api.mods.scan(installPath);
@@ -50,7 +51,11 @@ export function ModsSection({
 
         {message === null ? null : <p className="nx-banner"><span>{message}</span></p>}
 
-        {scan !== null && scan.folder === null ? (
+        {installPath === null ? (
+          <p className="nx-subtitle">
+            {t('mods.noFolder')} — {t('mods.noFolder.hint')}
+          </p>
+        ) : scan !== null && scan.folder === null ? (
           <p className="nx-subtitle">
             {t('mods.noFolder')} — {t('mods.noFolder.hint')}
           </p>

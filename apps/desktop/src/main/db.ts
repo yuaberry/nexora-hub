@@ -20,8 +20,10 @@ export interface LocalGameRecord {
   readonly externalKey: string;
   readonly title: string;
   readonly cover: string | null;
-  readonly installPath: string;
-  readonly executablePath: string;
+  /** `null` quando a entrada veio do catálogo (o jogo não está instalado). */
+  readonly installPath: string | null;
+  /** `null` quando não há executável conhecido (entrada de catálogo). */
+  readonly executablePath: string | null;
   /** Appid da Steam, quando o jogo veio de um manifesto da loja. */
   readonly steamAppId: string | null;
   readonly tags: readonly string[];
@@ -37,8 +39,9 @@ export interface UpsertLocalGameInput {
   readonly externalKey: string;
   readonly title: string;
   readonly cover?: string | null;
-  readonly installPath: string;
-  readonly executablePath: string;
+  /** Omitido ou `null` numa entrada de catálogo: o jogo não está no disco. */
+  readonly installPath?: string | null;
+  readonly executablePath?: string | null;
   /** Appid da Steam (manifesto da loja); mantém-se quando não é dado. */
   readonly steamAppId?: string | null;
   readonly tags?: readonly string[];
@@ -58,8 +61,8 @@ export class LocalLibrary {
         external_key text not null unique,
         title text not null,
         cover text,
-        install_path text not null,
-        executable_path text not null,
+        install_path text,
+        executable_path text,
         steam_app_id text,
         tags text not null default '[]',
         adult integer not null default 0,
@@ -80,6 +83,13 @@ export class LocalLibrary {
     } catch {
       // a coluna já existe — nada a fazer
     }
+
+    // Migração dos caminhos: as entradas de catálogo (um jogo que o
+    // utilizador encontrou pela loja mas que não está instalado) não têm
+    // pasta nem executável — as colunas passam a aceitar `NULL`. O SQLite
+    // não retira `NOT NULL` a uma coluna: a tabela é recrianda com os dados
+    // copiados, e o pragma garante que só acontece uma vez.
+    this.migrateNullablePaths();
 
     this.db.exec(`
       create table if not exists collections (
@@ -104,6 +114,54 @@ export class LocalLibrary {
         checksum text not null,
         revision integer not null
       );
+
+      create table if not exists game_dlcs (
+        game_key text not null,
+        app_id text not null,
+        title text not null,
+        kind text not null,
+        free integer not null default 0,
+        installed integer not null default 0,
+        updated_at text not null,
+        primary key (game_key, app_id)
+      );
+    `);
+  }
+
+  /**
+   * Recria a tabela dos jogos com os caminhos opcionais (migração única).
+   *
+   * O pragma `table_info` diz se `install_path` ainda exige valor: se sim, a
+   * tabela é copiada para uma nova (com os mesmos dados) e trocada no lugar.
+   * Um caminho que já era `NULL` nunca é inventado — só passa a ser aceite.
+   */
+  private migrateNullablePaths(): void {
+    const columns = this.db.prepare('pragma table_info(games)').all() as Record<string, unknown>[];
+    const installPath = columns.find((column) => column['name'] === 'install_path');
+    if (installPath === undefined || installPath['notnull'] !== 1) {
+      return;
+    }
+    this.db.exec(`
+      create table games_migrated (
+        id integer primary key autoincrement,
+        external_key text not null unique,
+        title text not null,
+        cover text,
+        install_path text,
+        executable_path text,
+        steam_app_id text,
+        tags text not null default '[]',
+        adult integer not null default 0,
+        favorite integer not null default 0,
+        last_played_at text,
+        total_seconds integer not null default 0,
+        created_at text not null,
+        updated_at text not null
+      );
+      insert into games_migrated (id, external_key, title, cover, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at)
+        select id, external_key, title, cover, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at from games;
+      drop table games;
+      alter table games_migrated rename to games;
     `);
   }
 
@@ -115,14 +173,17 @@ export class LocalLibrary {
         // No conflito, **tudo** se actualiza — inclusive o executável: um jogo
         // re-detectado com um executável melhor (a heurística mudou) tem de
         // actualizar a entrada, não ficar com a antiga para sempre. O que é do
-        // utilizador (favorito, tempo jogado) mantém-se.
+        // utilizador (favorito, tempo jogado) mantém-se. Excepção: um caminho
+        // novo que vem vazio **nunca** apaga um caminho real — uma entrada de
+        // catálogo encontrada depois da importação não pode deixar o jogo
+        // instalado sem pasta.
         `insert into games (external_key, title, cover, install_path, executable_path, steam_app_id, tags, adult, created_at, updated_at)
          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          on conflict(external_key) do update set
            title = excluded.title,
            cover = excluded.cover,
-           install_path = excluded.install_path,
-           executable_path = excluded.executable_path,
+           install_path = coalesce(excluded.install_path, games.install_path),
+           executable_path = coalesce(excluded.executable_path, games.executable_path),
            steam_app_id = coalesce(excluded.steam_app_id, games.steam_app_id),
            tags = excluded.tags,
            adult = excluded.adult,
@@ -135,8 +196,8 @@ export class LocalLibrary {
         input.externalKey,
         input.title,
         input.cover ?? null,
-        input.installPath,
-        input.executablePath,
+        input.installPath ?? null,
+        input.executablePath ?? null,
         input.steamAppId ?? null,
         JSON.stringify(input.tags ?? []),
         input.adult === true ? 1 : 0,
@@ -157,6 +218,18 @@ export class LocalLibrary {
       .prepare('select * from games order by title collate nocase')
       .all()
       .map((row) => toRecord(row as Record<string, unknown>));
+  }
+
+  /**
+   * Procura uma entrada pelo appid da Steam.
+   *
+   * É o que impede a duplicação: um jogo encontrado pelo catálogo quando já
+   * estava na biblioteca (importado do disco) actualiza a entrada que existe,
+   * em vez de criar uma segunda.
+   */
+  bySteamAppId(appId: string): LocalGameRecord | null {
+    const row = this.db.prepare('select * from games where steam_app_id = ?').get(appId);
+    return row === undefined ? null : toRecord(row as Record<string, unknown>);
   }
 
   findById(id: number): LocalGameRecord | null {
@@ -287,6 +360,42 @@ export class LocalLibrary {
     return row === undefined ? null : toRecord(row as Record<string, unknown>);
   }
 
+  // ---- DLCs declaradas pela loja ----------------------------------------
+
+  /**
+   * Substitui as DLCs conhecidas de um jogo.
+   *
+   * A lista vem da loja (pública) e a marca de instalada vem do disco: o
+   * que fica guardado é o cruzamento dos dois — um jogo sem DLCs fica com
+   * lista vazia, e a chamada seguinte não repete o que já sabe.
+   */
+  setDlcs(gameKey: string, dlcs: readonly DlcRow[]): void {
+    const now = new Date().toISOString();
+    this.db.prepare('delete from game_dlcs where game_key = ?').run(gameKey);
+    const insert = this.db.prepare(
+      `insert or replace into game_dlcs (game_key, app_id, title, kind, free, installed, updated_at)
+       values (?, ?, ?, ?, ?, ?, ?)`,
+    );
+    for (const dlc of dlcs) {
+      insert.run(gameKey, dlc.appId, dlc.title, dlc.kind, dlc.free ? 1 : 0, dlc.installed ? 1 : 0, now);
+    }
+  }
+
+  /** Lista as DLCs de um jogo (por título). */
+  listDlcs(gameKey: string): readonly DlcRow[] {
+    return (
+      this.db
+        .prepare('select * from game_dlcs where game_key = ? order by title collate nocase')
+        .all(gameKey) as Record<string, unknown>[]
+    ).map((row) => ({
+      appId: String(row['app_id']),
+      title: String(row['title']),
+      kind: String(row['kind']),
+      free: Number(row['free']) === 1,
+      installed: Number(row['installed']) === 1,
+    }));
+  }
+
   // ---- Snapshots de saves ---------------------------------------------
 
   /** Regista um snapshot (o índice persistido; a cópia vive no disco). */
@@ -339,6 +448,16 @@ export class LocalLibrary {
   }
 }
 
+/** Uma DLC conhecida de um jogo (nome da loja + se está no disco). */
+export interface DlcRow {
+  readonly appId: string;
+  readonly title: string;
+  readonly kind: string;
+  readonly free: boolean;
+  /** `true` quando a pasta do appid existe numa biblioteca da Steam. */
+  readonly installed: boolean;
+}
+
 /** Uma linha de snapshot da base local. */
 export interface SaveSnapshotRow {
   readonly id: string;
@@ -373,8 +492,8 @@ function toRecord(row: Record<string, unknown>): LocalGameRecord {
     externalKey: String(row['external_key']),
     title: String(row['title']),
     cover: typeof row['cover'] === 'string' ? row['cover'] : null,
-    installPath: String(row['install_path']),
-    executablePath: String(row['executable_path']),
+    installPath: typeof row['install_path'] === 'string' ? row['install_path'] : null,
+    executablePath: typeof row['executable_path'] === 'string' ? row['executable_path'] : null,
     steamAppId: typeof steamAppId === 'string' && steamAppId !== '' ? steamAppId : null,
     tags: parseTags(row['tags']),
     adult: Number(row['adult']) === 1,

@@ -3,6 +3,7 @@ export const saves = {
   'saves.title': 'Game saves',
   'saves.subtitle': 'Versioned snapshots on your computer. A save cannot be lost.',
   'saves.folder': 'Save folder',
+  'saves.noFolder': 'Game not installed (no save folder)',
   'saves.create': 'Create snapshot',
   'saves.created': 'Snapshot created.',
   'saves.restore': 'Restore',

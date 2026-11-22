@@ -16,6 +16,7 @@
 import { dialog, ipcMain } from 'electron';
 import { existsSync, statSync } from 'node:fs';
 import { basename } from 'node:path';
+import { steamCapsuleUrl } from '@nexora/core';
 import { steamCoverAlternatives, steamCoverFor } from './steam-images.js';
 import { localCoverFile } from './disk-scan.js';
 import { syncSteamLibrary } from './steam-sync.js';
@@ -76,8 +77,10 @@ export function registerCoversIpc(library: LocalLibrary): void {
       return { ok: false, message: 'Jogo em falta.' };
     }
     const entry = library.findById(numericId);
-    if (entry === null || entry.steamAppId === null) {
-      // Sem appid não há imagens da Steam: a capa é a local ou o placeholder.
+    if (entry === null || entry.steamAppId === null || entry.installPath === null) {
+      // Sem appid, ou sem pasta no disco (entrada de catálogo), não há
+      // imagens locais da Steam: a capa automática é a da loja ou o
+      // placeholder do tema.
       return { ok: true, options: [] };
     }
     const root = libraryRootOf(entry.installPath);
@@ -131,11 +134,18 @@ export function registerCoversIpc(library: LocalLibrary): void {
     if (entry === null) {
       return { ok: false, message: 'Jogo não encontrado.' };
     }
-    // A capa automática é a da Steam; sem ela, a capa local da pasta; sem
-    // nenhuma das duas, `null` — e o placeholder do tema desenha-se. Nunca um
-    // caminho adivinhado.
-    const steamCover = entry.steamAppId === null ? null : steamCoverFor(libraryRootOf(entry.installPath), entry.steamAppId);
-    const automatic = steamCover ?? localCoverFile(entry.installPath);
+    // A capa automática é a que a **Steam** guardou no disco; sem pasta no
+    // disco (entrada de catálogo), é a cápsula pública da loja; sem nenhuma
+    // das duas, `null` — e o placeholder do tema desenha-se. Nunca um caminho
+    // adivinhado.
+    const steamCover =
+      entry.installPath !== null && entry.steamAppId !== null
+        ? steamCoverFor(libraryRootOf(entry.installPath), entry.steamAppId)
+        : null;
+    const automatic =
+      steamCover ??
+      (entry.installPath !== null ? localCoverFile(entry.installPath) : null) ??
+      (entry.steamAppId === null ? null : steamCapsuleUrl(entry.steamAppId));
     const reset = library.setCover(numericId, automatic);
     return reset === null ? { ok: false, message: 'Jogo não encontrado.' } : { ok: true };
   });

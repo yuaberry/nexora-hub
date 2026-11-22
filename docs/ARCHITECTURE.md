@@ -426,4 +426,30 @@ mexe numa capa escolhida por ele.
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.
 A costura técnica mantém-se fechada (`packages/cloud` com `decideSync` e o
 cliente *stub* que recusa com motivo) — nada na interface anuncia a nuvem como
-existente.
+existente.\n
+## D45 — O catálogo entra como metadado, e a arte encaixa-se pelo tipo
+
+Um jogo que não está instalado continua a poder estar na biblioteca: o
+utilizador cola o **AppID** (ou procura pelo nome), a loja pública da Steam
+diz quem é o jogo, e a entrada nasce com título, cápsula e link — sem caminho
+de instalação. `install_path` e `executable_path` passaram a aceitar `NULL`
+(com migração que recria a tabela sem perder favoritos nem tempo jogado), e
+`bySteamAppId` é o que impede duplicar: um jogo já importado do disco é
+reconhecido quando o catálogo o encontra de novo.
+
+A imagem da loja **não** é carregada pelo renderer: a CSP fecha a rede ao
+renderer, e a Akamai recusa o user-agent do Electron (a prova ao vivo apanhou
+a imagem a zeros). O processo principal busca a cápsula com user-agent de
+browser e guarda-a no disco, ao lado da base local — a segunda vez que a
+página abre, a capa já é um ficheiro local, servida pelo mesmo
+`nexora://cover/` das capas da Steam. Uma imagem que falhe deixa o
+placeholder do tema (`GameImage`), nunca uma moldura vazia.
+
+O **enquadramento** é por tipo de arte: logo e cabeçalho são arte com margens
+transparentes e assentam contida na moldura (`object-fit: contain`); herói e
+cápsula são arte de canto a canto e enchem-na (`cover`). Antes, um logo 640×360
+numa moldura 3:4 saía cortado — era isto que estava "fora".
+
+As **DLCs** declaram-se na loja (um pedido por nome, com limite) e a marca de
+instalada vem dos manifestos no disco: os nomes vêm da rede, a verdade sobre o
+que está instalado vem do utilizador.

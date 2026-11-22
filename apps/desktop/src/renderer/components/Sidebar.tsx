@@ -4,7 +4,8 @@ import { useLibrary } from '../state/desktop.js';
 import { useAuth } from '../state/auth.js';
 import { initials } from './GameTile.js';
 import type { DownloadTaskView } from '../../shared/preload-api.js';
-import { coverUrl } from '../lib/media.js';
+import { coverFit, coverUrl } from '../lib/media.js';
+import { GameImage } from './GameImage.js';
 
 /**
  * Barra lateral do launcher — marca, navegação, biblioteca e estado.
@@ -128,11 +129,12 @@ export function Sidebar({
                 }}
               >
                 <span className="hub-lib-item__thumb">
-                  {game.cover === null ? (
-                    <span aria-hidden="true">{initials(game.title)}</span>
-                  ) : (
-                    <img src={coverUrl(game.cover) ?? undefined} alt="" loading="lazy" />
-                  )}
+                  <GameImage
+                    src={coverUrl(game.cover)}
+                    fit={coverFit(game.cover)}
+                    alt=""
+                    fallback={<span aria-hidden="true">{initials(game.title)}</span>}
+                  />
                 </span>
                 <span className="hub-lib-item__title">{game.title}</span>
               </button>

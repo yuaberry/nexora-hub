@@ -26,6 +26,8 @@ import { registerModsIpc } from './mods-ipc.js';
 import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerOverlayIpc } from './overlay-ipc.js';
 import { registerCoversIpc } from './covers-ipc.js';
+import { registerCatalogIpc } from './catalog-ipc.js';
+import { coverCacheDir } from './cover-cache.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -147,6 +149,10 @@ function bootstrap(): void {
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
   registerCoversIpc(library);
+
+  // Catálogo público da Steam: procurar pelo AppID ou pelo nome e guardar
+  // metadados na biblioteca local (a instalação continua a ser da loja).
+  registerCatalogIpc(library, coverCacheDir(config.databasePath));
 
   mainWindow = createMainWindow(config);
 }

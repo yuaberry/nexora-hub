@@ -6,9 +6,21 @@
  * o que está aqui. O processo principal valida cada argumento: o que vem do
  * renderer é tratado como entrada externa, não como código de confiança.
  *
- * Nenhum método promete o que não existe: não há downloads, saves na nuvem,
- * amigos ou overlay nesta fase — esses são só tipos.
+ * Nenhum método promete o que não existe: o que não existe leva o selo
+ * "Planeado" na interface, nunca um botão que finge funcionar.
  */
+
+import type { SteamAppSummary } from '@nexora/core';
+
+/** Uma DLC conhecida (nome da loja) e se está no disco do utilizador. */
+export interface DlcView {
+  readonly appId: string;
+  readonly title: string;
+  readonly kind: string;
+  readonly free: boolean;
+  /** `true` quando a pasta do appid existe numa biblioteca da Steam. */
+  readonly installed: boolean;
+}
 
 /** Uma entrada da biblioteca local (vista do renderer). */
 export interface DesktopGameView {
@@ -17,10 +29,14 @@ export interface DesktopGameView {
   readonly externalKey: string;
   readonly title: string;
   readonly cover: string | null;
-  readonly installPath: string;
-  readonly executablePath: string;
+  /** `null` quando a entrada veio do catálogo (o jogo não está instalado). */
+  readonly installPath: string | null;
+  /** `null` quando não há executável conhecido. */
+  readonly executablePath: string | null;
   /** Appid da Steam, quando o jogo veio de um manifesto da loja. */
   readonly steamAppId: string | null;
+  /** `false` quando não há executável: só há metadado (entrada de catálogo). */
+  readonly installed: boolean;
   readonly tags: readonly string[];
   readonly favorite: boolean;
   /** ISO-8601 UTC da última sessão, ou `null`. */
@@ -45,7 +61,7 @@ export type LaunchResultView =
   | { readonly ok: false; readonly reasonKey: LaunchRefusalKey };
 
 /** Motivos de recusa de arranque — chaves de tradução, não texto solto. */
-export type LaunchRefusalKey = 'missing-executable' | 'already-running' | 'not-found' | 'no-runner';
+export type LaunchRefusalKey = 'missing-executable' | 'already-running' | 'not-found' | 'no-runner' | 'not-installed';
 
 /** Resumo de uma sessão em curso. */
 export interface SessionSummaryView {
@@ -610,6 +626,35 @@ export interface DesktopApi {
       readonly options?: readonly { readonly path: string; readonly label: string }[];
       readonly message?: string;
     }>;
+    /**
+     * Os detalhes de um AppID na loja pública (nome, tipo, gratuito, DLCs).
+     *
+     * É a procura pelo AppID: o utilizador cola o número, a loja diz que jogo
+     * é — e a entrada pode ser guardada na biblioteca local.
+     */
+    readonly lookup: (appId: string) => Promise<{
+      readonly ok: boolean;
+      readonly app?: SteamAppSummary;
+      readonly message?: string;
+    }>;
+    /** A busca por nome na loja pública (para encontrar o AppID). */
+    readonly search: (term: string) => Promise<{
+      readonly ok: boolean;
+      readonly items?: readonly SteamAppSummary[];
+      readonly message?: string;
+    }>;
+    /**
+     * As DLCs declaradas por um jogo da biblioteca.
+     *
+     * Os nomes vêm da loja; `installed` diz se a pasta do appid está no
+     * disco. O resultado fica guardado — a página não volta a pedir.
+     */
+    readonly dlcs: (gameId: string) => Promise<{
+      readonly ok: boolean;
+      readonly items?: readonly DlcView[];
+      readonly truncated?: number;
+      readonly message?: string;
+    }>;
   };
   readonly friends: {
     /** Amigos, pedidos recebidos e enviados (exige conta). */
@@ -739,6 +784,21 @@ export interface DesktopApi {
     readonly detectFolders: () => Promise<readonly DetectedFolderView[]>;
     readonly toggleFavorite: (id: string) => Promise<DesktopGameView | null>;
     readonly remove: (id: string) => Promise<boolean>;
+    /**
+     * Adiciona um jogo pelo AppID da Steam (catálogo público).
+     *
+     * A entrada nasce com metadados e sem caminho de instalação: o jogo não
+     * está no disco. `duplicate: true` quando já estava na biblioteca — a
+     * entrada que existe fica intocada (capa e tempo jogado são do
+     * utilizador).
+     */
+    readonly addCatalog: (appId: string) => Promise<{
+      readonly ok: boolean;
+      readonly duplicate?: boolean;
+      readonly gameId?: string;
+      readonly title?: string;
+      readonly message?: string;
+    }>;
   };
   readonly runner: {
     /**

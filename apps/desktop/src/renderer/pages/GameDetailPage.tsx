@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import { accessToken } from '../lib/api.js';
+import { coverUrl } from '../lib/media.js';
 import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import { CommunitySection } from '../components/CommunitySection.js';
 import { PerformanceCard } from '../components/PerformanceCard.js';
 import { ModsSection } from '../components/ModsSection.js';
+import { CoverSection } from '../components/CoverSection.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
 /**
@@ -85,7 +87,7 @@ export function GameDetailPage({
           {game.cover === null ? (
             <span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>
           ) : (
-            <img src={game.cover} alt="" />
+            <img src={coverUrl(game.cover) ?? undefined} alt="" />
           )}
         </div>
 
@@ -161,6 +163,9 @@ export function GameDetailPage({
       <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
 
       <CommunitySection gameId={game.externalKey} />
+
+      {/* Capa: a automática (a da Steam) e a personalização do utilizador. */}
+      <CoverSection game={game} onChanged={() => library.reload()} />
 
       {/* Modos instalados: a leitura é local (os .jar da pasta mods). */}
       <ModsSection installPath={game.installPath} />

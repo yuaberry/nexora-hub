@@ -88,6 +88,15 @@ código de saída, tempo gravado).
 - Cada recomendação traz a razão (as etiquetas partilhadas) e o que já tem na
   biblioteca **não** é recomendado
 
+### 🖼️ Capas e sincronização
+- **Capas reais da Steam** — o logo, o herói e a cápsula que a Steam guardou
+  no disco do utilizador (offline, sem descarregar nada), escolhidas por uma
+  ordem declarada: o **logo** primeiro, porque desenha-se bem em qualquer tema
+- **Sincronização** — relê os manifestos da Steam e traz o que mudou (jogos
+  novos, todos diferentes); a capa que escolheste **nunca** é mexida
+- **Personalizável** — escolhe outra entre as imagens da Steam ou um ficheiro
+  teu, e volta à automática quando quiseres
+
 ### 🧩 Modos
 - **Detector de modos** — lê a pasta `mods` do jogo e diz **quantos são e de
   que carregador** (Fabric, Quilt, Forge, NeoForge), com o nome e a versão de
@@ -171,6 +180,10 @@ Os ficheiros de cada lançamento estão em
 </tr>
 <tr>
 <td><img src="docs/screenshots/overlay.png" alt="Overlay"/><br/><sub><b>Overlay</b> — medidas reais por cima do jogo (Shift+Tab).</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/capas-steam.png" alt="Capas da Steam"/><br/><sub><b>Capas reais</b> — os logos que a Steam guardou, lidos do disco.</sub></td>
+<td><img src="docs/screenshots/capa-personalizacao.png" alt="Capa personalizável"/><br/><sub><b>Capa personalizável</b> — escolhe entre as imagens da Steam ou um ficheiro teu.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
 </tr>

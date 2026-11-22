@@ -595,6 +595,21 @@ export interface DesktopApi {
      * `ok: false` quando o jogo não tem appid da Steam.
      */
     readonly open: (appId: string) => Promise<{ readonly ok: boolean }>;
+    /** Sincroniza a biblioteca com o que a Steam tem agora. */
+    readonly sync: () => Promise<{
+      readonly ok: boolean;
+      readonly updated?: number;
+      readonly added?: number;
+      readonly unchanged?: number;
+      readonly titles?: readonly string[];
+      readonly message?: string;
+    }>;
+    /** As imagens que a Steam guardou para um jogo (para escolher entre elas). */
+    readonly coverOptions: (gameId: string) => Promise<{
+      readonly ok: boolean;
+      readonly options?: readonly { readonly path: string; readonly label: string }[];
+      readonly message?: string;
+    }>;
   };
   readonly friends: {
     /** Amigos, pedidos recebidos e enviados (exige conta). */
@@ -629,6 +644,14 @@ export interface DesktopApi {
     readonly last: () => OverlayData | null;
     /** Abre ou fecha o overlay (o atalho Shift+Tab faz o mesmo). */
     readonly toggle: () => Promise<{ readonly ok: boolean; readonly visible: boolean }>;
+  };
+  readonly covers: {
+    /** Abre o selector de ficheiro de imagem. */
+    readonly pick: () => Promise<{ readonly ok: boolean; readonly path?: string }>;
+    /** Define a capa escolhida pelo utilizador. */
+    readonly set: (gameId: string, path: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
+    /** Volta à capa automática (a da Steam, se existir). */
+    readonly reset: (gameId: string) => Promise<{ readonly ok: boolean; readonly message?: string }>;
   };
   readonly mods: {
     /** Procura os modos na pasta de instalação de um jogo. */

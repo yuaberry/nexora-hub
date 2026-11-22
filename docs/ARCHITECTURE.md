@@ -402,6 +402,25 @@ nenhum processo com essa marca existe na tabela. Parar a sessão mata o
 ficar ligado. O overlay usa o mesmo observador de telemetria do cartão: a
 mesma medida, na mesma fonte.
 
+## D44 — A capa real vem do disco, servida pelo esquema da própria app
+
+A Steam guarda as imagens de cada jogo em
+`appcache/librarycache/<appid>/` — o `logo.png`, a `library_hero.jpg`, a
+`library_capsule.jpg`, a `header.jpg` e, nas versões modernas, subpastas com
+nomes de hash. O launcher lê essa pasta (recursivamente, porque o herói vive
+numa subpasta) e escolhe a capa por uma ordem **declarada**: o logo primeiro,
+porque é arte com fundo transparente e por isso desenha-se bem em qualquer
+tema (claro, escuro, OLED, preto e branco). Um ficheiro com nome de hash é
+classificado honestamente como "outras" — nunca adivinhado como herói.
+
+A imagem chega à interface por `nexora://cover/<caminho>`, servido pelo
+protocolo da própria app: um `file://` violaria a CSP, e um caminho absoluto
+não resolve sob um esquema interno. O caminho é **codificado** no helper do
+renderer — sem codificação a barra inicial perde-se na junção e a imagem
+devolve 404 (a prova ao vivo apanhou isto). O utilizador pode escolher outra
+entre as que a Steam guardou ou um ficheiro seu, e a sincronização **nunca**
+mexe numa capa escolhida por ele.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

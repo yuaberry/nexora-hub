@@ -105,6 +105,8 @@ const api: DesktopApi = {
     // Handoff para o cliente oficial: o renderer passa o appid, o processo
     // principal constrói o URL e decide abrir.
     open: (appId) => ipcRenderer.invoke('steam:open', appId) as Promise<{ ok: boolean }>,
+    sync: () => ipcRenderer.invoke('steam:sync') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly added?: number; readonly unchanged?: number; readonly titles?: readonly string[]; readonly message?: string }>,
+    coverOptions: (gameId) => ipcRenderer.invoke('steam:coverOptions', gameId) as Promise<{ readonly ok: boolean; readonly options?: readonly { path: string; label: string }[]; readonly message?: string }>,
   },
   store: {
     catalog: (query, platform, hideAdult) => ipcRenderer.invoke('store:catalog', query, platform, hideAdult) as Promise<StoreCatalogResult>,
@@ -159,6 +161,11 @@ const api: DesktopApi = {
     },
     last: () => (globalThis as unknown as { __nexoraOverlayLast?: OverlayData }).__nexoraOverlayLast ?? null,
     toggle: () => ipcRenderer.invoke('overlay:toggle') as Promise<{ ok: boolean; visible: boolean }>,
+  },
+  covers: {
+    pick: () => ipcRenderer.invoke('covers:pick') as Promise<{ ok: boolean; path?: string }>,
+    set: (gameId, path) => ipcRenderer.invoke('library:setCover', gameId, path) as Promise<{ ok: boolean; message?: string }>,
+    reset: (gameId) => ipcRenderer.invoke('library:resetCover', gameId) as Promise<{ ok: boolean; message?: string }>,
   },
   mods: {
     scan: (installPath) => ipcRenderer.invoke('mods:scan', installPath) as Promise<ModsScanView>,

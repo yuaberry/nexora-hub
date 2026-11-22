@@ -25,6 +25,7 @@ import { registerBenchmarkIpc } from './benchmark-ipc.js';
 import { registerModsIpc } from './mods-ipc.js';
 import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerOverlayIpc } from './overlay-ipc.js';
+import { registerCoversIpc } from './covers-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -143,6 +144,9 @@ function bootstrap(): void {
 
   // Overlay: a janela por cima do jogo, com as medidas reais do sistema.
   registerOverlayIpc();
+
+  // Capas e sincronização: imagens da Steam e a personalização do utilizador.
+  registerCoversIpc(library);
 
   mainWindow = createMainWindow(config);
 }

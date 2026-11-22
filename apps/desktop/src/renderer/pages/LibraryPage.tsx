@@ -28,6 +28,7 @@ export function LibraryPage({
   const { t, locale } = useInterface();
   const library = useLibrary();
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const [collections, setCollections] = useState<readonly CollectionView[] | null>(null);
   const [activeCollection, setActiveCollection] = useState<number | null>(null);
   const [collectionGames, setCollectionGames] = useState<readonly string[] | null>(null);
@@ -97,6 +98,35 @@ export function LibraryPage({
     library.reload();
   }, [library, t]);
 
+  /**
+   * Sincroniza com o que a Steam tem agora.
+   *
+   * A Steam actualiza os manifestos quando o jogo muda de versão — e este
+   * comando volta a lê-los: jogos novos entram, títulos diferentes são
+   * corrigidos. A capa escolhida pelo utilizador nunca é mexida.
+   */
+  const onSyncSteam = useCallback(async () => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    setSyncing(true);
+    const result = await api.steam.sync();
+    setSyncing(false);
+    if (!result.ok) {
+      setImportMessage(result.message ?? t('error.generic'));
+      return;
+    }
+    const updated = result.updated ?? 0;
+    const added = result.added ?? 0;
+    setImportMessage(
+      added === 0 && updated === 0
+        ? t('steam.sync.unchanged')
+        : t('steam.sync.done', { added, updated }),
+    );
+    library.reload();
+  }, [library, t]);
+
   const hits = useMemo(() => {
     const inCollection =
       activeCollection === null || collectionGames === null
@@ -133,6 +163,10 @@ export function LibraryPage({
           <Button onClick={() => void onScan()}>{t('scan.action')}</Button>
           {/* Importação oficial: lê os manifestos das lojas no disco. */}
           <Button onClick={() => void onOfficialImport()}>{t('official.action')}</Button>
+          {/* Sincronização: o que mudou na Steam desde a última vez. */}
+          <Button onClick={() => void onSyncSteam()} disabled={syncing}>
+            {syncing ? t('steam.sync.running') : t('steam.sync.action')}
+          </Button>
           <Button variant="primary" onClick={() => void onImport()}>
             {t('import.choose')}
           </Button>

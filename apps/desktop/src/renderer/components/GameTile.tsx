@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { LibraryGame } from '@nexora/protocol';
+import { coverUrl } from '../lib/media.js';
 
 /**
  * Cartão de jogo da biblioteca — a peça central da grelha.
@@ -56,7 +57,7 @@ export function GameTile({
         {game.cover === null ? (
           <span aria-hidden="true">{initials(game.title)}</span>
         ) : (
-          <img src={game.cover} alt="" loading="lazy" />
+          <img src={coverUrl(game.cover) ?? undefined} alt="" loading="lazy" />
         )}
         <span className="hub-tile__play" aria-hidden="true">
           ▶ {playLabel}

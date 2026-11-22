@@ -180,6 +180,24 @@ export class LocalLibrary {
     return this.findById(id);
   }
 
+  /**
+   * Define a capa de um jogo — a personalização do utilizador.
+   *
+   * `null` volta à capa automática (a da Steam, se existir; o placeholder do
+   * tema se não existir). A sincronização com a Steam **nunca** mexe numa
+   * capa que o utilizador escolheu: a escolha dele vale mais que a nossa.
+   */
+  setCover(id: number, cover: string | null): LocalGameRecord | null {
+    const row = this.findById(id);
+    if (row === null) {
+      return null;
+    }
+    this.db
+      .prepare('update games set cover = ?, updated_at = ? where id = ?')
+      .run(cover, new Date().toISOString(), id);
+    return this.findById(id);
+  }
+
   remove(id: number): boolean {
     const result = this.db.prepare('delete from games where id = ?').run(id);
     return Number(result.changes) > 0;

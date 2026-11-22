@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface, type Translator } from '@nexora/ui';
 import { accessToken } from '../lib/api.js';
+import { coverUrl } from '../lib/media.js';
 import type { RecommendationItemView } from '../../shared/preload-api.js';
 import { useAuth } from '../state/auth.js';
 import type { StoreGameView } from '../../shared/preload-api.js';
@@ -189,7 +190,7 @@ export function StorePage(): ReactNode {
                     {game.cover === null ? (
                       <span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>
                     ) : (
-                      <img src={game.cover} alt="" loading="lazy" />
+                      <img src={coverUrl(game.cover) ?? undefined} alt="" loading="lazy" />
                     )}
                   </div>
                   <strong className="hub-tile__title">{game.title}</strong>

@@ -584,6 +584,45 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
   `plataforma`, pontuação 0,2) com a razão à vista;
 - `pnpm typecheck` limpo; **607 testes verdes** no total.
 
+
+## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/steam/`) — classificação das imagens pelo
+      nome que a Steam lhes dá (logo, herói, cápsula, cabeçalho, desfoque) e a
+      ordem declarada de preferência para a capa — 10 testes no core.
+- [x] **Launcher** (`main/steam-images.ts`) — lê a pasta de imagens do jogo
+      **recursivamente** (a Steam moderna guarda o herói em subpastas com
+      nomes de hash) e devolve a capa escolhida e as alternativas — 5 testes
+      no desktop.
+- [x] **Protocolo** — `nexora://cover/<caminho>` serve as imagens do disco:
+      sem ele, a CSP proíbe `file://` e um caminho absoluto não resolve sob o
+      esquema interno. O caminho é codificado pelo renderer.
+- [x] **Sincronização** (`main/steam-sync.ts`) — relê os manifestos da Steam e
+      traz o que mudou: jogos novos entram, títulos diferentes são
+      corrigidos, e a capa escolhida pelo utilizador **nunca** é mexida.
+- [x] **Personalização** — secção **Capa** nos detalhes: escolher um ficheiro
+      (com diálogo do sistema), escolher entre as imagens que a Steam guardou,
+      ou restaurar a capa automática. A base local ganhou `setCover`.
+
+### Prova de execução real (2026-11-22)
+
+- A importação passou a trazer as capas: **Hollow Knight** →
+      `librarycache/367520/logo.png` e **R.E.P.O.** →
+      `librarycache/3241660/<hash>/logo.png` (o logo dentro de uma subpasta
+      com nome de hash — a leitura recursiva encontrou-o);
+- a biblioteca mostrou os **logos reais** nos cartões (a imagem carrega:
+      `naturalWidth` 640 × 360), e a sincronização devolveu
+      `updated: 0, added: 0, unchanged: 2` — honesto: nada mudou;
+- a secção Capa listou **6 imagens** da Steam (logo, herói, cápsula,
+      cabeçalho, a cápsula de nome de hash e o desfoque) com as dimensões
+      reais (1920, 300, 460…), e a troca para o `library_hero.jpg` foi
+      aplicada;
+- bug apanhado pela prova: o caminho absoluto perdia a barra inicial na
+      junção com `/cover/` — a codificação do caminho corrigiu-o (404 → 200);
+- `pnpm typecheck` limpo; **624 testes verdes** no total.
+
 ## Fase 5b — Detector de modos (concluída em 2026-11-21)
 
 Primeira peça da comunidade pesada: o que a instância do jogador tem

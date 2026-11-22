@@ -51,6 +51,39 @@ const CONTENT_SECURITY_POLICY = [
   "connect-src 'self'",
 ].join('; ');
 
+/**
+ * Serve uma imagem do disco pelo esquema interno.
+ *
+ * Só imagens (a extensão manda) e só ficheiros que existem: um pedido a um
+ * caminho que não é imagem é recusado com `404`. O caminho é codificado pelo
+ * renderer com `coverUrl`.
+ */
+async function serveCover(encodedPath: string): Promise<Response> {
+  const path = decodeURIComponent(encodedPath);
+  const extension = extname(path).toLowerCase();
+  if (!IMAGE_EXTENSIONS.has(extension)) {
+    return new Response('Não é uma imagem.', { status: 404 });
+  }
+  const file = await readIfExists(path);
+  if (file === null) {
+    return new Response('Imagem não encontrada.', { status: 404 });
+  }
+  return new Response(new Uint8Array(file.content), {
+    status: 200,
+    headers: {
+      'content-type': MIME_TYPES[extension] ?? 'application/octet-stream',
+      'content-security-policy': CONTENT_SECURITY_POLICY,
+      // A capa não muda de minuto a minuto, mas uma capa trocada pelo
+      // utilizador tem de aparecer: uma hora de cache privado equilibra as
+      // duas coisas.
+      'cache-control': 'private, max-age=3600',
+    },
+  });
+}
+
+/** Extensões de imagem servidas (as mesmas que a interface aceita). */
+const IMAGE_EXTENSIONS: ReadonlySet<string> = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
+
 /** Regista o esquema interno da aplicação. */
 export function registerNexoraProtocol(config: DesktopConfig, _session?: Session): void {
   // O esquema regista-se pelo **nome** (`nexora`), sem `://`: com o sufixo o
@@ -59,6 +92,13 @@ export function registerNexoraProtocol(config: DesktopConfig, _session?: Session
   protocol.handle(APP_SCHEME, async (req) => {
     const url = new URL(req.url);
     const pathname = decodeURIComponent(url.pathname);
+
+    // `/cover/<caminho>` serve uma imagem do disco: é assim que as capas reais
+    // (o logo da Steam, a capa escolhida pelo utilizador) chegam à interface,
+    // sem violar a CSP nem usar `file://`.
+    if (pathname.startsWith('/cover/')) {
+      return serveCover(pathname.slice('/cover/'.length));
+    }
 
     if (isApiPath(pathname)) {
       const body = await readBody(req);

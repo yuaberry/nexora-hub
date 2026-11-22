@@ -26,6 +26,7 @@ import { externalKeyFor } from './naming.js';
 import { localCoverFile, scanForExecutables } from './disk-scan.js';
 import { detectExecutable } from './scan.js';
 import { isKnownToolFolder } from './scan-filter.js';
+import { steamCoverFor } from './steam-images.js';
 
 /** Uma loja verificada e o que ela deu. */
 export interface OfficialStoreReport {
@@ -151,7 +152,11 @@ export function importSteamLibrary(
         library.upsert({
           externalKey: externalKeyFor(installPath),
           title: manifest.name,
-          cover: localCoverFile(installPath),
+          // A capa é a imagem que a **Steam** guardou para o jogo (o logo,
+          // quando existe): está no disco do utilizador, e por isso a
+          // biblioteca continua completa offline. A capa local da pasta é a
+          // reserva, e o placeholder do tema é o último recurso.
+          cover: steamCoverFor(entry.path, manifest.appId) ?? localCoverFile(installPath),
           installPath,
           executablePath: executable.path,
           // O appid fica guardado: é o que permite abrir o jogo no cliente

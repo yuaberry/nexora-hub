@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface, type Translator } from '@nexora/ui';
 import { accessToken } from '../lib/api.js';
+import type { RecommendationItemView } from '../../shared/preload-api.js';
 import { useAuth } from '../state/auth.js';
 import type { StoreGameView } from '../../shared/preload-api.js';
 
@@ -31,6 +32,7 @@ export function StorePage(): ReactNode {
   const [platform, setPlatform] = useState('');
   const [hideAdult, setHideAdult] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+  const [recommended, setRecommended] = useState<readonly RecommendationItemView[] | null>(null);
 
   const reload = useCallback(async () => {
     if (api === undefined) {
@@ -45,8 +47,15 @@ export function StorePage(): ReactNode {
     setGames(result.items ?? []);
     setMessage(null);
 
-    // A lista de desejos exige conta: sem sessão, fica vazia.
+    // As recomendações pessoais vêm das etiquetas do que joga — exigem conta.
     const token = accessToken();
+    if (token !== null) {
+      const recomendadas = await api.recommend.forYou(token);
+      setRecommended(recomendadas.ok ? recomendadas.items ?? [] : null);
+    } else {
+      setRecommended(null);
+    }
+
     if (token !== null) {
       const list = await api.wishlist.list(token);
       if (list.ok && list.items !== undefined) {
@@ -130,6 +139,41 @@ export function StorePage(): ReactNode {
           {hideAdult ? t('store.hideAdult') : t('store.showAdult')}
         </Button>
       </div>
+
+      {user === null ? (
+        <Card>
+          <div className="nx-stack">
+            <strong>{t('recommend.forYou')}</strong>
+            <span className="nx-subtitle">{t('recommend.signIn')}</span>
+          </div>
+        </Card>
+      ) : recommended !== null && recommended.length === 0 ? (
+        <Card>
+          <div className="nx-stack">
+            <strong>{t('recommend.forYou')}</strong>
+            <span className="nx-subtitle">{t('recommend.noLibrary')}</span>
+          </div>
+        </Card>
+      ) : recommended !== null ? (
+        <Card>
+          <div className="nx-stack">
+            <strong>{t('recommend.forYou')}</strong>
+            <span className="nx-subtitle">
+              {t('recommend.because')} · {t('recommend.algorithm')}
+            </span>
+            <div className="hub-suggestions">
+              {recommended.slice(0, 6).map((item) => (
+                <span
+                  key={item.gameId}
+                  title={t('recommend.reason', { tags: item.sharedTags.join(', ') })}
+                >
+                  <Badge>{item.title}</Badge>
+                </span>
+              ))}
+            </div>
+          </div>
+        </Card>
+      ) : null}
 
       {visible.length === 0 ? (
         <EmptyState title={t('store.empty')} hint={t('store.empty.hint')} />

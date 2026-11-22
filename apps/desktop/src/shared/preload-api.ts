@@ -532,6 +532,28 @@ export interface ModsScanView {
   readonly mods: readonly ModView[];
 }
 
+/** Uma recomendação (vista do renderer). */
+export interface RecommendationItemView {
+  readonly gameId: string;
+  readonly title: string;
+  readonly tagline: string;
+  readonly platforms: readonly string[];
+  readonly adult: boolean;
+  /** Pontuação da semelhança (0 a 1 nos parecidos; ponderada nos pessoais). */
+  readonly score: number;
+  /** As etiquetas partilhadas — a razão da recomendação. */
+  readonly sharedTags: readonly string[];
+}
+
+/** O que a rota de recomendações devolve. */
+export interface RecommendationsView {
+  readonly ok: boolean;
+  readonly items?: readonly RecommendationItemView[];
+  /** A razão da recomendação (`library-tags`, `no-library`). */
+  readonly reason?: string;
+  readonly message?: string;
+}
+
 /** A API exposta pelo preload em `window.nexora`. */
 export interface DesktopApi {
   /** Diagnóstico do executável (assíncrono: a versão vive no main). */
@@ -577,6 +599,12 @@ export interface DesktopApi {
     readonly sample: () => Promise<TelemetrySampleView>;
     /** Esquece a leitura anterior da CPU (a próxima não sabe o uso). */
     readonly reset: () => Promise<{ readonly ok: boolean }>;
+  };
+  readonly recommend: {
+    /** Parecidos com um jogo do directório (público). */
+    readonly similar: (gameId: string) => Promise<RecommendationsView>;
+    /** Recomendado para si (exige conta). */
+    readonly forYou: (token: string) => Promise<RecommendationsView>;
   };
   readonly mods: {
     /** Procura os modos na pasta de instalação de um jogo. */

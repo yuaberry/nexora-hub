@@ -20,6 +20,7 @@ import { chat } from './chat.js';
 import { achievements } from './achievements.js';
 import { benchmark } from './benchmark.js';
 import { mods } from './mods.js';
+import { recommend } from './recommend.js';
 import { pages } from './pages.js';
 
 /**
@@ -53,5 +54,6 @@ export const ptBR = {
   ...achievements,
   ...benchmark,
   ...mods,
+  ...recommend,
   ...pages,
 } as const;

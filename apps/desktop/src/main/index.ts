@@ -23,6 +23,7 @@ import { registerOptimizerIpc } from './optimizer-ipc.js';
 import { registerChatIpc } from './chat-ipc.js';
 import { registerBenchmarkIpc } from './benchmark-ipc.js';
 import { registerModsIpc } from './mods-ipc.js';
+import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
@@ -135,6 +136,9 @@ function bootstrap(): void {
 
   // Detector de modos: lê os .jar da pasta mods com as ferramentas do sistema.
   registerModsIpc();
+
+  // Recomendações: algoritmo declarado sobre o catálogo, servido pela API.
+  registerRecommendIpc();
 
   mainWindow = createMainWindow(config);
 }

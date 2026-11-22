@@ -373,6 +373,21 @@ porque um total que escondesse os desconhecidos mentiria. A leitura usa as
 ferramentas do sistema (`unzip -Z1` e `unzip -p`), a mesma aparalhagem da
 extracção de downloads, sem uma dependência nova.
 
+## D42 — Recomendações: uma fórmula declarada, não uma IA fingida
+
+A semelhança entre jogos é a sobreposição das etiquetas (Jaccard) e a
+recomendação pessoal pondera essas sobreposições pelo **tempo realmente
+jogado** em cada etiqueta. Não há modelo nem rede neural: há uma fórmula que
+qualquer pessoa lê, e a interface diz o que é. A razão de cada recomendação
+viaja com ela — as **etiquetas partilhadas** — para quem vê possa julgar.
+
+O que a pessoa já tem na biblioteca não lhe é recomendado. A comparação entre
+o catálogo e a biblioteca é por nome normalizado (minúsculas sem
+separadores), e é **declarada como heurística**: o título pode diferir, e por
+isso a recomendação é apresentada como "pelas etiquetas do que joga", nunca
+como uma promessa de variedade. Sem biblioteca não há preferências: a rota
+devolve vazio com a razão `no-library`, e a interface explica o que falta.
+
 ## D7 (revista, 2026-11-18) — Nexora Cloud adiada
 
 O responsável adiou a integração com o Nexora Cloud: o launcher segue sozinho.

@@ -17,7 +17,7 @@
 | 5b | **Comunidade pesada**: fóruns, marketplace de mods 1-clique, detector de modos (Minecraft), clãs, eventos, reputação | 🟡 Em curso (detector pronto; o resto planeado) | mod instalado em 1 clique reflecte no jogo; detector lista "342 mods, Fabric" |
 | 6 | **Biblioteca++**: atalhos de desktop, scan de discos, colecções, "reviewar depois de jogar" | ✅ Concluída | atalho .desktop criado; scan sem ferramentas do Steam; review sem 10 min de jogo recusada (403) |
 | 7 | **Performance e overlay**: FPS medido, CPU/GPU/RAM/temperatura, otimizador de SO com ponto de restauração, controles (bateria/remap/layouts), overlay Shift+Tab | 🟡 Em curso (medidas + otimizador prontos; FPS e overlay planeados) | FPS medido dentro do jogo (não inventado); otimização reverte sem quebrar o SO |
-| 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | 🟡 Em curso (benchmark medido pronto; recomendações planeadas) | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
+| 8 | **IA NEXORA + benchmark**: recomendações, diagnóstico, benchmark com estimativa rotulada | 🟡 Em curso (benchmark e recomendações prontos; diagnóstico planeado) | "jogos parecidos com Terraria" devolve catálogo real; benchmark diz "estimado" vs "medido" |
 | 9 | **Futuro**: Remote Play (Sunshine/Moonlight + sessões Nexora Cloud), Big Picture, widgets VTuber | ⏳ Planejada | latência medida com percentis; botão de streaming desligado enquanto não houver medição |
 
 ## Fase 1 — Detalhamento
@@ -523,6 +523,36 @@ escrita na interface.
 
 
 
+
+
+## Fase 8 — Recomendações (concluída em 2026-11-22)
+
+Segunda peça da fase da IA e do benchmark: as recomendações existem e são
+honestas sobre o que são. O diagnóstico por IA fica planeado.
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/recommend/`) — semelhança por etiquetas
+      partilhadas (Jaccard), parecidos com um jogo e recomendação pessoal
+      ponderada pelo tempo jogado — 12 testes no core.
+- [x] **API** — `GET /api/v1/recommendations/similar/:gameId` (público) e
+      `GET /api/v1/recommendations/for-you` (exige sessão; as preferências
+      saem da biblioteca ponderada pelo tempo jogado, e o que já se tem é
+      excluído) — 7 testes na API.
+- [x] **Launcher** — secção **"Recomendado para si"** na Loja, com a razão
+      de cada recomendação (as etiquetas partilhadas) e o aviso do algoritmo
+      declarado; estados honestos para sem conta e sem biblioteca.
+
+### Prova de execução real (2026-11-22)
+
+- Ao vivo, pela API: uma conta com Hollow Knight (metroidvania/plataforma/
+  indie) e Terraria (sandbox/plataforma/coop) na biblioteca recebeu
+  preferências `plataforma=2, metroidvania=1, indie=1, sandbox=1, coop=1` e a
+  recomendação **Stardew Valley** (partilha `indie`) — **sem os dois jogos
+  que já tem**;
+- os parecidos com Terraria devolveram **Hollow Knight** (partilha
+  `plataforma`, pontuação 0,2) com a razão à vista;
+- `pnpm typecheck` limpo; **607 testes verdes** no total.
 
 ## Fase 5b — Detector de modos (concluída em 2026-11-21)
 

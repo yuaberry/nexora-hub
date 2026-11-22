@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.1.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-588%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-607%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -80,6 +80,13 @@ código de saída, tempo gravado).
 - **Conquistas** avaliadas sobre sessões reais (10 h, 5 jogos, coruja,
   maratona…) com barras de progresso honestas
 - **Pontos** com **livro auditável**: o saldo é a soma das entradas
+
+### 🧭 Recomendações
+- **Parecidos com um jogo** e **recomendado para si** — a semelhança é a
+  sobreposição das etiquetas (Jaccard) ponderada pelo tempo jogado: uma
+  **fórmula declarada**, não uma IA fingida
+- Cada recomendação traz a razão (as etiquetas partilhadas) e o que já tem na
+  biblioteca **não** é recomendado
 
 ### 🧩 Modos
 - **Detector de modos** — lê a pasta `mods` do jogo e diz **quantos são e de
@@ -214,7 +221,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **588 verdes** (151 contra PostgreSQL real) |
+| **Testes** | **607 verdes** (164 contra PostgreSQL real) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real |
 | **Build** | Linux + Windows empacotados a cada versão |
@@ -236,7 +243,7 @@ symlinks do `/sys`, o `process.execPath` do Electron dentro da app).
 | 5b | Comunidade pesada — fóruns, mods, clãs, eventos | ⏳ Planejada |
 | 6 | Biblioteca++ — atalhos, scan, colecções | ✅ Concluída |
 | 7 | Desempenho — **telemetria e otimizador**, overlay, FPS | 🟡 Em curso |
-| 8 | IA NEXORA — **benchmark medido**, recomendações | 🟡 Em curso |
+| 8 | IA NEXORA — **benchmark medido e recomendações**, diagnóstico | 🟡 Em curso |
 | 9 | Futuro — Remote Play, Big Picture, widgets | ⏳ Planejada |
 
 O detalhe de cada fase, com as provas, está em [docs/ROADMAP.md](docs/ROADMAP.md).

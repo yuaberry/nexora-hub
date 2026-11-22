@@ -1,85 +1,248 @@
-# NEXORA HUB
+<div align="center">
 
-> **Launcher de jogos da NEXORA.** A sua biblioteca de jogos, num só lugar.
+# ⚡ NEXORA HUB
 
-O NEXORA HUB é o launcher de jogos da empresa NEXORA: reúne o que o utilizador
-**já tem** instalado no computador, encontra rápido (por nome, sigla ou só as
-consoantes), inicia e mede o tempo jogado — com a interface a crescer por
-fases, sem nunca anunciar o que não existe.
+### O launcher de jogos da NEXORA — a sua biblioteca, num só lugar.
 
-**O que este repositório é, nesta fase:**
+**Linux · Windows** · Desktop nativo (Electron) + API + Web
 
-| Peça | Estado |
-| --- | --- |
-| App de desktop (Electron 42) | **Funcional**: biblioteca local, importação de pastas, pesquisa dinâmica, início de jogos com medição, configurações de dispositivo |
-| API (Fastify + PostgreSQL) | **Funcional**: autenticação completa (senha + MFA + refresh rotativo), biblioteca, pesquisa, sessões |
-| Web (React) | **Funcional**: leitura da biblioteca, login, admin esqueleto — PT-BR/EN |
-| Biblioteca local, Downloads (HTTP verificado), pesquisa, medição, snapshots de saves, interface estilo launcher | **Funcional** |
-| Saves na nuvem (Nexora Cloud — adiada pelo responsável), amigos, loja, overlay, Remote Play, torrent | **Planejados** — só interface/tipos + selo "Planeado" |
+[![Versão](https://img.shields.io/badge/versão-0.1.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
+[![Testes](https://img.shields.io/badge/testes-567%20verdes-2ea44f)](#qualidade)
+[![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
+[![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
+[![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
 
-> **Nada aqui finge funcionar.** Um módulo que ainda não existe aparece com o
-> selo "Planeado" e a explicação do que falta. **A NEXORA não hospeda nem
-> redistribui jogos**: o launcher lê pastas locais do utilizador. Não há
-> contorno de proteções (Denuvo) nem de anticheat — ver [`docs/LEGAL.md`](docs/LEGAL.md).
+[**↓ Transferir**](#instalação) ·
+[Funcionalidades](#funcionalidades) ·
+[Capturas](#capturas) ·
+[Arquitectura](#arquitectura) ·
+[Desenvolvimento](#desenvolvimento) ·
+[Roadmap](#roadmap)
 
-## Estado verificado (Fase 1, 2026-11-17)
+</div>
 
-| Verificação | Resultado |
-| --- | --- |
-| `pnpm typecheck` | limpo nos 10 projetos |
-| `pnpm test` | **274 testes verdes**, 2 ignorados (exigem PostgreSQL real) |
-| `pnpm build` | packages, API, web e desktop compilados |
-| Empacotamento | `nexora-hub-0.1.0-x86_64.AppImage` e `nexora-hub-0.1.0-amd64.deb` construídos (`--publish never`) |
-| App real (Electron no DISPLAY=:0) | barra superior estilo launcher, herói com a última sessão, "Continuar a jogar", Downloads com barras de progresso — ver abaixo |
-| Pesquisa viva | escrever **"l"** sugere **"League Of Legends"** (motor `searchGames` de `@nexora/core`) |
-| Ciclo completo | `launch` via preload → IPC → `LocalGameRunner` spawn → fim natural → **tempo gravado** na base local (acumulado entre sessões) |
-| Executável empacotado | AppImage abre com a interface completa e a biblioteca local (BD em `~/.config/NEXORA HUB`) |
-| Armazenamento | `usage` devolve medidas reais do volume (982 GB total / 563 GB livres) |
+---
 
-Prova registada em [`docs/ROADMAP.md`](docs/ROADMAP.md).
+## O que é
 
-## Stack
+O **NEXORA HUB** é o launcher de jogos da NEXORA. Ele lê as pastas que o
+utilizador **já tem** instaladas — inclusive as da Steam, por meio dos
+manifestos que a própria Steam escreve no disco — encontra o jogo por nome,
+sigla ou só as
+consoantes, inicia e **mede o tempo jogado de verdade** (processo filho,
+código de saída, tempo gravado).
 
-Monorepo **pnpm**; TypeScript estrito sem `any`; ESM NodeNext.
+> ### A regra que rege tudo: nada é anunciado antes de existir.
+> Um módulo que ainda não existe aparece com o selo **Planejado** e a razão do
+> que falta — nunca um botão a fingir que funciona. A **NEXORA não hospeda nem
+> redistribui jogos**: o launcher lê o que está no computador do utilizador.
 
-- **Desktop**: Electron 42 — `contextIsolation`, `sandbox`, CSP restritiva,
-  protocolo interno `nexora://` (o renderer nunca fala com a rede directamente).
-- **API**: Fastify 5 + Drizzle + PostgreSQL 16 (modo degradado em memória sem
-  banco) + Redis/TOTP/refresh rotativo espelhados do Nexora Cloud.
-- **Web**: React 19 + Vite + Tailwind 4 — o mesmo build serve de base do
-  renderer do desktop quando faz sentido.
-- **Domínio**: `@nexora/core` (busca, planos, armazenamento), `@nexora/runner`
-  (arranque + medição), `@nexora/ui` (tokens, i18n).
+---
 
-## Como rodar
+## Funcionalidades
+
+<table>
+<tr><td width="50%" valign="top">
+
+### 🎮 Biblioteca e jogos
+- **Biblioteca local unificada** com o título real do manifesto da Steam
+  (`REPO` → `R.E.P.O.`), executável detectado e capa local
+- **Pesquisa por sílabas e consoantes** — `l` encontra *League Of Legends*,
+  `mncft` encontra *Minecraft*
+- **Início com medição real** — sessão de facto, tempo jogado gravado
+- **Jogos Windows no Linux** correm pelo Wine/Proton com prefixo **por jogo**
+- **"Abrir na Steam"** — o *handoff* legítimo: o jogo corre pelo cliente
+  oficial, com a licença do utilizador e os servidores oficiais
+
+### 📊 Estatísticas e timeline
+- Horas jogadas, sessões, jogos distintos, **top de jogos** e género favorito
+- **Hora de pico** e histograma por hora
+- Timeline real: sessões, comentários, reviews, desejos
+
+### 👥 Social
+- **Amigos** — pedidos, aceitar/recusar/cancelar, remover
+- **Presença por *heartbeat*** (validade de 45 s): quem joga mostra o jogo —
+  *"A jogar Hollow Knight"* — e quem pára de bater fica *offline*
+- **Chat** directo entre amigos, com o histórico na API
+
+</td><td width="50%" valign="top">
+
+### 🛠️ Desempenho
+- **Medições reais** de CPU, memória, carga e **temperatura** (8 sensores
+  lidos de `/proc` e `/sys`) — nada estimado
+- **Otimizador** que limpa o que o sistema regenera (cache de miniaturas,
+  shaders, lixo), com **ponto de restauro** e o relatório do que saiu
+- **GameMode** aplicado no arranque quando está instalado — sem privilégios
+- **O que o otimizador recusa está escrito**: governor da CPU, swappiness,
+  desactivar serviços e "limpar RAM", cada um com o motivo
+
+### 🏆 Economia
+- **Conquistas** avaliadas sobre sessões reais (10 h, 5 jogos, coruja,
+  maratona…) com barras de progresso honestas
+- **Pontos** com **livro auditável**: o saldo é a soma das entradas
+
+### 🎨 Interface
+- **Tema OLED** (preto `#000000` verdadeiro) e **preto e branco**
+- Tokens de papel, alto contraste, "reduzir movimento", PT-BR e EN
+- **Benchmark medido** — compara a máquina antes e depois de optimizar
+
+</td></tr>
+</table>
+
+### O que ainda não existe (e está dito)
+
+Torrent · Saves na nuvem (integração adiada pelo responsável) · Overlay
+Shift+Tab · FPS dentro do jogo (exige injecção no processo) · Recomendações
+de IA · Remote Play. Cada um aparece na interface com o selo **Planejado**.
+
+---
+
+## Instalação
+
+> **Windows:** o executável **não é assinado** com certificado de código — o
+> SmartScreen avisa na primeira execução. A razão é honesta: assinar exigiria
+> um certificado comprado por quem opera o projecto.
+
+### Linux
+
+| Formato | Ficheiro | Instalação |
+| --- | --- | --- |
+| **AppImage** (qualquer distribuição) | `nexora-hub-0.1.0-x86_64.AppImage` | `chmod +x` e executar — sem instalar |
+| **.deb** (Debian, Ubuntu, Mint) | `nexora-hub-0.1.0-amd64.deb` | `sudo apt install ./nexora-hub-0.1.0-amd64.deb` |
+
+### Windows
+
+| Formato | Ficheiro | Instalação |
+| --- | --- | --- |
+| **Instalador NSIS** (x64) | `nexora-hub-0.1.0-x64.exe` | executar e seguir o assistente |
+
+> O macOS **não** é suportado nesta fase.
+
+Os ficheiros de cada lançamento estão em
+[**Releases**](https://github.com/yuaberry/nexora-hub/releases).
+
+---
+
+## Capturas
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/biblioteca.png" alt="Biblioteca"/><br/><sub><b>Biblioteca</b> — os jogos que tem, com o tempo jogado.</sub></td>
+<td width="50%"><img src="docs/screenshots/tema-oled.png" alt="Tema OLED"/><br/><sub><b>Tema OLED</b> — preto <code>#000000</code>: num painel OLED o pixel preto está desligado.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/tema-noir.png" alt="Tema preto e branco"/><br/><sub><b>Preto e branco</b> — nenhum token tem matiz.</sub></td>
+<td><img src="docs/screenshots/desempenho.png" alt="Desempenho"/><br/><sub><b>Desempenho</b> — CPU, memória e temperatura medidos de verdade.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/otimizador.png" alt="Otimizador"/><br/><sub><b>Otimizador</b> — 27,9 MB medidos em cache, com o custo de cada limpeza.</sub></td>
+<td><img src="docs/screenshots/amigos.png" alt="Amigos"/><br/><sub><b>Amigos</b> — presença por <i>heartbeat</i>: quem joga mostra o jogo.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/chat.png" alt="Chat"/><br/><sub><b>Chat</b> — conversas directas entre amigos, histórico na API.</sub></td>
+<td><img src="docs/screenshots/conquistas.png" alt="Conquistas"/><br/><sub><b>Conquistas</b> — progresso real e livro de pontos.</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/benchmark.png" alt="Benchmark"/><br/><sub><b>Benchmark</b> — pontuação medida, nunca estimada (997,8 nesta máquina).</sub></td>
+<td><img src="docs/screenshots/familia.png" alt="Família"/><br/><sub><b>Família</b> — grupo com limite de plano e biblioteca partilhada.</sub></td>
+</tr>
+</table>
+
+---
+
+## Arquitectura
+
+Monorepo **pnpm** com TypeScript estrito (**sem `any`**, ESM `NodeNext`):
+
+```
+apps/
+├── api/        Fastify 5 + Drizzle + PostgreSQL (com modo degradado em memória)
+├── desktop/    Electron 42 — shell, importação local, runner, telemetria
+├── web/        React 19 + Vite (leitura da biblioteca, comunidade)
+└── site/       página pública
+packages/
+├── core/       domínio puro: catálogo, busca, planos, stats, social,
+│               chat, conquistas, benchmark, telemetria, importadores
+├── protocol/   contrato HTTP/WS (envelope, paginação, eventos)
+├── download/   motor HTTP multi-conexão com verificação por checksum
+├── runner/     plano de arranque + runner local (spawn e medição reais)
+├── sources/    manifestos declarativos com attestation legal
+├── cloud/      snapshots de saves e `decideSync` (integração adiada)
+└── ui/         tokens de tema, i18n PT-BR/EN e componentes
+```
+
+**Decisões que não se mudam** (a lista completa em
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)):
+
+- **Um limite anunciado é aplicado** — planos e quotas entram com a regra e o
+  teste, não só com o texto na interface.
+- **A medida é real** — tempo jogado, telemetria e benchmark vêm do sistema.
+- **Recurso de outro utilizador devolve `404`**, nunca `403`.
+- **Nenhuma cor própria de componente** — só tokens de papel.
+
+## Desenvolvimento
+
+Requer **Node ≥ 24** e **pnpm 12**.
 
 ```bash
-pnpm install                          # ver pnpm-workspace.yaml para os builds permitidos
-docker-compose up -d                  # opcional: PostgreSQL/Redis/MinIO (modo v1)
-pnpm --filter @nexora/api dev         # API em 127.0.0.1:3100
-pnpm --filter @nexora/desktop dev     # app Electron (compila main, preload e renderer)
+pnpm install          # dependências do workspace
+pnpm typecheck        # tsc --noEmit em todos os projectos
+pnpm test             # todos os testes (Vitest, multi-projecto)
+pnpm build            # compila packages, API, web e desktop
+pnpm --filter @nexora/desktop package:all   # empacota Linux + Windows
 ```
 
-Requer **Node >= 24** e **pnpm 12**.
+A API arranca sem contentores em **modo degradado** (dados em memória, diz-no
+em `/health`). Com PostgreSQL real, as migrações aplicam-se com
+`drizzle-kit` e a suite de integração corre com `DATABASE_URL` definido.
 
-## Estrutura
+Contribuição: convenções, honestidade e escopo em
+[AGENTS.md](AGENTS.md); a fronteira legal em [docs/LEGAL.md](docs/LEGAL.md).
 
-```
-apps/api          # autenticação, biblioteca, pesquisa, sessões
-apps/web          # interface web (leitura)
-apps/desktop      # launcher Electron (shell, importação local, runner)
-apps/site         # site: landing, descargas e documentação
-packages/core     # domínio puro — testável sem infraestrutura
-packages/protocol # contrato HTTP/WS
-packages/runner   # interface + runner local (spawn + medição real)
-packages/ui       # tokens de tema, i18n, componentes
-docs/             # ARCHITECTURE.md, ROADMAP.md, LEGAL.md
-```
+## Qualidade
 
-## Privacidade e legal
+| | |
+| --- | --- |
+| **Testes** | **567 verdes** (157 contra PostgreSQL real) |
+| **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
+| **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real |
+| **Build** | Linux + Windows empacotados a cada versão |
 
-- O executável **não guarda credenciais** da API; o tempo jogado é medido
-  localmente e sincronizar com a conta é fase futura.
-- A NEXORA não distribui jogos: a importação lê pastas que o utilizador já
-  tem. Posição legal completa em [`docs/LEGAL.md`](docs/LEGAL.md).
-- Nenhum segredo no repositório: só `.env.example` com placeholders.
+Cada fase do [roadmap](docs/ROADMAP.md) só fecha com `pnpm typecheck`,
+`pnpm test`, build e **prova de execução real** registada — incluindo os bugs
+que essas provas encontraram (o prefixo do Wine que não era criado, os
+symlinks do `/sys`, o `process.execPath` do Electron dentro da app).
+
+## Roadmap
+
+| Fase | Entrega | Estado |
+| --- | --- | --- |
+| 1 | Fundação, domínio, API, desktop e web | ✅ Concluída |
+| 2 | Downloads HTTP com verificação, manifestos, fontes | ✅ Concluída |
+| 3 | Nuvem e perfis — **Família**, **importação da Steam**, saves | 🟡 Em curso |
+| 4 | Social — **amigos, presença, chat**, loja, desejos, comunidade | ✅ Concluída |
+| 5 | Economia — **pontos e conquistas**, estatísticas, timeline | 🟡 Em curso |
+| 5b | Comunidade pesada — fóruns, mods, clãs, eventos | ⏳ Planejada |
+| 6 | Biblioteca++ — atalhos, scan, colecções | ✅ Concluída |
+| 7 | Desempenho — **telemetria e otimizador**, overlay, FPS | 🟡 Em curso |
+| 8 | IA NEXORA — **benchmark medido**, recomendações | 🟡 Em curso |
+| 9 | Futuro — Remote Play, Big Picture, widgets | ⏳ Planejada |
+
+O detalhe de cada fase, com as provas, está em [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Licença
+
+**Todos os direitos reservados.** Software proprietário da NEXORA; a licença
+de distribuição é decidida pelo responsável do projecto. Marcas e nomes de
+terceiros (Steam, Epic, GOG) pertencem aos seus donos e são usados apenas
+para identificar as lojas para onde o utilizador compra.
+
+---
+
+<div align="center">
+
+**NEXORA HUB** · feito pelo Núcleo de Engenharia da NEXORA
+
+<sub>A NEXORA não hospeda nem redistribui jogos. O launcher lê o que o utilizador já tem.</sub>
+
+</div>

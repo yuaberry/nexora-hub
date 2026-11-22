@@ -16,8 +16,10 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "dev": "pnpm --filter @nexora/web build && pnpm --filter @nexora/desktop build && electron .",
-    "package": "electron-builder --linux --publish never",
-    "package:all": "electron-builder --publish never"
+    "package": "electron-builder --linux --win --publish never",
+    "package:linux": "electron-builder --linux --publish never",
+    "package:win": "electron-builder --win --publish never",
+    "package:all": "electron-builder --linux --win --publish never"
   },
   "dependencies": {
     "@nexora/cloud": "workspace:*",

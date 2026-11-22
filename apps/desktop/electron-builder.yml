@@ -53,6 +53,21 @@ linux:
       Comment: A sua biblioteca de jogos, num só lugar.
       Categories: Game;
 
+# Windows — instalador (NSIS) e executável portátil, ambos x64.
+#
+# Sem certificado de código: o Windows SmartScreen vai avisar o utilizador na
+# primeira vez. A ausência de assinatura é declarada aqui e no README, não
+# escondida — assinar exigiria um certificado comprado por quem opera o
+# projecto.
+win:
+  # Instalador NSIS x64. O alvo "portable" não entra porque produziria outro
+  # `.exe` com o mesmo nome e sobrescreveria o instalador — um instalador é o
+  # que se espera no Windows.
+  target:
+    - target: nsis
+      arch:
+        - x64
+
 # A publicação é feita pelo GitHub (tag + Release) e **não** pelo
 # electron-builder: `--publish never` é obrigatório para que nada seja
 # enviado para um servidor de release sem autorização.

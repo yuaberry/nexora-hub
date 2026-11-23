@@ -16,6 +16,7 @@ import { OptimizerPage } from './pages/OptimizerPage.js';
 import { ChatPage } from './pages/ChatPage.js';
 import { AchievementsPage } from './pages/AchievementsPage.js';
 import { BenchmarkPage } from './pages/BenchmarkPage.js';
+import { BigPicturePage } from './pages/BigPicturePage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
 import type { DesktopGameView } from '../shared/preload-api.js';
@@ -48,7 +49,8 @@ export type Route =
   | { readonly name: 'achievements' }
   | { readonly name: 'benchmark' }
   | { readonly name: 'account' }
-  | { readonly name: 'planned'; readonly module: PlannedModule };
+  | { readonly name: 'planned'; readonly module: PlannedModule }
+  | { readonly name: 'bigpicture' };
 
 export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en' } = {}): ReactNode {
   const [route, setRoute] = useState<Route>({ name: 'home' });
@@ -77,7 +79,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'bigpicture') => {
       navigate({ name: target });
     },
     [navigate],
@@ -115,7 +117,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'bigpicture') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -144,6 +146,12 @@ function Shell({
     },
     [library],
   );
+
+  // O modo grande ecrã é uma rota de ecrã inteiro: a estrutura do launcher
+  // (barra lateral, pesquisa, cabeçalho) sai de cena — é o modo sofá.
+  if (route.name === 'bigpicture') {
+    return <BigPicturePage onExit={goBack} onOpenGame={onSelectGame} />;
+  }
 
   return (
     <AppShell

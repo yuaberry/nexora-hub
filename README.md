@@ -116,6 +116,11 @@ código de saída, tempo gravado).
   inventados
 - **A tua escolha manda** — uma capa escolhida por ti nunca é substituída
 
+### 🛋️ Modo grande ecrã
+- **Ecrã inteiro** — a biblioteca desenhada para o sofá: cápsulas grandes,
+  herói com a arte, relógio e nada mais
+- **Setas para navegar, Enter para abrir, Escape para sair** — sem rato
+
 ### ☁️ Saves na nuvem
 - **O teu progresso com a conta** — versões dos dois lados (computador e
   nuvem) com a decisão de conflito declarada: em sincronia, à frente de um
@@ -210,7 +215,7 @@ Os ficheiros de cada lançamento estão em
 <td><img src="docs/screenshots/overlay.png" alt="Overlay"/><br/><sub><b>Overlay</b> — medidas reais por cima do jogo (Shift+Tab).</sub></td>
 </tr>
 <tr>
-<td><img src="docs/screenshots/capas-steam.png" alt="Capas da Steam"/><br/><sub><b>Capas reais</b> — os logos que a Steam guardou, lidos do disco.</sub></td><td><img src="docs/screenshots/dlcs-steam.png" alt="DLCs"/><br/><sub><b>DLCs</b> — nomes da loja, instaladas do disco.</sub></td><td><img src="docs/screenshots/catalogo-appid.png" alt="Adicionar por AppID"/><br/><sub><b>Adicionar por AppID</b> — metadado na biblioteca, instalação na loja.</sub></td><td><img src="docs/screenshots/parede-capsulas.png" alt="Parede de jogos"/><br/><sub><b>Parede de jogos</b> — cápsulas verticais iguais em qualquer máquina.</sub></td><td><img src="docs/screenshots/home-capsulas.png" alt="Início"/><br/><sub><b>Início</b> — a mesma parede, da tua biblioteca.</sub></td><td><img src="docs/screenshots/saves-nuvem.png" alt="Saves na nuvem"/><br/><sub><b>Saves na nuvem</b> — os dois lados e a decisão de conflito.</sub></td><td><img src="docs/screenshots/inicio-prateleiras.png" alt="Início"/><br/><sub><b>Início</b> — destaque com arte e prateleiras da tua biblioteca.</sub></td><td><img src="docs/screenshots/detalhes-heroi.png" alt="Detalhes"/><br/><sub><b>Detalhes</b> — a arte do jogo como cabeçalho.</sub></td>
+<td><img src="docs/screenshots/capas-steam.png" alt="Capas da Steam"/><br/><sub><b>Capas reais</b> — os logos que a Steam guardou, lidos do disco.</sub></td><td><img src="docs/screenshots/dlcs-steam.png" alt="DLCs"/><br/><sub><b>DLCs</b> — nomes da loja, instaladas do disco.</sub></td><td><img src="docs/screenshots/catalogo-appid.png" alt="Adicionar por AppID"/><br/><sub><b>Adicionar por AppID</b> — metadado na biblioteca, instalação na loja.</sub></td><td><img src="docs/screenshots/parede-capsulas.png" alt="Parede de jogos"/><br/><sub><b>Parede de jogos</b> — cápsulas verticais iguais em qualquer máquina.</sub></td><td><img src="docs/screenshots/home-capsulas.png" alt="Início"/><br/><sub><b>Início</b> — a mesma parede, da tua biblioteca.</sub></td><td><img src="docs/screenshots/saves-nuvem.png" alt="Saves na nuvem"/><br/><sub><b>Saves na nuvem</b> — os dois lados e a decisão de conflito.</sub></td><td><img src="docs/screenshots/inicio-prateleiras.png" alt="Início"/><br/><sub><b>Início</b> — destaque com arte e prateleiras da tua biblioteca.</sub></td><td><img src="docs/screenshots/detalhes-heroi.png" alt="Detalhes"/><br/><sub><b>Detalhes</b> — a arte do jogo como cabeçalho.</sub></td><td><img src="docs/screenshots/modo-grande-ecra.png" alt="Modo grande ecrã"/><br/><sub><b>Modo grande ecrã</b> — a biblioteca a dez pés, com setas e Enter.</sub></td>
 <td><img src="docs/screenshots/capa-personalizacao.png" alt="Capa personalizável"/><br/><sub><b>Capa personalizável</b> — escolhe entre as imagens da Steam ou um ficheiro teu.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>

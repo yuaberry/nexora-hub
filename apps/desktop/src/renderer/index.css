@@ -548,6 +548,122 @@ body {
   font-size: 0.85rem;
 }
 
+
+/* ---------- Modo grande ecrã (sofá) -------------------------------------- */
+
+.hub-big {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-5);
+  padding: var(--paper-space-6);
+  overflow-y: auto;
+  background:
+    radial-gradient(120% 90% at 50% -10%, var(--paper-accent-soft) 0%, transparent 55%),
+    var(--paper-surface-deepest);
+}
+
+.hub-big:focus {
+  outline: none;
+}
+
+.hub-big__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--paper-space-3);
+}
+
+.hub-big__clock {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--paper-ink-strong);
+}
+
+.hub-big__hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-3);
+  padding: var(--paper-space-6);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  background: linear-gradient(135deg, var(--paper-placeholder-from), var(--paper-placeholder-to));
+  background-size: cover;
+  background-position: center 25%;
+  overflow: hidden;
+}
+
+.hub-big__hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--paper-surface-deepest) 92%, transparent) 0%,
+    color-mix(in srgb, var(--paper-surface-deepest) 72%, transparent) 50%,
+    color-mix(in srgb, var(--paper-surface-deepest) 30%, transparent) 100%
+  );
+}
+
+.hub-big__hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hub-big__heroLabel {
+  color: var(--paper-ink-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hub-big__heroTitle {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--paper-ink-strong);
+}
+
+.hub-big__shelves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--paper-space-6);
+}
+
+.hub-big__shelves .hub-shelf__title {
+  font-size: 1.15rem;
+}
+
+.hub-big__shelves .hub-shelf__item {
+  flex-basis: 15rem;
+}
+
+.hub-big__hint {
+  color: var(--paper-ink-muted);
+  font-size: 0.85rem;
+}
+
+/* Cápsula grande: a arte e o texto crescem para quem vê do sofá. */
+.hub-capsule--lg .hub-capsule__art {
+  border-radius: var(--paper-radius-lg);
+}
+
+.hub-capsule--lg .hub-capsule__title {
+  font-size: 1rem;
+}
+
+.hub-capsule--lg .hub-capsule__hours {
+  font-size: 0.85rem;
+}
+
+.hub-capsule--lg .nx-button {
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+}
+
 /* ---------- Estrutura em duas colunas (estilo launcher) ----------------- */
 
 .hub-shell {

@@ -660,7 +660,27 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5a — Montra visual: prateleiras, destaque com arte e herói dos detalhes (2026-11-23)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 6a — Modo grande ecrã (2026-11-23)
+
+### Entregue
+
+- [x] **Rota de ecrã inteiro** (`bigpicture`) — a estrutura do launcher
+      (barra lateral, pesquisa, cabeçalho) sai de cena; o relógio e o botão
+      de sair ficam no topo; o botão "Modo grande ecrã" vive no cabeçalho.
+- [x] **Navegação por teclado** — setas movem a selecção entre as cápsulas, o
+      Enter abre, o Escape volta ao launcher. (O comando de um jogo não é
+      emulado nem anunciado.)
+- [x] **Cápsulas grandes** (`size=lg`) e herói com a arte do jogo — a mesma
+      montra do Início, desenhada para ver do sofá.
+
+### Prova de execução real (2026-11-23)
+
+- o botão do cabeçalho entrou no modo: `.hub-big` presente, `.hub-shell`
+  ausente (ecrã inteiro), três prateleiras (7, 2 e 5 jogos) e 14 cápsulas
+  grandes;
+- `ArrowRight` moveu o foco de "Hollow Knight" para "R.E.P.O."; `Escape`
+  voltou ao launcher (`.hub-big` ausente, `.hub-shell` presente);
+- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 5a — Montra visual: prateleiras, destaque com arte e herói dos detalhes (2026-11-23)
 
 ### Entregue
 

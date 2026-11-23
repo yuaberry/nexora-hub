@@ -31,7 +31,7 @@ export function AppShell({
   readonly search: string;
   readonly onSearch: (value: string) => void;
   readonly onBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'bigpicture') => void;
   readonly onSelectGame: (gameId: string) => void;
   readonly children: ReactNode;
 }): ReactNode {
@@ -41,7 +41,7 @@ export function AppShell({
   // A rota da barra lateral: 'details' ilumina a Biblioteca, e 'planned' não
   // tem entrada própria (os módulos planeados vivem dentro das páginas).
   const shellRoute: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' =
-    route.name === 'details' ? 'library' : route.name === 'planned' ? 'home' : route.name;
+    route.name === 'details' ? 'library' : route.name === 'planned' ? 'home' : route.name === 'bigpicture' ? 'home' : route.name;
 
   return (
     <div className="hub-shell">
@@ -82,6 +82,8 @@ export function AppShell({
               lightLabel={t('settings.theme.light')}
               darkLabel={t('settings.theme.dark')}
             />
+            {/* Modo grande ecrã: a mesma biblioteca, desenhada para o sofá. */}
+            <Button onClick={() => onNavigate('bigpicture')}>{t('bigpicture.enter')}</Button>
           </div>
         </header>
 

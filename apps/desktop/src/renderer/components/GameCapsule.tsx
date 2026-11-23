@@ -22,6 +22,7 @@ export function GameCapsule({
   installed = true,
   playLabel,
   hoursLabel,
+  size = 'md',
   onSelect,
   onPlay,
   onToggleFavorite,
@@ -32,6 +33,8 @@ export function GameCapsule({
   readonly cover: string | null;
   /** `false` numa entrada de catálogo: não há executável. */
   readonly installed?: boolean;
+  /** `lg` no modo grande ecrã: cápsulas e texto maiores, para ver do sofá. */
+  readonly size?: 'md' | 'lg';
   readonly playLabel: string;
   /** As horas já formatadas no idioma activo. */
   readonly hoursLabel: string | null;
@@ -43,7 +46,7 @@ export function GameCapsule({
   const url = coverUrl(cover);
 
   return (
-    <article className="hub-capsule" data-game-id={id}>
+    <article className={`hub-capsule hub-capsule--${size}`} data-game-id={id}>
       <button
         type="button"
         className="hub-capsule__art"

@@ -17,12 +17,15 @@ export function GameShelf({
   games,
   hoursLabelOf,
   playLabel,
+  size = 'md',
   onSelect,
   onPlay,
   onToggleFavorite,
 }: {
   readonly title: string;
   readonly games: readonly DesktopGameView[];
+  /** `lg` no modo grande ecrã. */
+  readonly size?: 'md' | 'lg';
   /** As horas de cada jogo (já formatadas), ou `null` sem tempo medido. */
   readonly hoursLabelOf: (game: DesktopGameView) => string | null;
   readonly playLabel: string;
@@ -48,6 +51,7 @@ export function GameShelf({
               hoursLabel={hoursLabelOf(game)}
               favorite={game.favorite}
               playLabel={playLabel}
+              size={size}
               onSelect={onSelect}
               onPlay={onPlay}
               onToggleFavorite={onToggleFavorite}

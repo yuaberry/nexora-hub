@@ -8,6 +8,7 @@ export const shell = {
   'sidebar.downloadsActive': '{count} download(s) em curso',
   'home.featured': 'Destaque',
   'home.featured.subtitle': 'A sua última sessão, pronta a continuar.',
+  'home.subtitle': 'A montra da tua biblioteca — o que jogaste, o que acabaste, e o que ainda não experimentaste.',
   'home.tab.hot': 'Quentes',
   'home.tab.recent': 'Jogados recentemente',
   'home.tab.discover': 'Para descobrir',

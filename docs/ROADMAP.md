@@ -660,7 +660,31 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 4a — Saves na nuvem (2026-11-23)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5a — Montra visual: prateleiras, destaque com arte e herói dos detalhes (2026-11-23)
+
+### Entregue
+
+- [x] **Prateleiras** (`GameShelf`) — o Início passou de separadores + grelha
+      para filas horizontais com dados reais: "Quentes" (mais jogados),
+      "Jogados recentemente" (última sessão) e "Para descobrir" (nunca
+      jogados); uma prateleira sem jogos **não existe** — nada de filas vazias.
+- [x] **Destaque com arte** — o banner do Início mostrou a capa do jogo como
+      fundo (com véu para a leitura), em vez do gradiente vazio.
+- [x] **Herói dos detalhes** (`hub-hero`) — a arte do jogo como fundo do
+      cabeçalho, título e acções principais por cima (jogar, Steam, loja,
+      favoritos); um logo — arte com margens — assenta contido no centro em
+      vez de servir de fundo; o botão "Voltar" duplicado (o shell já tem um)
+      foi removido.
+- [x] **Selos honestos** — o "Planejado" que restava no destaque saiu: o que
+      ele anunciava já existe.
+
+### Prova de execução real (2026-11-23)
+
+- Início: destaque "R.E.P.O." com a arte no fundo; três prateleiras com 7, 2
+      e 5 jogos; "Surpreenda-me" presente;
+- Detalhes do Hollow Knight: herói com a arte de fundo (`nexora://cover/…`),
+      título e os quatro botões; um único "Voltar" (o do shell);
+- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 4a — Saves na nuvem (2026-11-23)
 
 ### Entregue
 

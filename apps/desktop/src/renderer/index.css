@@ -140,6 +140,19 @@ body {
     var(--paper-surface-raised);
 }
 
+.hub-hero__logo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--paper-space-5);
+}
+
+.hub-hero__logo img {
+  max-width: 100%;
+  max-height: 7rem;
+}
+
 .hub-hero__title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -446,6 +459,95 @@ body {
   white-space: nowrap;
 }
 
+
+/* ---------- Prateleiras (montra horizontal) ------------------------------ */
+
+.hub-shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.hub-shelf__title {
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.hub-shelf__row {
+  display: flex;
+  gap: var(--paper-space-4);
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  scrollbar-width: thin;
+}
+
+.hub-shelf__item {
+  flex: 0 0 10.5rem;
+  min-width: 0;
+}
+
+/* ---------- Herói dos detalhes ------------------------------------------ */
+
+.hub-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 13rem;
+  padding: var(--paper-space-5);
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius-lg);
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, var(--paper-placeholder-from), var(--paper-placeholder-to));
+  background-size: cover;
+  background-position: center 30%;
+}
+
+/* O véu que garante a leitura do título sobre qualquer arte. */
+.hub-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--paper-surface-deepest) 92%, transparent) 0%,
+    color-mix(in srgb, var(--paper-surface-deepest) 55%, transparent) 45%,
+    color-mix(in srgb, var(--paper-surface-deepest) 15%, transparent) 100%
+  );
+}
+
+.hub-hero__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.hub-hero__logo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--paper-space-5);
+}
+
+.hub-hero__logo img {
+  max-width: 100%;
+  max-height: 7rem;
+}
+
+.hub-hero__title {
+  font-size: 1.6rem;
+  line-height: 1.15;
+  color: var(--paper-ink-strong);
+}
+
+.hub-hero__meta {
+  color: var(--paper-ink);
+  font-size: 0.85rem;
+}
+
 /* ---------- Estrutura em duas colunas (estilo launcher) ----------------- */
 
 .hub-shell {
@@ -620,6 +722,7 @@ body {
 /* ---------- Herói / destaque ------------------------------------------ */
 
 .hub-featured {
+  position: relative;
   display: grid;
   gap: 0.75rem;
   padding: 2rem;
@@ -628,6 +731,28 @@ body {
   background:
     radial-gradient(130% 160% at 8% -10%, var(--paper-accent-soft) 0%, transparent 60%),
     linear-gradient(120deg, var(--paper-surface-raised), var(--paper-surface-sunken));
+  background-size: cover, auto;
+  background-position: center 22%, center;
+  overflow: hidden;
+}
+
+/* O véu do destaque: a arte entra pela direita, o texto lê-se na esquerda. */
+.hub-featured::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--paper-surface-deepest) 92%, transparent) 0%,
+    color-mix(in srgb, var(--paper-surface-deepest) 70%, transparent) 50%,
+    color-mix(in srgb, var(--paper-surface-deepest) 25%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.hub-featured > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hub-featured__label {

@@ -3,7 +3,8 @@ import { Badge, Button, EmptyState, PlannedBadge, useInterface, type Translator 
 import { useLibrary, useRunner } from '../state/desktop.js';
 import { formatPlayTime } from '../lib/format.js';
 import { accessToken } from '../lib/api.js';
-import { GameCapsule } from '../components/GameCapsule.js';
+import { GameShelf } from '../components/GameShelf.js';
+import { coverUrl } from '../lib/media.js';
 import type { DesktopGameView } from '../../shared/preload-api.js';
 
 /**
@@ -17,15 +18,6 @@ import type { DesktopGameView } from '../../shared/preload-api.js';
  * Nada de "Top da semana" inventado: sem medição semanal, o separador não
  * existe — a honestidade do produto também é interface.
  */
-
-/** Separadores do Início (chaves explícitas, nunca dinâmicas). */
-const TABS = [
-  { id: 'hot', key: 'home.tab.hot' },
-  { id: 'recent', key: 'home.tab.recent' },
-  { id: 'discover', key: 'home.tab.discover' },
-] as const;
-
-type TabId = (typeof TABS)[number]['id'];
 
 /** As acções do runner de que a Home precisa. */
 interface RunnerActions {
@@ -44,7 +36,6 @@ export function HomePage({
   const { t, locale } = useInterface();
   const library = useLibrary();
   const runner = useRunner();
-  const [tab, setTab] = useState<TabId>('hot');
   const [message, setMessage] = useState<string | null>(null);
 
   const games = library.value ?? [];
@@ -80,8 +71,6 @@ export function HomePage({
     }
   }, [games, onOpenGame]);
 
-  const active = rows[tab];
-
   if (library.loading) {
     return <p>{t('common.loading')}</p>;
   }
@@ -95,9 +84,12 @@ export function HomePage({
       ) : null}
 
       {featured !== null ? (
-        <section className="hub-featured">
+        <section
+          className="hub-featured"
+          style={coverUrl(featured.cover) === null ? undefined : { backgroundImage: `url("${coverUrl(featured.cover)}")` }}
+        >
           <span className="hub-featured__label">{t('home.featured')}</span>
-          <h2 className="hub-featured__title">{featured.title}</h2>
+          <strong className="hub-featured__title">{featured.title}</strong>
           <p className="hub-featured__desc">
             {t('home.featured.subtitle')} · {formatPlayTime(featured.totalSeconds, locale, t)}
           </p>
@@ -111,53 +103,46 @@ export function HomePage({
               {t('common.action.play')}
             </Button>
             <Button onClick={() => onOpenGame(featured.externalKey)}>{t('details.title')}</Button>
-            <Badge tone="planned">{t('planned.badge')}</Badge>
           </div>
         </section>
       ) : null}
 
-      <div className="hub-tabs">
-        {TABS.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            className={`hub-tab${entry.id === tab ? ' hub-tab--active' : ''}`}
-            aria-pressed={entry.id === tab}
-            onClick={() => {
-              setTab(entry.id);
-            }}
-          >
-            {t(entry.key)}
-          </button>
-        ))}
-        <span style={{ flex: 1 }} />
+      <div className="hub-row hub-row--between">
+        <p className="nx-subtitle">{t('home.subtitle')}</p>
         <Button onClick={onSurprise}>✨ {t('home.surprise')}</Button>
       </div>
 
       {message === null ? null : <p className="nx-banner"><span>{message}</span></p>}
       {library.error === null ? null : <p className="nx-banner"><span>{library.error}</span></p>}
 
-      {active.length === 0 ? (
-        <EmptyState title={t('library.search.noResults')} hint={t('library.search.hint')} />
-      ) : (
-        <div className="hub-capsule-grid">
-          {active.map((game) => (
-            <GameCapsule
-              key={game.externalKey}
-              id={game.externalKey}
-              title={game.title}
-              cover={game.cover}
-              installed={game.installed}
-              hoursLabel={game.totalSeconds >= 3600 ? formatPlayTime(game.totalSeconds, locale, t) : null}
-              favorite={game.favorite}
-              playLabel={t('common.action.play')}
-              onSelect={onOpenGame}
-              onPlay={onPlay}
-              onToggleFavorite={onToggleFavorite}
-            />
-          ))}
-        </div>
-      )}
+      {/* Prateleiras: cada uma com dados reais — uma sem jogos não existe. */}
+      <GameShelf
+        title={t('home.tab.hot')}
+        games={rows.hot}
+        hoursLabelOf={(game) => (game.totalSeconds >= 3600 ? formatPlayTime(game.totalSeconds, locale, t) : null)}
+        playLabel={t('common.action.play')}
+        onSelect={onOpenGame}
+        onPlay={onPlay}
+        onToggleFavorite={onToggleFavorite}
+      />
+      <GameShelf
+        title={t('home.tab.recent')}
+        games={rows.recent}
+        hoursLabelOf={(game) => (game.totalSeconds >= 3600 ? formatPlayTime(game.totalSeconds, locale, t) : null)}
+        playLabel={t('common.action.play')}
+        onSelect={onOpenGame}
+        onPlay={onPlay}
+        onToggleFavorite={onToggleFavorite}
+      />
+      <GameShelf
+        title={t('home.tab.discover')}
+        games={rows.discover}
+        hoursLabelOf={(game) => (game.totalSeconds >= 3600 ? formatPlayTime(game.totalSeconds, locale, t) : null)}
+        playLabel={t('common.action.play')}
+        onSelect={onOpenGame}
+        onPlay={onPlay}
+        onToggleFavorite={onToggleFavorite}
+      />
 
       <div className="hub-planned-row">
         <PlannedBadge label={t('planned.badge')} />

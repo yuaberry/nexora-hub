@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
+import { Button, Card, EmptyState, useInterface } from '@nexora/ui';
 import { steamStoreUrl } from '@nexora/core';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import { accessToken } from '../lib/api.js';
@@ -99,12 +99,52 @@ export function GameDetailPage({
     );
   }
 
+  // O herói: a arte do jogo como fundo (o véu garante a leitura), o título e
+  // as acções principais por cima. Um logo — arte com margens — não serve de
+  // fundo: assenta contido no centro, sobre o gradiente do tema.
+  const heroUrl = coverFit(game.cover) === 'cover' ? coverUrl(game.cover) : null;
+
   return (
     <div className="nx-stack">
-      <div className="hub-row hub-row--between">
-        <Button onClick={onBack}>{t('common.action.back')}</Button>
-        <PlannedBadge label={t('planned.badge')} />
-      </div>
+      <section
+        className="hub-hero"
+        style={heroUrl === null ? undefined : { backgroundImage: `url("${heroUrl}")` }}
+      >
+        {heroUrl === null && game.cover !== null ? (
+          <div className="hub-hero__logo">
+            <GameImage
+              src={coverUrl(game.cover)}
+              fit="contain"
+              alt=""
+              fallback={<span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>}
+            />
+          </div>
+        ) : null}
+        <div className="hub-hero__body">
+          <span className="hub-hero__meta">{game.tags.join(' · ')}</span>
+          <strong className="hub-hero__title">{game.title}</strong>
+          <div className="hub-row">
+            <Button variant="primary" onClick={() => void onPlay()} disabled={!game.installed}>
+              {t('common.action.play')}
+            </Button>
+            {game.steamAppId === null ? null : (
+              <Button onClick={() => void onOpenInSteam()}>{t('steam.open')}</Button>
+            )}
+            {game.steamAppId === null ? null : (
+              <Button onClick={() => void onOpenInStore()}>{t('catalog.store')}</Button>
+            )}
+            <Button
+              aria-pressed={game.favorite}
+              onClick={() => {
+                void library.toggleFavorite(game.id);
+              }}
+            >
+              {game.favorite ? t('details.favorite') : t('details.notFavorite')}
+            </Button>
+          </div>
+        </div>
+      </section>
+
 
       <div className="hub-detail">
         <div className="nx-cover hub-cover-large">
@@ -141,20 +181,6 @@ export function GameDetailPage({
           </dl>
 
           <div className="hub-row">
-            <Button variant="primary" onClick={() => void onPlay()} disabled={!game.installed}>
-              {t('common.action.play')}
-            </Button>
-            {game.steamAppId === null ? null : (
-              <Button onClick={() => void onOpenInSteam()}>{t('steam.open')}</Button>
-            )}
-            <Button
-              aria-pressed={game.favorite}
-              onClick={() => {
-                void library.toggleFavorite(game.id);
-              }}
-            >
-              {game.favorite ? t('details.favorite') : t('details.notFavorite')}
-            </Button>
             <Button
               onClick={() => {
                 const api = globalThis.window?.nexora;

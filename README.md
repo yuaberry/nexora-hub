@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.2.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-655%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-662%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -108,6 +108,14 @@ código de saída, tempo gravado).
   a preenchê-la; uma imagem que falhe mostra o placeholder, nunca uma moldura
   vazia
 
+### 🎨 Parede de jogos
+- **Capas unificadas** — a cápsula vertical oficial da Steam (`library_600x900`),
+  igual para todos os utilizadores, guardada em cache no disco (offline a
+  partir da segunda vez)
+- **Horas jogadas** em cada cápsula — a medida real do runner, sem números
+  inventados
+- **A tua escolha manda** — uma capa escolhida por ti nunca é substituída
+
 ### 🧩 Modos
 - **Detector de modos** — lê a pasta `mods` do jogo e diz **quantos são e de
   que carregador** (Fabric, Quilt, Forge, NeoForge), com o nome e a versão de
@@ -193,7 +201,7 @@ Os ficheiros de cada lançamento estão em
 <td><img src="docs/screenshots/overlay.png" alt="Overlay"/><br/><sub><b>Overlay</b> — medidas reais por cima do jogo (Shift+Tab).</sub></td>
 </tr>
 <tr>
-<td><img src="docs/screenshots/capas-steam.png" alt="Capas da Steam"/><br/><sub><b>Capas reais</b> — os logos que a Steam guardou, lidos do disco.</sub></td><td><img src="docs/screenshots/dlcs-steam.png" alt="DLCs"/><br/><sub><b>DLCs</b> — nomes da loja, instaladas do disco.</sub></td><td><img src="docs/screenshots/catalogo-appid.png" alt="Adicionar por AppID"/><br/><sub><b>Adicionar por AppID</b> — metadado na biblioteca, instalação na loja.</sub></td>
+<td><img src="docs/screenshots/capas-steam.png" alt="Capas da Steam"/><br/><sub><b>Capas reais</b> — os logos que a Steam guardou, lidos do disco.</sub></td><td><img src="docs/screenshots/dlcs-steam.png" alt="DLCs"/><br/><sub><b>DLCs</b> — nomes da loja, instaladas do disco.</sub></td><td><img src="docs/screenshots/catalogo-appid.png" alt="Adicionar por AppID"/><br/><sub><b>Adicionar por AppID</b> — metadado na biblioteca, instalação na loja.</sub></td><td><img src="docs/screenshots/parede-capsulas.png" alt="Parede de jogos"/><br/><sub><b>Parede de jogos</b> — cápsulas verticais iguais em qualquer máquina.</sub></td><td><img src="docs/screenshots/home-capsulas.png" alt="Início"/><br/><sub><b>Início</b> — a mesma parede, da tua biblioteca.</sub></td>
 <td><img src="docs/screenshots/capa-personalizacao.png" alt="Capa personalizável"/><br/><sub><b>Capa personalizável</b> — escolhe entre as imagens da Steam ou um ficheiro teu.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
 <td><img src="docs/screenshots/estatisticas.png" alt="Estatísticas"/><br/><sub><b>Estatísticas</b> — agregadas no servidor a partir das sessões reais.</sub></td>
@@ -255,7 +263,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **655 verdes** (164 contra PostgreSQL real) |
+| **Testes** | **662 verdes** (164 contra PostgreSQL real) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real (último: capas da loja que não carregavam no Electron, logo cortado em moldura retrato, import perdido que silenciava o cache) |
 | **Build** | Linux + Windows empacotados a cada versão |

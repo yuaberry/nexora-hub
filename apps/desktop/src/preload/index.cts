@@ -167,6 +167,7 @@ const api: DesktopApi = {
     toggle: () => ipcRenderer.invoke('overlay:toggle') as Promise<{ ok: boolean; visible: boolean }>,
   },
   covers: {
+    hydrate: () => ipcRenderer.invoke('covers:hydrate') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly failed?: number; readonly skipped?: number }>,
     pick: () => ipcRenderer.invoke('covers:pick') as Promise<{ ok: boolean; path?: string }>,
     set: (gameId, path) => ipcRenderer.invoke('library:setCover', gameId, path) as Promise<{ ok: boolean; message?: string }>,
     reset: (gameId) => ipcRenderer.invoke('library:resetCover', gameId) as Promise<{ ok: boolean; message?: string }>,

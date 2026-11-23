@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   isSteamAppId,
+  steamPortraitUrl,
   steamAppFromDetails,
   steamAppsFromSearch,
   steamCapsuleUrl,
@@ -105,6 +106,14 @@ describe('steamAppsFromSearch', () => {
   it('resposta sem itens devolve lista vazia', () => {
     expect(steamAppsFromSearch({ total: 0 })).toEqual([]);
     expect(steamAppsFromSearch(null)).toEqual([]);
+  });
+});
+
+describe('steamPortraitUrl', () => {
+  it('segue o padrão público da cápsula vertical', () => {
+    expect(steamPortraitUrl('367520')).toBe(
+      'https://cdn.akamai.steamstatic.com/steam/apps/367520/library_600x900.jpg',
+    );
   });
 });
 

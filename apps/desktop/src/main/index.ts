@@ -148,7 +148,7 @@ function bootstrap(): void {
   registerOverlayIpc();
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
-  registerCoversIpc(library);
+  registerCoversIpc(library, coverCacheDir(config.databasePath));
 
   // Catálogo público da Steam: procurar pelo AppID ou pelo nome e guardar
   // metadados na biblioteca local (a instalação continua a ser da loja).

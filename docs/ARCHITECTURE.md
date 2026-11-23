@@ -452,4 +452,27 @@ numa moldura 3:4 saía cortado — era isto que estava "fora".
 
 As **DLCs** declaram-se na loja (um pedido por nome, com limite) e a marca de
 instalada vem dos manifestos no disco: os nomes vêm da rede, a verdade sobre o
-que está instalado vem do utilizador.
+que está instalado vem do utilizador.\n
+## D46 — A mesma capa em qualquer máquina: cápsulas públicas em cache
+
+A pasta local da Steam (`librarycache`) só existe em quem tem a loja
+instalada: quem instalou por outro caminho, ou noutra máquina, via capas
+diferentes — ou nenhuma. A **cápsula pública** (`library_600x900.jpg`, 2×3) é
+a mesma para toda a gente, e é a arte que as lojas mostram na parede de jogos.
+
+A hidratação (`covers-hydrate.ts`) busca essa cápsula pelo appid — o processo
+principal fala com a Internet; o renderer não pode (CSP + user-agent do
+Electron recusado pela Akamai) — e guarda-a no cache do disco, ao lado da base
+local. A entrada passa a apontar para o ficheiro local: a biblioteca fica
+completa offline, e todas as máquinas mostram a mesma arte. A promessa das
+capas escolhidas passa a ter **marca na base** (`cover_chosen`): uma escolha do
+utilizador nunca é substituída — nem pela hidratação, nem pelo upsert, nem pela
+sincronização.
+
+O enquadramento mantém-se pelo tipo de arte (D45): a cápsula é arte de canto a
+canto (`cover`), e um logo com margens continua contido (`contain`).
+
+A parede da biblioteca (`GameCapsule`) é o formato das lojas: cápsula vertical,
+horas jogadas no canto (a medida real do runner, só a partir de uma hora), e o
+botão de jogar por baixo — desactivado numa entrada de catálogo, que não tem
+executável.

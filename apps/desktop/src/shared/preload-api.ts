@@ -691,6 +691,20 @@ export interface DesktopApi {
     readonly toggle: () => Promise<{ readonly ok: boolean; readonly visible: boolean }>;
   };
   readonly covers: {
+    /**
+     * Hidrata as capas com a cápsula pública da loja.
+     *
+     * Busca a arte vertical (`library_600x900`) pelo appid e guarda-a no
+     * disco: a biblioteca fica com a mesma capa em qualquer máquina, e
+     * offline a partir da segunda vez. Uma capa escolhida pelo utilizador
+     * nunca é substituída.
+     */
+    readonly hydrate: () => Promise<{
+      readonly ok: boolean;
+      readonly updated?: number;
+      readonly failed?: number;
+      readonly skipped?: number;
+    }>;
     /** Abre o selector de ficheiro de imagem. */
     readonly pick: () => Promise<{ readonly ok: boolean; readonly path?: string }>;
     /** Define a capa escolhida pelo utilizador. */

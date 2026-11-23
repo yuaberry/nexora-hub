@@ -629,7 +629,38 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
       entradas remotas sem imagem mostram o placeholder;
 - bug apanhado pelos testes: `writeFile` perdeu o import na refacção —
       a excepção era engolida pelo `catch` e a capa nunca era guardada;
-- `pnpm typecheck` limpo; **655 testes verdes** no total.\n\n## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
+- `pnpm typecheck` limpo; **655 testes verdes** no total.\n\n## Fase 3e — Capas unificadas e parede de jogos (2026-11-22)
+
+### Entregue
+
+- [x] **Cápsula pública para todos** (`steamPortraitUrl` no core + hidratação
+      no launcher) — a arte vertical `library_600x900` buscada pelo appid e
+      guardada no cache do disco; a biblioteca fica igual em qualquer máquina e
+      offline a partir da segunda vez — 6 testes.
+- [x] **Marca de capa escolhida** (`cover_chosen`) — uma escolha do utilizador
+      nunca é substituída pela hidratação, pelo upsert nem pela sincronização;
+      migração de bases antigas sem perder dados (o select da migração tinha
+      uma coluna a menos que o insert — apanhado pelo teste).
+- [x] **Parede de jogos** (`GameCapsule`) — cápsula 2×3, horas jogadas no
+      canto (só a partir de uma hora), botão de jogar desactivado em entradas
+      de catálogo; a Biblioteca e o Início passaram a usar a parede.
+- [x] **Enquadramento** mantido por tipo de arte (D45).
+
+### Prova de execução real (2026-11-22)
+
+- a hidratação correu sozinha ao abrir a Biblioteca: 4 jogos com appid
+      receberam a cápsula em cache (`.dev-data/cover-cache/…`) — Hollow Knight,
+      R.E.P.O., Team Fortress 2 e Counter-Strike 2;
+- a parede mostrou **7 cápsulas**, 4 com imagem carregada (300×450, 2:3), e as
+      entradas sem appid (Epic, LoL, Minecraft) com o placeholder;
+- o Início mostrou a mesma parede (7 cápsulas, 4 imagens);
+- bug apanhado pelo teste: a migração da base antiga contava 14 valores para
+      15 colunas — o select não trazia a coluna nova;
+- `pnpm typecheck` limpo; **662 testes verdes** no total.
+
+> Nota de migração: capas escolhidas antes desta versão não tinham marca na
+> base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
 
 ### Entregue
 

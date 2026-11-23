@@ -3,8 +3,7 @@ import { Badge, Button, EmptyState, PlannedBadge, useInterface, type Translator 
 import { useLibrary, useRunner } from '../state/desktop.js';
 import { formatPlayTime } from '../lib/format.js';
 import { accessToken } from '../lib/api.js';
-import { GameTile } from '../components/GameTile.js';
-import type { LibraryGame } from '@nexora/protocol';
+import { GameCapsule } from '../components/GameCapsule.js';
 import type { DesktopGameView } from '../../shared/preload-api.js';
 
 /**
@@ -141,14 +140,16 @@ export function HomePage({
       {active.length === 0 ? (
         <EmptyState title={t('library.search.noResults')} hint={t('library.search.hint')} />
       ) : (
-        <div className="hub-tile-grid">
+        <div className="hub-capsule-grid">
           {active.map((game) => (
-            <GameTile
+            <GameCapsule
               key={game.externalKey}
-              game={toLibraryGame(game)}
+              id={game.id}
+              title={game.title}
+              cover={game.cover}
+              installed={game.installed}
+              hoursLabel={game.totalSeconds >= 3600 ? formatPlayTime(game.totalSeconds, locale, t) : null}
               favorite={game.favorite}
-              playTimeLabel={formatPlayTime(game.totalSeconds, locale, t)}
-              metaLabel={game.tags.join(' · ')}
               playLabel={t('common.action.play')}
               onSelect={onOpenGame}
               onPlay={onPlay}
@@ -183,22 +184,5 @@ async function onPlayFeatured(
   );
 }
 
-/** Converte uma vista local na entrada de biblioteca do contrato. */
-function toLibraryGame(view: DesktopGameView): LibraryGame {
-  return {
-    id: view.externalKey,
-    title: view.title,
-    cover: view.cover,
-    provider: 'local',
-    tags: view.tags,
-    adult: false,
-    installPath: view.installPath,
-    executablePath: view.executablePath,
-    favorite: view.favorite,
-    collections: [],
-    lastPlayedAt: view.lastPlayedAt,
-    totalSeconds: view.totalSeconds,
-  };
-}
 
 /** Pesquisa local reexportada (o separador filtra o que existe). */

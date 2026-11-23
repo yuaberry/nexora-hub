@@ -47,6 +47,19 @@ export function steamCapsuleUrl(appId: string): string {
   return `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`;
 }
 
+/**
+ * URL da **cápsula vertical** pública (600×900, a arte de biblioteca).
+ *
+ * É a capa que a Steam e launchers como o Hydra mostram na parede de jogos:
+ * vertical, quadrada na informação, e **igual para todos os utilizadores** —
+ * ao contrário da pasta local `librarycache`, que só existe em quem tem a
+ * Steam instalada. A biblioteca do launcher fica com o mesmo aspecto em
+ * qualquer máquina.
+ */
+export function steamPortraitUrl(appId: string): string {
+  return `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`;
+}
+
 /** URL da página da loja de um app. */
 export function steamStoreUrl(appId: string): string {
   return `https://store.steampowered.com/app/${appId}`;

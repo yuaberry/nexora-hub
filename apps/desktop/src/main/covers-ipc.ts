@@ -20,6 +20,7 @@ import { steamCapsuleUrl } from '@nexora/core';
 import { steamCoverAlternatives, steamCoverFor } from './steam-images.js';
 import { localCoverFile } from './disk-scan.js';
 import { syncSteamLibrary } from './steam-sync.js';
+import { hydrateCovers } from './covers-hydrate.js';
 import type { LocalLibrary } from './db.js';
 
 /** Extensões de imagem aceites como capa. */
@@ -52,8 +53,13 @@ async function pickCoverFile(): Promise<string | null> {
   return result.filePaths[0] ?? null;
 }
 
-/** Regista os canais das capas e da sincronização. */
-export function registerCoversIpc(library: LocalLibrary): void {
+/**
+ * Regista os canais das capas e da sincronização.
+ *
+ * `coversDir` é a pasta do cache das imagens da loja (ao lado da base local):
+ * é para lá que a hidratação guarda as cápsulas buscadas.
+ */
+export function registerCoversIpc(library: LocalLibrary, coversDir: string): void {
   // Sincroniza com o que a Steam tem agora.
   ipcMain.handle('steam:sync', (): {
     readonly ok: boolean;
@@ -112,8 +118,23 @@ export function registerCoversIpc(library: LocalLibrary): void {
     if (!IMAGE_EXTENSIONS.some((extension) => path.toLowerCase().endsWith(extension))) {
       return { ok: false, message: 'Formato de imagem não suportado.' };
     }
-    const updated = library.setCover(numericId, path);
+    const updated = library.setCover(numericId, path, true);
     return updated === null ? { ok: false, message: 'Jogo não encontrado.' } : { ok: true };
+  });
+
+  /**
+   * Hidrata as capas com a cápsula pública da loja — a mesma arte para todos
+   * os utilizadores, guardada no disco. Uma capa escolhida pelo utilizador
+   * nunca é substituída. O relatório diz o que mudou.
+   */
+  ipcMain.handle('covers:hydrate', async (): Promise<{
+    readonly ok: boolean;
+    readonly updated: number;
+    readonly failed: number;
+    readonly skipped: number;
+  }> => {
+    const report = await hydrateCovers(library, coversDir);
+    return { ok: true, ...report };
   });
 
   // Abre o selector de ficheiro (a capa escolhida passa pelo setCover).
@@ -146,7 +167,7 @@ export function registerCoversIpc(library: LocalLibrary): void {
       steamCover ??
       (entry.installPath !== null ? localCoverFile(entry.installPath) : null) ??
       (entry.steamAppId === null ? null : steamCapsuleUrl(entry.steamAppId));
-    const reset = library.setCover(numericId, automatic);
+    const reset = library.setCover(numericId, automatic, false);
     return reset === null ? { ok: false, message: 'Jogo não encontrado.' } : { ok: true };
   });
 }

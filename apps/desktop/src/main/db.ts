@@ -20,6 +20,8 @@ export interface LocalGameRecord {
   readonly externalKey: string;
   readonly title: string;
   readonly cover: string | null;
+  /** `true` quando a capa foi escolhida pelo utilizador (nunca auto-substituída). */
+  readonly coverChosen: boolean;
   /** `null` quando a entrada veio do catálogo (o jogo não está instalado). */
   readonly installPath: string | null;
   /** `null` quando não há executável conhecido (entrada de catálogo). */
@@ -61,6 +63,7 @@ export class LocalLibrary {
         external_key text not null unique,
         title text not null,
         cover text,
+        cover_chosen integer not null default 0,
         install_path text,
         executable_path text,
         steam_app_id text,
@@ -80,6 +83,11 @@ export class LocalLibrary {
     // "coluna duplicada" — um erro esperado, por isso silenciado.
     try {
       this.db.exec('alter table games add column steam_app_id text;');
+    } catch {
+      // a coluna já existe — nada a fazer
+    }
+    try {
+      this.db.exec('alter table games add column cover_chosen integer not null default 0;');
     } catch {
       // a coluna já existe — nada a fazer
     }
@@ -147,6 +155,7 @@ export class LocalLibrary {
         external_key text not null unique,
         title text not null,
         cover text,
+        cover_chosen integer not null default 0,
         install_path text,
         executable_path text,
         steam_app_id text,
@@ -158,8 +167,8 @@ export class LocalLibrary {
         created_at text not null,
         updated_at text not null
       );
-      insert into games_migrated (id, external_key, title, cover, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at)
-        select id, external_key, title, cover, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at from games;
+      insert into games_migrated (id, external_key, title, cover, cover_chosen, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at)
+        select id, external_key, title, cover, cover_chosen, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at from games;
       drop table games;
       alter table games_migrated rename to games;
     `);
@@ -181,7 +190,7 @@ export class LocalLibrary {
          values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          on conflict(external_key) do update set
            title = excluded.title,
-           cover = excluded.cover,
+           cover = case when games.cover_chosen = 1 then games.cover else excluded.cover end,
            install_path = coalesce(excluded.install_path, games.install_path),
            executable_path = coalesce(excluded.executable_path, games.executable_path),
            steam_app_id = coalesce(excluded.steam_app_id, games.steam_app_id),
@@ -260,14 +269,14 @@ export class LocalLibrary {
    * tema se não existir). A sincronização com a Steam **nunca** mexe numa
    * capa que o utilizador escolheu: a escolha dele vale mais que a nossa.
    */
-  setCover(id: number, cover: string | null): LocalGameRecord | null {
+  setCover(id: number, cover: string | null, chosen: boolean): LocalGameRecord | null {
     const row = this.findById(id);
     if (row === null) {
       return null;
     }
     this.db
-      .prepare('update games set cover = ?, updated_at = ? where id = ?')
-      .run(cover, new Date().toISOString(), id);
+      .prepare('update games set cover = ?, cover_chosen = ?, updated_at = ? where id = ?')
+      .run(cover, chosen ? 1 : 0, new Date().toISOString(), id);
     return this.findById(id);
   }
 
@@ -492,6 +501,7 @@ function toRecord(row: Record<string, unknown>): LocalGameRecord {
     externalKey: String(row['external_key']),
     title: String(row['title']),
     cover: typeof row['cover'] === 'string' ? row['cover'] : null,
+    coverChosen: Number(row['cover_chosen'] ?? 0) === 1,
     installPath: typeof row['install_path'] === 'string' ? row['install_path'] : null,
     executablePath: typeof row['executable_path'] === 'string' ? row['executable_path'] : null,
     steamAppId: typeof steamAppId === 'string' && steamAppId !== '' ? steamAppId : null,

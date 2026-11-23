@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Badge, Button, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, ErrorNote } from '../state/desktop.js';
 import { searchLocalLibrary } from '../lib/catalog.js';
 import { formatPlayTime } from '../lib/format.js';
-import { GameTile } from '../components/GameTile.js';
-import type { LibraryGame } from '@nexora/protocol';
-import type { CollectionView, DesktopGameView } from '../../shared/preload-api.js';
+import { GameCapsule } from '../components/GameCapsule.js';
+import type { CollectionView } from '../../shared/preload-api.js';
 
 /**
  * Biblioteca — todos os jogos, com a pesquisa do cabeçalho.
@@ -127,6 +126,26 @@ export function LibraryPage({
     library.reload();
   }, [library, t]);
 
+  /**
+   * Hidrata as capas com a cápsula pública da loja.
+   *
+   * Corre uma vez por sessão da página: busca a arte vertical pelo appid (o
+   * processo principal fala com a Internet) e guarda-a no disco. A grelha
+   * mostra placeholders enquanto isso, e a biblioteca recarrega no fim — a
+   * mesma capa passa a existir em qualquer máquina.
+   */
+  const hydrated = useRef(false);
+  useEffect(() => {
+    const api = globalThis.window?.nexora;
+    if (hydrated.current || api === undefined) {
+      return;
+    }
+    hydrated.current = true;
+    void api.covers.hydrate().then(() => {
+      library.reload();
+    });
+  }, [library]);
+
   const hits = useMemo(() => {
     const inCollection =
       activeCollection === null || collectionGames === null
@@ -218,15 +237,18 @@ export function LibraryPage({
       ) : hits.length === 0 ? (
         <EmptyState title={t('library.search.noResults')} hint={t('library.search.hint')} />
       ) : (
-        <div className="hub-tile-grid">
+        <div className="hub-capsule-grid">
           {hits.map((game) => (
-            <GameTile
+            <GameCapsule
               key={game.externalKey}
-              game={toLibraryGame(game)}
-              favorite={game.favorite}
+              id={game.id}
+              title={game.title}
+              cover={game.cover}
               installed={game.installed}
-              playTimeLabel={formatPlayTime(game.totalSeconds, locale, t)}
-              metaLabel={game.tags.join(' · ')}
+              // A marca de horas só aparece a partir de uma hora jogada —
+              // como nas lojas: um zero não diz nada.
+              hoursLabel={game.totalSeconds >= 3600 ? formatPlayTime(game.totalSeconds, locale, t) : null}
+              favorite={game.favorite}
               playLabel={t('common.action.play')}
               onSelect={onOpenGame}
               onPlay={onPlay}
@@ -245,22 +267,4 @@ export function LibraryPage({
       </div>
     </div>
   );
-}
-
-/** Converte uma vista local na entrada de biblioteca do contrato. */
-function toLibraryGame(view: DesktopGameView): LibraryGame {
-  return {
-    id: view.externalKey,
-    title: view.title,
-    cover: view.cover,
-    provider: 'local',
-    tags: view.tags,
-    adult: false,
-    installPath: view.installPath,
-    executablePath: view.executablePath,
-    favorite: view.favorite,
-    collections: [],
-    lastPlayedAt: view.lastPlayedAt,
-    totalSeconds: view.totalSeconds,
-  };
 }

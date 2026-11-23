@@ -14,3 +14,5 @@ coverage/
 # Artefactos de empacotamento do Electron.
 *.AppImage
 *.deb
+# Dados de runtime da API (saves na nuvem provam-se, não versionam-se).
+data/

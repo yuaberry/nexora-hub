@@ -1,0 +1,12 @@
+[
+  {
+    "id": "506e015a-891b-413e-be0c-8a08c815ebac",
+    "userId": "ecdb4b13-2e04-4793-95e7-8730357a7844",
+    "gameKey": "/jogo/xyz",
+    "label": "Snapshot",
+    "checksum": "abcdefgh12",
+    "sizeBytes": 8,
+    "revision": 7,
+    "createdAt": "2026-11-23T02:31:20.635Z"
+  }
+]

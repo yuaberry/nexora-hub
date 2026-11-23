@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { z } from 'zod';
 
 /**
@@ -41,6 +43,7 @@ const envSchema = z.object({
   PORT: envInt(),
   CORS_ORIGIN: envString(),
   AUTH_SECRET: envString(),
+  SAVES_DIR: envString(),
   NODE_ENV: envString(),
 });
 
@@ -56,8 +59,23 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     PORT: source['PORT'],
     CORS_ORIGIN: source['CORS_ORIGIN'],
     AUTH_SECRET: source['AUTH_SECRET'],
+    SAVES_DIR: source['SAVES_DIR'],
     NODE_ENV: source['NODE_ENV'],
   });
+}
+
+/**
+ * Directório dos saves na nuvem.
+ *
+ * Configurável por `SAVES_DIR`; em teste, um directório temporário (um teste
+ * nunca deve escrever no repositório); fora de teste, `data/saves` dentro de
+ * onde a API corre.
+ */
+export function savesDirectory(env: Env): string {
+  if (env.SAVES_DIR !== undefined) {
+    return env.SAVES_DIR;
+  }
+  return isTestEnv(env) ? join(tmpdir(), 'nexora-saves') : 'data/saves';
 }
 
 /** `true` quando o processo está em modo de teste. */

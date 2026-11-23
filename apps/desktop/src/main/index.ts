@@ -27,6 +27,7 @@ import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerOverlayIpc } from './overlay-ipc.js';
 import { registerCoversIpc } from './covers-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
+import { registerSaveCloudIpc } from './save-cloud-ipc.js';
 import { coverCacheDir } from './cover-cache.js';
 import { registerFamilyIpc } from './family-ipc.js';
 import type { AppInfoView } from '../shared/preload-api.js';
@@ -112,7 +113,7 @@ function bootstrap(): void {
   registerDownloadsIpc(library);
 
   // Saves: snapshots versionados, com o índice na base local.
-  registerSavesIpc(library);
+  const saves = registerSavesIpc(library);
 
   // Família: grupo, convites e biblioteca partilhada (a API é a dona das
   // regras — o dono do limite de plano é o servidor).
@@ -153,6 +154,9 @@ function bootstrap(): void {
   // Catálogo público da Steam: procurar pelo AppID ou pelo nome e guardar
   // metadados na biblioteca local (a instalação continua a ser da loja).
   registerCatalogIpc(library, coverCacheDir(config.databasePath));
+
+  // Saves na nuvem: snapshots locais que sobem e descem com a conta.
+  registerSaveCloudIpc(saves, library, config.apiBaseUrl);
 
   mainWindow = createMainWindow(config);
 }

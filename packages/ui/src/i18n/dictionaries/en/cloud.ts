@@ -1,0 +1,21 @@
+/** EN dictionary — cloud saves. */
+export const cloud = {
+  'cloud.title': 'Cloud saves',
+  'cloud.login': 'Sign in to your account to keep saves in the cloud.',
+  'cloud.localSide': 'On this computer',
+  'cloud.remoteSide': 'In the cloud (with the account)',
+  'cloud.localEmpty': 'You have no local snapshots of this game yet.',
+  'cloud.remoteEmpty': 'No cloud versions for this game.',
+  'cloud.upload': 'Upload',
+  'cloud.restore': 'Restore',
+  'cloud.delete': 'Delete',
+  'cloud.uploaded': 'Revision {revision} uploaded to the cloud.',
+  'cloud.restored': 'Revision {revision} restored — a local safety snapshot was kept.',
+  'cloud.deleted': 'Cloud version deleted.',
+  'cloud.failed': 'The cloud did not answer. Try again.',
+  'cloud.inSync': 'In sync with the cloud.',
+  'cloud.localAhead': 'The local version is ahead — upload it.',
+  'cloud.remoteAhead': 'The cloud is ahead — restore it.',
+  'cloud.diverged': 'The two versions diverged: choose which one stays.',
+  'cloud.hint': 'Restoring creates a local safety snapshot before touching the folder — nothing is lost.',
+} as const;

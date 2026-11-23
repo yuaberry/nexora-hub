@@ -660,7 +660,44 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 4a — Saves na nuvem (2026-11-23)
+
+### Entregue
+
+- [x] **API** (`modules/saves`) — enviar, listar, descarregar e apagar versões
+      de saves, atrás de sessão; o save de outro utilizador devolve **404**,
+      nunca 403; escritas auditadas; limite declarado de 512 MB — 5 testes de
+      integração.
+- [x] **Arquivo** — o conteúdo é um `tar.gz` (ferramenta do sistema, sem
+      dependência nova); a **revisão e o checksum da cópia local viajam com o
+      envio**, para a decisão de conflito comparar os dois lados.
+- [x] **Cliente** (`packages/cloud/cloud-saves.ts`) — as quatro operações,
+      puras e testadas com rede falsa — 8 testes.
+- [x] **Launcher** (`save-cloud.ts` + `save-archive.ts`) — enviar empacota a
+      pasta real; **restaurar cria um snapshot local de segurança antes** de
+      extrair; o estado compara as versões dos dois lados pelo motor
+      (`decideSync`) — 3 testes de orquestração + 3 do arquivo.
+- [x] **Interface** — cartão "Saves na nuvem" nos detalhes: as versões dos
+      dois lados, a decisão (em sincronia / local à frente / remoto à frente /
+      **divergente**), enviar, restaurar e apagar; sem sessão, diz o que falta
+      em vez de fingir.
+- [x] **Decisão revista** — D7: os saves passaram a viver na própria API (a
+      conta já existe aqui); o *stub* do Nexora Cloud externo fica para o
+      cross-save entre serviços.
+
+### Prova de execução real (2026-11-23)
+
+- API no ar (modo memória, `health: degraded` declarado): conta nova criada
+      por HTTP;
+- snapshot local #6 criado (pasta real em `/tmp`, 22 bytes);
+- envio: `{"ok":true,"revision":6}` — a revisão da cópia local viajou;
+- estado depois: local #6 e remoto #6, e o motor disse **em sincronia**;
+- a API confirma independentemente (item com o mesmo `gameKey` e checksum);
+- o cartão "Saves na nuvem" mostrou os dois lados e o estado;
+- bug apanhado pela prova: a cápsula da biblioteca passava o **id da base** à
+  navegação (que procura pela chave externa) — os detalhes não abriam;
+  corrigido nos dois sítios (Biblioteca e Início);
+- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
 
 ### Entregue
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { Badge, Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
+import { Button, Card, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { steamStoreUrl } from '@nexora/core';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import { accessToken } from '../lib/api.js';
@@ -11,6 +11,7 @@ import { PerformanceCard } from '../components/PerformanceCard.js';
 import { ModsSection } from '../components/ModsSection.js';
 import { DlcSection } from '../components/DlcSection.js';
 import { GameImage } from '../components/GameImage.js';
+import { CloudSavesCard } from '../components/CloudSavesCard.js';
 import { CoverSection } from '../components/CoverSection.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
 
@@ -193,6 +194,9 @@ export function GameDetailPage({
 
       <SavesCard gameKey={game.externalKey} savePath={game.installPath} onMessage={setMessage} />
 
+      {/* Saves na nuvem: as versões dos dois lados e a decisão de conflito. */}
+      <CloudSavesCard gameKey={game.externalKey} />
+
       <CommunitySection gameId={game.externalKey} />
 
       {/* Capa: a automática (a da Steam) e a personalização do utilizador. */}
@@ -278,7 +282,6 @@ function SavesCard({
           <Button variant="primary" onClick={() => void onCreate()} disabled={savePath === null}>
             {t('saves.create')}
           </Button>
-          <Badge tone="planned">{t('planned.badge')}</Badge>
         </div>
 
         {snapshots === null ? (
@@ -303,8 +306,6 @@ function SavesCard({
             ))}
           </ul>
         )}
-
-        <p className="nx-subtitle">{t('planned.cloudSync')}</p>
       </div>
     </Card>
   );

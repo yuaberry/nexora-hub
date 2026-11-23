@@ -1,0 +1,21 @@
+/** Dicionário PT-BR — saves na nuvem. */
+export const cloud = {
+  'cloud.title': 'Saves na nuvem',
+  'cloud.login': 'Entra na tua conta para guardar os saves na nuvem.',
+  'cloud.localSide': 'No teu computador',
+  'cloud.remoteSide': 'Na nuvem (com a conta)',
+  'cloud.localEmpty': 'Ainda não criaste snapshots locais deste jogo.',
+  'cloud.remoteEmpty': 'Nenhuma versão na nuvem para este jogo.',
+  'cloud.upload': 'Enviar',
+  'cloud.restore': 'Restaurar',
+  'cloud.delete': 'Apagar',
+  'cloud.uploaded': 'Versão {revision} enviada para a nuvem.',
+  'cloud.restored': 'Versão {revision} restaurada — um snapshot de segurança ficou guardado.',
+  'cloud.deleted': 'Versão apagada da nuvem.',
+  'cloud.failed': 'A nuvem não respondeu. Tenta outra vez.',
+  'cloud.inSync': 'Em sincronia com a nuvem.',
+  'cloud.localAhead': 'A versão local está à frente — envia-a.',
+  'cloud.remoteAhead': 'A nuvem está à frente — restaura-a.',
+  'cloud.diverged': 'As duas versões divergem: escolhe qual fica.',
+  'cloud.hint': 'Restaurar cria um snapshot local de segurança antes de tocar na pasta — nada se perde.',
+} as const;

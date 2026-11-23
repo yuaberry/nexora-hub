@@ -1,10 +1,12 @@
 /**
- * `@nexora/cloud` — interface do cliente de saves na nuvem.
+ * `@nexora/cloud` — saves na nuvem.
  *
- * Os saves na nuvem do launcher vivem no **Nexora Cloud**. Nesta fase o
- * cliente é um *stub* que declara `available: false` e explica o que falta —
- * a integração real é fase futura, e nenhuma interface pode fingir que
- * guarda saves antes de ela existir.
+ * **Decisão revista (D7).** Os saves na nuvem do launcher passaram a viver na
+ * **própria API** (`@nexora/api`, módulo `saves`), com a conta que o
+ * utilizador já tem: o cliente real é `cloud-saves.ts`, testado com rede
+ * falsa. O *stub* que continua abaixo é o contrato para o **Nexora Cloud**
+ * externo — cross-save entre serviços, que continua fase futura, e que agora
+ * fica claramente separado do que já funciona.
  */
 
 /** Estado do cliente de saves (sempre explícito). */
@@ -83,3 +85,14 @@ export {
   folderSize,
   MAX_CONTENT_BYTES_PER_FILE,
 } from './snapshot-store.js';
+export {
+  deleteSave,
+  downloadSave,
+  entriesFromList,
+  listSaves,
+  uploadSave,
+  type CloudSaveEntry,
+  type SaveFetch,
+  type SaveResponse,
+  type SaveResult,
+} from './cloud-saves.js';

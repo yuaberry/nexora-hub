@@ -241,7 +241,7 @@ export function LibraryPage({
           {hits.map((game) => (
             <GameCapsule
               key={game.externalKey}
-              id={game.id}
+              id={game.externalKey}
               title={game.title}
               cover={game.cover}
               installed={game.installed}

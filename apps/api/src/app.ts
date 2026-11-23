@@ -5,6 +5,7 @@ import {
   ACCESS_TOKEN_TTL_SECONDS,
   loadEnv,
   requireAuthSecret,
+  savesDirectory,
   type Env,
 } from './config/env.js';
 import { registerErrorHandler } from './plugins/errorHandler.js';
@@ -29,6 +30,8 @@ import { registerAchievementRoutes } from './modules/achievements/routes.js';
 import { registerRecommendRoutes } from './modules/recommend/routes.js';
 import { registerSessionRoutes } from './modules/sessions/routes.js';
 import { registerAdminRoutes } from './modules/admin/routes.js';
+import { SaveStore } from './modules/saves/save-store.js';
+import { registerSaveRoutes } from './modules/saves/routes.js';
 import { registerGatewayRoutes } from './gateway/socket.js';
 
 /**
@@ -115,6 +118,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerRecommendRoutes(app, repositories);
   registerSessionRoutes(app, repositories);
   registerAdminRoutes(app, repositories);
+
+  // Saves na nuvem: o arquivo vive no disco (binário opaco), ao lado da base.
+  registerSaveRoutes(app, new SaveStore(savesDirectory(env)), repositories.audit);
 
   app.get('/api/v1/health', async () => ({
     status: repositories.mode === 'memory' ? 'degraded' : 'ok',

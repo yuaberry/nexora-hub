@@ -140,6 +140,10 @@ const api: DesktopApi = {
     list: (gameKey) => ipcRenderer.invoke('saves:list', gameKey) as Promise<readonly SaveSnapshotView[]>,
     restore: (snapshotId, savePath) => ipcRenderer.invoke('saves:restore', snapshotId, savePath) as Promise<SourceOperationResult>,
     remove: (gameKey, snapshotId) => ipcRenderer.invoke('saves:remove', gameKey, snapshotId) as Promise<boolean>,
+    cloudStatus: (gameKey, token) => ipcRenderer.invoke('saves:cloudStatus', gameKey, token) as Promise<{ readonly ok: boolean; readonly local?: readonly { readonly id: string; readonly label: string; readonly revision: number; readonly createdAt: string }[]; readonly remote?: readonly { readonly id: string; readonly label: string; readonly revision: number; readonly createdAt: string }[]; readonly decision?: string; readonly message?: string }>,
+    cloudUpload: (gameKey, snapshotId, token) => ipcRenderer.invoke('saves:cloudUpload', gameKey, snapshotId, token) as Promise<{ readonly ok: boolean; readonly revision?: number; readonly message?: string }>,
+    cloudRestore: (gameKey, cloudId, token) => ipcRenderer.invoke('saves:cloudRestore', gameKey, cloudId, token) as Promise<{ readonly ok: boolean; readonly revision?: number; readonly message?: string }>,
+    cloudDelete: (cloudId, token) => ipcRenderer.invoke('saves:cloudDelete', cloudId, token) as Promise<{ readonly ok: boolean; readonly message?: string }>,
   },
   telemetry: {
     sample: () => ipcRenderer.invoke('telemetry:sample') as Promise<TelemetrySampleView>,

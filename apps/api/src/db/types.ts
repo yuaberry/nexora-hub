@@ -55,4 +55,6 @@ export type AuditAction =
   | 'presence.heartbeat'
   | 'chat.open'
   | 'chat.message'
-  | 'achievement.unlocked';
+  | 'achievement.unlocked'
+  | 'save.upload'
+  | 'save.delete';

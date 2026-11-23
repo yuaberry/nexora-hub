@@ -24,6 +24,7 @@ import { recommend } from './recommend.js';
 import { overlay } from './overlay.js';
 import { steamSync } from './steam-sync.js';
 import { catalog } from './catalog.js';
+import { cloud } from './cloud.js';
 import { pages } from './pages.js';
 
 /**
@@ -59,5 +60,6 @@ export const en = {
   ...overlay,
   ...steamSync,
   ...catalog,
+  ...cloud,
   ...pages,
 };

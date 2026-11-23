@@ -841,6 +841,36 @@ export interface DesktopApi {
     readonly list: (gameKey: string) => Promise<readonly SaveSnapshotView[]>;
     readonly restore: (snapshotId: string, savePath: string) => Promise<SourceOperationResult>;
     readonly remove: (gameKey: string, snapshotId: string) => Promise<boolean>;
+    /**
+     * Saves na nuvem — o progresso guardado com a conta.
+     *
+     * `cloudStatus` devolve as versões dos dois lados e a decisão de
+     * conflito; `cloudUpload` envia um snapshot local (com a revisão e o
+     * checksum dele); `cloudRestore` repõe uma versão da nuvem — criando um
+     * snapshot local de segurança **antes** de tocar na pasta. Todas exigem
+     * o token da sessão.
+     */
+    readonly cloudStatus: (gameKey: string, token: string) => Promise<{
+      readonly ok: boolean;
+      readonly local?: readonly { readonly id: string; readonly label: string; readonly revision: number; readonly createdAt: string }[];
+      readonly remote?: readonly { readonly id: string; readonly label: string; readonly revision: number; readonly createdAt: string }[];
+      readonly decision?: string;
+      readonly message?: string;
+    }>;
+    readonly cloudUpload: (gameKey: string, snapshotId: string, token: string) => Promise<{
+      readonly ok: boolean;
+      readonly revision?: number;
+      readonly message?: string;
+    }>;
+    readonly cloudRestore: (gameKey: string, cloudId: string, token: string) => Promise<{
+      readonly ok: boolean;
+      readonly revision?: number;
+      readonly message?: string;
+    }>;
+    readonly cloudDelete: (cloudId: string, token: string) => Promise<{
+      readonly ok: boolean;
+      readonly message?: string;
+    }>;
   };
   readonly downloads: {
     readonly list: () => Promise<DownloadsListView>;

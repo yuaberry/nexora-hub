@@ -475,4 +475,16 @@ canto (`cover`), e um logo com margens continua contido (`contain`).
 A parede da biblioteca (`GameCapsule`) é o formato das lojas: cápsula vertical,
 horas jogadas no canto (a medida real do runner, só a partir de uma hora), e o
 botão de jogar por baixo — desactivado numa entrada de catálogo, que não tem
-executável.
+executável.\n
+## D7 (revista de novo, 2026-11-22) — saves na nuvem na própria API
+
+A decisão original punha os saves no Nexora Cloud externo, por separação de
+serviços. Foi revista: os saves passaram a viver na **própria API**
+(`modules/saves`), pelas mesmas contas e no mesmo envelope de erros, por três
+razões — (1) a conta já existe aqui, e um segundo sistema de contas seria um
+problema, não uma feature; (2) o conteúdo é binário e opaco, e um arquivo em
+disco ao lado da base serve a pergunta sem encher PostgreSQL; (3) a revisão e
+o checksum no índice permitem a decisão de conflito no cliente, onde as duas
+cópias existem. O contrato com o Nexora Cloud externo fica como *stub* em
+`packages/cloud` — cross-save entre serviços continua fase futura, e agora
+claramente separado do que já funciona.

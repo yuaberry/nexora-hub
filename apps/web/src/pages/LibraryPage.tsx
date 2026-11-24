@@ -10,6 +10,7 @@ import {
   useInterface,
 } from '@nexora/ui';
 import type { LibraryGame } from '@nexora/protocol';
+import { steamPortraitUrl } from '@nexora/core';
 import * as api from '../api/library.js';
 import { accessToken } from '../api/client.js';
 
@@ -30,6 +31,7 @@ export function LibraryPage(): ReactNode {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<readonly string[]>([]);
+  const [synced, setSynced] = useState<readonly api.SyncedEntry[] | null>(null);
 
   const load = useCallback(async () => {
     if (accessToken() === null) {
@@ -48,6 +50,30 @@ export function LibraryPage(): ReactNode {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // A biblioteca sincronizada: o metadado que o launcher subiu para a conta.
+  useEffect(() => {
+    if (accessToken() === null) {
+      setSynced([]);
+      return;
+    }
+    let cancelled = false;
+    void api
+      .syncedLibrary()
+      .then((response) => {
+        if (!cancelled) {
+          setSynced(response.items);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSynced([]);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Sugestões ao digitar: a pesquisa é a do catálogo curado, servida pela API.
   useEffect(() => {
@@ -170,6 +196,48 @@ export function LibraryPage(): ReactNode {
           ))}
         </div>
       )}
+
+      <div className="nx-stack">
+        <div className="nx-row nx-row--between">
+          <div className="nx-stack">
+            <h2 className="nx-title">{t('web.synced.title')}</h2>
+            <p className="nx-subtitle">{t('web.synced.subtitle')}</p>
+          </div>
+        </div>
+
+        {synced === null ? (
+          <p>{t('common.loading')}</p>
+        ) : accessToken() === null ? (
+          <EmptyState title={t('web.synced.title')} hint={t('web.synced.signIn')} />
+        ) : synced.length === 0 ? (
+          <EmptyState title={t('web.synced.title')} hint={t('web.synced.empty')} />
+        ) : (
+          <div className="hub-library-grid">
+            {synced.map((entry) => (
+              <div className="nx-card" key={entry.externalKey}>
+                <div className="nx-stack">
+                  <span className="nx-cover" style={{ aspectRatio: '2 / 3' }}>
+                    {entry.steamAppId === null && entry.coverUrl === null ? (
+                      <span aria-hidden="true">{entry.title.slice(0, 1).toUpperCase()}</span>
+                    ) : (
+                      <img
+                        src={entry.coverUrl ?? steamPortraitUrl(entry.steamAppId ?? '')}
+                        alt=""
+                        loading="lazy"
+                      />
+                    )}
+                  </span>
+                  <strong>{entry.title}</strong>
+                  <span className="nx-subtitle">
+                    {entry.installed ? t('web.synced.installed') : t('web.synced.library')}
+                    {entry.favorite ? ` · ${t('web.synced.favorite')}` : ''}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Card>
         <div className="nx-row nx-row--between">

@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.2.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-740%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-741%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -134,8 +134,9 @@ código de saída, tempo gravado).
 ### ☁️ A tua conta
 - **Saves na nuvem** — versões dos dois lados e a decisão de conflito
 - **Biblioteca sincronizada** — o metadado da tua biblioteca sobe para a conta
-  (título, appid, favorito, tempo medido); **caminhos locais e executáveis
-  ficam na tua máquina** — a conta não precisa de saber onde os ficheiros estão
+  (título, appid, favorito, tempo medido) e a **web mostra-a**, com a cápsula
+  reconstruída a partir do appid; **caminhos locais e executáveis ficam na tua
+  máquina** — a conta não precisa de saber onde os ficheiros estão
 
 ### ☁️ Saves na nuvem
 - **O teu progresso com a conta** — versões dos dois lados (computador e
@@ -293,7 +294,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **740 verdes** (164 contra PostgreSQL real) |
+| **Testes** | **741 verdes** (164 contra PostgreSQL real) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real (último: capas da loja que não carregavam no Electron, logo cortado em moldura retrato, import perdido que silenciava o cache) |
 | **Build** | Linux + Windows empacotados a cada versão |

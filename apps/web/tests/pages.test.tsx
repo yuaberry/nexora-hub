@@ -49,7 +49,17 @@ function render(path: string, locale: 'pt-BR' | 'en' = 'pt-BR', authenticated = 
 }
 
 describe('estrutura da web', () => {
-  it('a rota de login mostra o formulário em PT-BR', () => {
+
+  it('a biblioteca sincronizada explica de onde vem a cápsula', () => {
+    // A rota exige sessão; com sessão (e sem rede no teste) a secção mostra
+    // o estado vazio honesto — e diz de onde vem a arte.
+    const html = render('/biblioteca', 'pt-BR', true);
+    expect(html).toContain('A tua biblioteca');
+    expect(html).toContain('arte pública da Steam');
+    expect(html).toContain('A carregar'); // sem rede no teste, o estado honesto de carregamento
+  });
+
+    it('a rota de login mostra o formulário em PT-BR', () => {
     const html = render('/login', 'pt-BR');
     expect(html).toContain('Entrar no NEXORA HUB');
     expect(html).toContain('E-mail');

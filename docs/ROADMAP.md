@@ -660,7 +660,25 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 3f — Biblioteca sincronizada com a conta (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 3g — A web mostra a biblioteca sincronizada (2026-11-24)
+
+### Entregue
+
+- [x] **Web** — secção "A tua biblioteca" na página da Biblioteca: o metadado
+      que o launcher subiu para a conta, com a cápsula reconstruída a partir
+      do **appid** (a arte pública da Steam — caminhos locais nunca sobem);
+      sem sessão ou sem jogos sincronizados, diz o que falta.
+- [x] **Cliente** (`syncedLibrary`) e dependência do `@nexora/core` na web
+      (a mesma fonte do padrão da cápsula — sem URL duplicada).
+
+### Prova de execução real (2026-11-24)
+
+- o ciclo completo: o launcher sincronizou 7 jogos (prova do lote anterior),
+      a API guarda-os (`GET /api/v1/library/mine` → 7 entradas com appids) e a
+      web passa a mostrá-los com a cápsula por appid;
+- teste de estrutura: a secção renderiza com o título, a explicação honesta
+      da origem da arte e o estado de carregamento;
+- `pnpm typecheck` limpo; **741 testes verdes** no total.\n\n## Fase 3f — Biblioteca sincronizada com a conta (2026-11-24)
 
 ### Entregue
 

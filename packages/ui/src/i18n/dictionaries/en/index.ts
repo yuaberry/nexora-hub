@@ -29,6 +29,7 @@ import { forums } from './forums.js';
 import { clans } from './clans.js';
 import { events } from './events.js';
 import { diagnostics } from './diagnostics.js';
+import { syncedLibrary } from './synced-library.js';
 import { pages } from './pages.js';
 
 /**
@@ -69,5 +70,6 @@ export const en = {
   ...clans,
   ...events,
   ...diagnostics,
+  ...syncedLibrary,
   ...pages,
 };

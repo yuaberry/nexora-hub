@@ -84,3 +84,24 @@ export function adminOverview() {
     '/api/v1/admin/overview',
   );
 }
+/**
+ * A biblioteca sincronizada da conta.
+ *
+ * O launcher sobe o **metadado** (título, appid, favorito, tempo medido) e a
+ * web mostra-o: a cápsula é reconstruída a partir do appid (a arte pública da
+ * Steam), porque caminhos locais nunca sobem.
+ */
+export interface SyncedEntry {
+  readonly externalKey: string;
+  readonly title: string;
+  readonly steamAppId: string | null;
+  readonly coverUrl: string | null;
+  readonly installed: boolean;
+  readonly favorite: boolean;
+  readonly totalSeconds: number;
+  readonly updatedAt: string;
+}
+
+export function syncedLibrary() {
+  return apiRequest<{ items: SyncedEntry[]; total: number }>('/api/v1/library/mine');
+}

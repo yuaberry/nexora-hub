@@ -23,6 +23,15 @@ const MAX_BODY_LENGTH = 4_000;
 const MAX_PAGE_LIMIT = 50;
 
 /**
+ * Query do jogo.
+ *
+ * O identificador do jogo na biblioteca local é um **caminho**
+ * (`/home/…/steamapps/common/…`): barras codificadas não sobrevivem ao
+ * roteador de caminhos, por isso o jogo viaja na *query*.
+ */
+const GameQuery = z.object({ game: z.string().min(1).max(512) });
+
+/**
  * Tempo mínimo de jogo para poder reviewar (10 minutos).
  *
  * Regra inspirada na análise do Hydra ("reviews unlocked once you have
@@ -95,8 +104,12 @@ function reviewView(row: {
 export function registerCommunityRoutes(app: FastifyInstance, repositories: Repositories): void {
   // ---- Comentários ----------------------------------------------------
 
-  app.get('/api/v1/games/:gameId/comments', async (request) => {
-    const gameId = (request.params as { gameId: string }).gameId;
+  app.get('/api/v1/comments', async (request) => {
+    const params = GameQuery.safeParse(request.query);
+    if (!params.success) {
+      throw errors.invalidRequest('Jogo inválido.');
+    }
+    const gameId = params.data.game;
     const query = request.query as Record<string, unknown>;
     const limit = Number(query['limit'] ?? 20);
     const offset = Number(query['offset'] ?? 0);
@@ -112,9 +125,13 @@ export function registerCommunityRoutes(app: FastifyInstance, repositories: Repo
     return { items, page: pageMeta(items.length, { limit, offset }), hasMore: items.length === limit };
   });
 
-  app.post('/api/v1/games/:gameId/comments', async (request, reply) => {
+  app.post('/api/v1/comments', async (request, reply) => {
     const user = requireAuth(request);
-    const gameId = (request.params as { gameId: string }).gameId;
+    const params = GameQuery.safeParse(request.query);
+    if (!params.success) {
+      throw errors.invalidRequest('Jogo inválido.');
+    }
+    const gameId = params.data.game;
     const parsed = CommentBody.safeParse(request.body);
     if (!parsed.success) {
       throw errors.invalidRequest('Payload inválido.', [
@@ -140,8 +157,12 @@ export function registerCommunityRoutes(app: FastifyInstance, repositories: Repo
 
   // ---- Reviews --------------------------------------------------------
 
-  app.get('/api/v1/games/:gameId/reviews', async (request) => {
-    const gameId = (request.params as { gameId: string }).gameId;
+  app.get('/api/v1/reviews', async (request) => {
+    const params = GameQuery.safeParse(request.query);
+    if (!params.success) {
+      throw errors.invalidRequest('Jogo inválido.');
+    }
+    const gameId = params.data.game;
     const query = request.query as Record<string, unknown>;
     const limit = Number(query['limit'] ?? 20);
     const offset = Number(query['offset'] ?? 0);
@@ -168,9 +189,13 @@ export function registerCommunityRoutes(app: FastifyInstance, repositories: Repo
   });
 
   // Cria ou substitui a review do utilizador (uma por jogo).
-  app.put('/api/v1/games/:gameId/reviews/me', async (request) => {
+  app.put('/api/v1/reviews/me', async (request) => {
     const user = requireAuth(request);
-    const gameId = (request.params as { gameId: string }).gameId;
+    const params = GameQuery.safeParse(request.query);
+    if (!params.success) {
+      throw errors.invalidRequest('Jogo inválido.');
+    }
+    const gameId = params.data.game;
     const parsed = ReviewBody.safeParse(request.body);
     if (!parsed.success) {
       throw errors.invalidRequest('Payload inválido.', [

@@ -25,6 +25,7 @@ import { overlay } from './overlay.js';
 import { steamSync } from './steam-sync.js';
 import { catalog } from './catalog.js';
 import { cloud } from './cloud.js';
+import { forums } from './forums.js';
 import { pages } from './pages.js';
 
 /**
@@ -61,5 +62,6 @@ export const en = {
   ...steamSync,
   ...catalog,
   ...cloud,
+  ...forums,
   ...pages,
 };

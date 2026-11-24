@@ -78,6 +78,13 @@ export function forwardToApi(
     });
 
     if (body !== undefined && body !== '') {
+      // O comprimento do corpo é **obrigatório**: sem `content-length` (e sem
+      // `transfer-encoding: chunked`), o servidor não sabe onde o corpo
+      // acaba — e o Fastify devolve-o como texto em vez de o parsear como
+      // JSON. A prova ao vivo apanhou isto: um POST com corpo chegava à API
+      // como *string*, e a validação falhava com "payload inválido".
+      const length = Buffer.byteLength(body);
+      upstream.setHeader('content-length', length);
       upstream.write(body);
     }
     upstream.end();

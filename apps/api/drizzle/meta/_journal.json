@@ -36,6 +36,13 @@
       "when": 1795298280959,
       "tag": "0004_achievements",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795335000000,
+      "tag": "0005_forums",
+      "breakpoints": true
     }
   ]
 }

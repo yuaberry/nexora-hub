@@ -15,6 +15,7 @@ export * from './library-schema.js';
 export * from './sessions-schema.js';
 export * from './audit-schema.js';
 export * from './community-schema.js';
+export * from './forums-schema.js';
 export * from './wishlist-schema.js';
 export * from './family-schema.js';
 export * from './friends-schema.js';

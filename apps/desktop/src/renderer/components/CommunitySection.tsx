@@ -56,8 +56,8 @@ export function CommunitySection({ gameId }: { readonly gameId: string }): React
   const reload = useCallback(async () => {
     try {
       const [commentList, reviewList] = await Promise.all([
-        apiRequest<{ items: CommentView[] }>(`/api/v1/games/${gameId}/comments`),
-        apiRequest<{ items: ReviewView[] }>(`/api/v1/games/${gameId}/reviews`),
+        apiRequest<{ items: CommentView[] }>(`/api/v1/comments?game=${encodeURIComponent(gameId)}`),
+        apiRequest<{ items: ReviewView[] }>(`/api/v1/reviews?game=${encodeURIComponent(gameId)}`),
       ]);
       setComments(commentList.items);
       setReviews(reviewList.items);
@@ -81,7 +81,7 @@ export function CommunitySection({ gameId }: { readonly gameId: string }): React
       return;
     }
     try {
-      const created = await apiRequest<CommentView>(`/api/v1/games/${gameId}/comments`, {
+      const created = await apiRequest<CommentView>(`/api/v1/comments?game=${encodeURIComponent(gameId)}`, {
         method: 'POST',
         body: { body: draft.trim() },
       });
@@ -96,7 +96,7 @@ export function CommunitySection({ gameId }: { readonly gameId: string }): React
   const onReview = useCallback(async () => {
     const optional = (value: string): number | null => (value.trim() === '' ? null : Number(value));
     try {
-      await apiRequest<ReviewView>(`/api/v1/games/${gameId}/reviews/me`, {
+      await apiRequest<ReviewView>(`/api/v1/reviews/me?game=${encodeURIComponent(gameId)}`, {
         method: 'PUT',
         body: {
           rating: myReview.rating,

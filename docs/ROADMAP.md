@@ -660,7 +660,36 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5c — Descrição real da loja na página do jogo (2026-11-23)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5c — Fóruns de jogo (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/community/forums.ts`) — ordem pela última
+      actividade (respondido sobe), tópico **fechado** só aceita resposta do
+      autor, e os limites declarados — 6 testes.
+- [x] **API** (`modules/forums`) — tópicos e respostas atrás de sessão; fechar
+      e apagar filtram pelo dono (**404**, nunca 403); migração `0005` com
+      índices por jogo/actividade e tópico/criação — 5 testes de integração.
+- [x] **Interface** — cartão "Fórum" nos detalhes: criar tópico, abrir,
+      responder, fechar/reabrir e apagar (só o que é do utilizador); sem
+      sessão, explica o que falta.
+- [x] **Bugs reais corrigidos** (apanhados pela prova ao vivo):
+      - o **proxy** reencaminhava o corpo sem `content-length` — o servidor
+        não sabe onde o corpo acaba;
+      - o jogo é identificado por um **caminho** (`/home/…/common/…`): barras
+        codificadas não sobrevivem ao roteador de caminhos — comentários,
+        reviews e fóruns passaram a levar o jogo na *query* (web e desktop);
+      - a secção passava o corpo **já convertido** a um cliente que converte
+        sozinho (dupla codificação) — a API recebia texto, não objecto.
+
+### Prova de execução real (2026-11-24)
+
+- conta nova criada pela interface; tópico "Onde ficam os amuletos?" criado
+      pelo formulário e **apareceu na lista**;
+- tópico aberto, resposta "Fica na Cidade das Lágrimas." enviada e **visível
+      no tópico**;
+- o POST directo pelo proxy da app devolveu 201 (caminho com barras incluído);
+- `pnpm typecheck` limpo; **698 testes verdes** no total.\n\n## Fase 5c — Descrição real da loja na página do jogo (2026-11-23)
 
 ### Entregue
 

@@ -43,12 +43,12 @@ export interface ReviewAggregate {
 
 /** Lista os comentários de um jogo. */
 export function comments(gameId: string) {
-  return apiRequest<{ items: Comment[] }>(`/api/v1/games/${gameId}/comments`);
+  return apiRequest<{ items: Comment[] }>(`/api/v1/comments?game=${encodeURIComponent(gameId)}`);
 }
 
 /** Cria um comentário (exige sessão). */
 export function createComment(gameId: string, body: string) {
-  return apiRequest<Comment>(`/api/v1/games/${gameId}/comments`, { method: 'POST', body: { body } });
+  return apiRequest<Comment>(`/api/v1/comments?game=${encodeURIComponent(gameId)}`, { method: 'POST', body: { body } });
 }
 
 /** Apaga um comentário próprio. */
@@ -58,7 +58,7 @@ export function deleteComment(commentId: string) {
 
 /** Lista as reviews de um jogo, com o agregado. */
 export function reviews(gameId: string) {
-  return apiRequest<{ items: Review[]; aggregate: ReviewAggregate }>(`/api/v1/games/${gameId}/reviews`);
+  return apiRequest<{ items: Review[]; aggregate: ReviewAggregate }>(`/api/v1/reviews?game=${encodeURIComponent(gameId)}`);
 }
 
 /** Cria ou substitui a review do utilizador (exige sessão). */
@@ -73,7 +73,7 @@ export function upsertReview(
     body?: string;
   },
 ) {
-  return apiRequest<Review>(`/api/v1/games/${gameId}/reviews/me`, { method: 'PUT', body: input });
+  return apiRequest<Review>(`/api/v1/reviews/me?game=${encodeURIComponent(gameId)}`, { method: 'PUT', body: input });
 }
 
 /** Apaga a review do utilizador. */

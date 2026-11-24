@@ -7,6 +7,7 @@ import { coverFit, coverUrl } from '../lib/media.js';
 import type { CollectionView } from '../../shared/preload-api.js';
 import { formatDate, formatPlayTime } from '../lib/format.js';
 import { CommunitySection } from '../components/CommunitySection.js';
+import { ForumSection } from '../components/ForumSection.js';
 import { PerformanceCard } from '../components/PerformanceCard.js';
 import { ModsSection } from '../components/ModsSection.js';
 import { DlcSection } from '../components/DlcSection.js';
@@ -215,6 +216,9 @@ export function GameDetailPage({
       <CloudSavesCard gameKey={game.externalKey} />
 
       <CommunitySection gameId={game.externalKey} />
+
+      {/* Fórum do jogo: tópicos e respostas, com as regras da API. */}
+      <ForumSection gameId={game.externalKey} />
 
       {/* Sobre: a descrição curta da loja, guardada para uso offline. */}
       <AboutSection game={game} />

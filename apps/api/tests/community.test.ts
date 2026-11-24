@@ -42,7 +42,7 @@ describe('comentários', () => {
     const built = await buildTestApp();
     const response = await built.app.inject({
       method: 'POST',
-      url: '/api/v1/games/league-of-legends/comments',
+      url: '/api/v1/comments?game=league-of-legends',
       payload: { body: 'Muito bom!' },
     });
     expect(response.statusCode).toBe(401);
@@ -54,14 +54,14 @@ describe('comentários', () => {
 
     const created = await built.app.inject({
       method: 'POST',
-      url: '/api/v1/games/league-of-legends/comments',
+      url: '/api/v1/comments?game=league-of-legends',
       headers: authHeader(user.accessToken),
       payload: { body: 'Melhor jogo do mundo.' },
     });
     expect(created.statusCode).toBe(201);
     const comment = created.json() as { id: string; body: string };
 
-    const list = await built.app.inject({ method: 'GET', url: '/api/v1/games/league-of-legends/comments' });
+    const list = await built.app.inject({ method: 'GET', url: '/api/v1/comments?game=league-of-legends' });
     expect((list.json() as { items: { id: string }[] }).items.some((item) => item.id === comment.id)).toBe(true);
 
     const removed = await built.app.inject({
@@ -71,7 +71,7 @@ describe('comentários', () => {
     });
     expect(removed.statusCode).toBe(204);
 
-    const after = await built.app.inject({ method: 'GET', url: '/api/v1/games/league-of-legends/comments' });
+    const after = await built.app.inject({ method: 'GET', url: '/api/v1/comments?game=league-of-legends' });
     expect((after.json() as { items: { id: string }[] }).items.some((item) => item.id === comment.id)).toBe(false);
   });
 
@@ -82,7 +82,7 @@ describe('comentários', () => {
 
     const created = await built.app.inject({
       method: 'POST',
-      url: '/api/v1/games/terraria/comments',
+      url: '/api/v1/comments?game=terraria',
       headers: authHeader(owner.accessToken),
       payload: { body: 'Meu comentário.' },
     });
@@ -101,7 +101,7 @@ describe('comentários', () => {
     const user = await registerUser(built.app, 'com4@nexora.local');
     const response = await built.app.inject({
       method: 'POST',
-      url: '/api/v1/games/terraria/comments',
+      url: '/api/v1/comments?game=terraria',
       headers: authHeader(user.accessToken),
       payload: { body: '' },
     });
@@ -117,7 +117,7 @@ describe('reviews', () => {
 
     const first = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/league-of-legends/reviews/me',
+      url: '/api/v1/reviews/me?game=league-of-legends',
       headers: authHeader(user.accessToken),
       payload: { rating: 6, body: 'Bom, mas o cliente…' },
     });
@@ -126,13 +126,13 @@ describe('reviews', () => {
 
     const second = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/league-of-legends/reviews/me',
+      url: '/api/v1/reviews/me?game=league-of-legends',
       headers: authHeader(user.accessToken),
       payload: { rating: 9, story: 8, gameplay: 10 },
     });
     expect((second.json() as { rating: number }).rating).toBe(9);
 
-    const list = await built.app.inject({ method: 'GET', url: '/api/v1/games/league-of-legends/reviews' });
+    const list = await built.app.inject({ method: 'GET', url: '/api/v1/reviews?game=league-of-legends' });
     const body = list.json() as { items: { rating: number }[] };
     expect(body.items).toHaveLength(1);
     expect(body.items[0]?.rating).toBe(9);
@@ -147,18 +147,18 @@ describe('reviews', () => {
 
     await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/terraria/reviews/me',
+      url: '/api/v1/reviews/me?game=terraria',
       headers: authHeader(first.accessToken),
       payload: { rating: 8, story: 10, gameplay: 6 },
     });
     await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/terraria/reviews/me',
+      url: '/api/v1/reviews/me?game=terraria',
       headers: authHeader(second.accessToken),
       payload: { rating: 6, story: 8, gameplay: 8 },
     });
 
-    const response = await built.app.inject({ method: 'GET', url: '/api/v1/games/terraria/reviews' });
+    const response = await built.app.inject({ method: 'GET', url: '/api/v1/reviews?game=terraria' });
     const body = response.json() as {
       aggregate: { count: number; averageRating: number; averageStory: number | null; averageSound: number | null };
     };
@@ -174,7 +174,7 @@ describe('reviews', () => {
     const user = await registerUser(built.app, 'rev4@nexora.local');
     const response = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/terraria/reviews/me',
+      url: '/api/v1/reviews/me?game=terraria',
       headers: authHeader(user.accessToken),
       payload: { rating: 11 },
     });
@@ -188,7 +188,7 @@ describe('reviews', () => {
 
     const created = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/terraria/reviews/me',
+      url: '/api/v1/reviews/me?game=terraria',
       headers: authHeader(owner.accessToken),
       payload: { rating: 7 },
     });
@@ -209,7 +209,7 @@ describe('regra: reviewar depois de jogar', () => {
 
     const response = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/league-of-legends/reviews/me',
+      url: '/api/v1/reviews/me?game=league-of-legends',
       headers: authHeader(user.accessToken),
       payload: { rating: 9 },
     });
@@ -226,7 +226,7 @@ describe('regra: reviewar depois de jogar', () => {
 
     const response = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/league-of-legends/reviews/me',
+      url: '/api/v1/reviews/me?game=league-of-legends',
       headers: authHeader(user.accessToken),
       payload: { rating: 8 },
     });
@@ -240,7 +240,7 @@ describe('regra: reviewar depois de jogar', () => {
 
     const response = await built.app.inject({
       method: 'PUT',
-      url: '/api/v1/games/league-of-legends/reviews/me',
+      url: '/api/v1/reviews/me?game=league-of-legends',
       headers: authHeader(user.accessToken),
       payload: { rating: 9, story: 10 },
     });

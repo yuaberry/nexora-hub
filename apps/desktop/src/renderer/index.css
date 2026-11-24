@@ -540,6 +540,24 @@ body {
   max-width: 90ch;
 }
 
+
+/* Ligação de lista (título de tópico) — sobe como botão, lê-se como texto. */
+.hub-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--paper-ink-strong);
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+
+.hub-link:hover {
+  color: var(--paper-accent);
+  text-decoration: underline;
+}
+
 /* ---------- Prateleiras (montra horizontal) ------------------------------ */
 
 .hub-shelf {

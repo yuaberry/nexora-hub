@@ -496,6 +496,7 @@ export interface WishlistRepository {
 export interface Repositories {
   readonly comments: CommentRepository;
   readonly reviews: ReviewRepository;
+  readonly forums: ForumRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -538,6 +539,64 @@ export interface CommentRepository {
   readonly listByUser: (userId: string, limit: number) => Promise<readonly CommentRecord[]>;
   /** Apaga um comentário **do dono** (devolve `false` se não for dele). */
   readonly deleteOwned: (commentId: string, userId: string) => Promise<boolean>;
+}
+
+/** Um tópico de fórum (o que a lista mostra). */
+export interface ForumThreadRecord {
+  readonly id: string;
+  readonly gameId: string;
+  readonly authorId: string;
+  readonly title: string;
+  /** O corpo da primeira mensagem (a pergunta). */
+  readonly body: string;
+  readonly replyCount: number;
+  /** Fechado pelo autor: só ele responde. */
+  readonly locked: boolean;
+  readonly createdAt: Date;
+  readonly lastActivityAt: Date;
+}
+
+/** Uma resposta dentro de um tópico. */
+export interface ForumPostRecord {
+  readonly id: string;
+  readonly threadId: string;
+  readonly authorId: string;
+  readonly body: string;
+  readonly createdAt: Date;
+}
+
+/** Entrada para criar um tópico. */
+export interface NewThreadInput {
+  readonly gameId: string;
+  readonly authorId: string;
+  readonly title: string;
+  readonly body: string;
+}
+
+/** Entrada para criar uma resposta. */
+export interface NewPostInput {
+  readonly threadId: string;
+  readonly authorId: string;
+  readonly body: string;
+}
+
+export interface ForumRepository {
+  /** Cria um tópico (a primeira mensagem é o corpo). */
+  readonly createThread: (input: NewThreadInput) => Promise<ForumThreadRecord>;
+  /** Lista os tópicos de um jogo, do mais activo para o menos activo. */
+  readonly listThreads: (gameId: string, limit: number, offset: number) => Promise<readonly ForumThreadRecord[]>;
+  /** Procura um tópico pelo id. */
+  readonly findThread: (threadId: string) => Promise<ForumThreadRecord | null>;
+  /** Cria uma resposta e faz o tópico subir (actividade e contagem). */
+  readonly createPost: (input: NewPostInput) => Promise<ForumPostRecord>;
+  /** Lista as respostas de um tópico, da mais antiga para a mais recente. */
+  readonly listPosts: (threadId: string, limit: number, offset: number) => Promise<readonly ForumPostRecord[]>;
+  /** Fecha ou abre um tópico **do autor** (`false` se não for dele). */
+  readonly setLocked: (threadId: string, authorId: string, locked: boolean) => Promise<boolean>;
+  /** Apaga um tópico **do autor** (e as suas respostas). */
+  readonly deleteOwnedThread: (threadId: string, authorId: string) => Promise<boolean>;
+  /** Apaga uma resposta **do autor**. */
+  readonly deleteOwnedPost: (postId: string, authorId: string) => Promise<boolean>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

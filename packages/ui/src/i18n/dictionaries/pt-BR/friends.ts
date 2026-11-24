@@ -1,5 +1,6 @@
 /** Dicionário PT-BR — amigos e presença. */
 export const friends = {
+  'nav.clans': 'Clãs',
   'nav.friends': 'Amigos',
   'friends.title': 'Amigos',
   'friends.subtitle': 'A presença é um coração que bate: quem joga mostra o jogo, quem para de bater fica offline.',

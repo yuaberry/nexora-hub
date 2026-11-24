@@ -18,11 +18,13 @@ import { PostgresChatRepository } from './postgres-chat.js';
 import { PostgresAchievementRepository } from './postgres-achievements.js';
 import { MemoryCommentRepository, MemoryReviewRepository } from './memory-community.js';
 import { MemoryForumRepository } from './memory-forums.js';
+import { MemoryClanRepository } from './memory-clans.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
 import { PostgresAuthSessionRepository, PostgresMfaRepository } from './postgres-auth.js';
 import { PostgresCommentRepository, PostgresReviewRepository } from './postgres-community.js';
 import { PostgresForumRepository } from './postgres-forums.js';
+import { PostgresClanRepository } from './postgres-clans.js';
 import { PostgresLibraryRepository, PostgresPlaySessionRepository } from './postgres-game.js';
 import type { Repositories } from './types.js';
 
@@ -44,6 +46,7 @@ export function createMemoryRepositories(): Repositories {
     mfa: new MemoryMfaRepository(),
     comments: new MemoryCommentRepository(),
     forums: new MemoryForumRepository(),
+    clans: new MemoryClanRepository(),
     reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
     wishlist: new MemoryWishlistRepository(),
@@ -79,6 +82,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     mfa: new PostgresMfaRepository(database.db),
     comments: new PostgresCommentRepository(database.db),
     forums: new PostgresForumRepository(database.db),
+    clans: new PostgresClanRepository(database.db),
     reviews: new PostgresReviewRepository(database.db),
     library: new PostgresLibraryRepository(database.db),
     sessions: new PostgresPlaySessionRepository(database.db),

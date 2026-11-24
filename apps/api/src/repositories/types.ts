@@ -497,6 +497,7 @@ export interface Repositories {
   readonly comments: CommentRepository;
   readonly reviews: ReviewRepository;
   readonly forums: ForumRepository;
+  readonly clans: ClanRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -597,6 +598,74 @@ export interface ForumRepository {
   readonly deleteOwnedThread: (threadId: string, authorId: string) => Promise<boolean>;
   /** Apaga uma resposta **do autor**. */
   readonly deleteOwnedPost: (postId: string, authorId: string) => Promise<boolean>;
+}
+
+/** Um clã. */
+export interface ClanRecord {
+  readonly id: string;
+  readonly name: string;
+  readonly tag: string;
+  readonly description: string;
+  readonly ownerId: string;
+  readonly memberCount: number;
+  readonly createdAt: Date;
+}
+
+/** Uma pertença. */
+export interface ClanMemberRecord {
+  readonly clanId: string;
+  readonly userId: string;
+  /** `owner`, `officer` ou `member`. */
+  readonly role: string;
+  readonly joinedAt: Date;
+}
+
+/** Um convite (por email de quem foi convidado). */
+export interface ClanInviteRecord {
+  readonly id: string;
+  readonly clanId: string;
+  readonly inviterId: string;
+  readonly inviteeEmail: string;
+  /** `pending`, `accepted` ou `declined`. */
+  readonly status: string;
+  readonly createdAt: Date;
+  readonly answeredAt: Date | null;
+}
+
+/** O que a criação de um clã devolve (ou o motivo da recusa). */
+export type ClanCreation =
+  | { readonly ok: true; readonly clan: ClanRecord; readonly membership: ClanMemberRecord }
+  | { readonly ok: false; readonly reason: 'name-taken' | 'name-invalid' | 'tag-invalid' };
+
+export interface ClanRepository {
+  /** Cria um clã (o criador é o dono e primeiro membro). */
+  readonly create: (input: { name: string; tag: string; description: string; ownerId: string }) => Promise<ClanCreation>;
+  /** Procura um clã pelo id. */
+  readonly findById: (clanId: string) => Promise<ClanRecord | null>;
+  /** Procura um clã pelo nome (o nome é único). */
+  readonly findByName: (name: string) => Promise<ClanRecord | null>;
+  /** Lista os clãs de um utilizador (os que é membro). */
+  readonly listByUser: (userId: string) => Promise<readonly { readonly clan: ClanRecord; readonly role: string }[]>;
+  /** Os membros de um clã, dos mais antigos para os mais recentes. */
+  readonly members: (clanId: string) => Promise<readonly ClanMemberRecord[]>;
+  /** A pertença de um utilizador num clã (`null` se não for membro). */
+  readonly membership: (clanId: string, userId: string) => Promise<ClanMemberRecord | null>;
+  /** Convida por email (um convite pendente por convidado e clã). */
+  readonly invite: (input: { clanId: string; inviterId: string; inviteeEmail: string }) => Promise<ClanInviteRecord>;
+  /** Os convites pendentes para um email. */
+  readonly pendingInvites: (email: string) => Promise<readonly ClanInviteRecord[]>;
+  /** Procura um convite pelo id. */
+  readonly findInvite: (inviteId: string) => Promise<ClanInviteRecord | null>;
+  /** Responde a um convite (`accepted` ou `declined`). */
+  readonly answerInvite: (inviteId: string, status: 'accepted' | 'declined') => Promise<ClanInviteRecord | null>;
+  /** Junta um membro ao clã (a pertença e a contagem andam juntas). */
+  readonly join: (clanId: string, userId: string) => Promise<ClanMemberRecord | null>;
+  /** Muda o papel de um membro. */
+  readonly setRole: (clanId: string, userId: string, role: string) => Promise<boolean>;
+  /** Remove um membro (a pertença e a contagem andam juntas). */
+  readonly removeMember: (clanId: string, userId: string) => Promise<boolean>;
+  /** Apaga um clã e tudo o que é dele. */
+  readonly dissolve: (clanId: string) => Promise<boolean>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

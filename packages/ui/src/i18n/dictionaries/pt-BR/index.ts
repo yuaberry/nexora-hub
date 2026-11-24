@@ -26,6 +26,7 @@ import { steamSync } from './steam-sync.js';
 import { catalog } from './catalog.js';
 import { cloud } from './cloud.js';
 import { forums } from './forums.js';
+import { clans } from './clans.js';
 import { pages } from './pages.js';
 
 /**
@@ -65,5 +66,6 @@ export const ptBR = {
   ...catalog,
   ...cloud,
   ...forums,
+  ...clans,
   ...pages,
 } as const;

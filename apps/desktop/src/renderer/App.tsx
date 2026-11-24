@@ -12,6 +12,7 @@ import { StorePage } from './pages/StorePage.js';
 import { StatsPage } from './pages/StatsPage.js';
 import { FamilyPage } from './pages/FamilyPage.js';
 import { FriendsPage } from './pages/FriendsPage.js';
+import { ClansPage } from './pages/ClansPage.js';
 import { OptimizerPage } from './pages/OptimizerPage.js';
 import { ChatPage } from './pages/ChatPage.js';
 import { AchievementsPage } from './pages/AchievementsPage.js';
@@ -47,6 +48,7 @@ export type Route =
   | { readonly name: 'optimizer' }
   | { readonly name: 'chat'; readonly with?: { readonly userId: string; readonly displayName: string | null; readonly email: string } }
   | { readonly name: 'achievements' }
+  | { readonly name: 'clans' }
   | { readonly name: 'benchmark' }
   | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule }
@@ -79,7 +81,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'bigpicture') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'bigpicture') => {
       navigate({ name: target });
     },
     [navigate],
@@ -117,7 +119,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'bigpicture') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'bigpicture') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -176,6 +178,7 @@ function Shell({
       {route.name === 'store' ? <StorePage /> : null}
       {route.name === 'stats' ? <StatsPage /> : null}
       {route.name === 'family' ? <FamilyPage /> : null}
+      {route.name === 'clans' ? <ClansPage /> : null}
       {route.name === 'friends' ? (
         <FriendsPage
           onMessage={(friend) =>
@@ -229,6 +232,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.family');
     case 'friends':
       return t('nav.friends');
+    case 'clans':
+      return t('nav.clans');
     case 'optimizer':
       return t('nav.optimizer');
     case 'chat':

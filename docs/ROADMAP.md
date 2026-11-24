@@ -660,7 +660,31 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5c — Fóruns de jogo (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5d — Clãs (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/community/clans.ts`) — quem gere (dono e
+      oficiais), quem muda papéis (**só o dono**, e nunca a si próprio), quem
+      sai (todos menos o dono), quem expulsa quem (oficial não expulsa
+      oficial, o dono nunca é expulso) e o limite de 50 membros — 6 testes.
+- [x] **API** (`modules/clans`) — criar (o criador é dono), convidar por
+      email, aceitar/recusar (**o email da sessão tem de ser o do convite**),
+      promover/despromover, expulsar, sair e dissolver; migração `0006` — 6
+      testes de integração.
+- [x] **Interface** — página "Clãs" (barra lateral): criar, ver os meus com
+      papel e contagem, convites recebidos, membros com promoção/expulsão
+      conforme as regras, sair/dissolver; sem sessão, explica o que falta.
+
+### Prova de execução real (2026-11-24)
+
+- clã "[NX] NEXORA" criado pelo formulário e **apareceu na lista**;
+- convite por email (201), aceitação pela segunda conta (200) e a API
+      confirma **2 membros** (`owner`, `member`);
+- a vista da segunda conta mostra o clã com o papel "Membro";
+- bug real corrigido: a aceitação do convite não verificava o email da
+  sessão — qualquer utilizador aceitaria qualquer convite;
+- `pnpm typecheck` limpo; **710 testes verdes** no total.\n\n## Fase 5c — Fóruns de jogo (2026-11-24)
 
 ### Entregue
 

@@ -1,5 +1,6 @@
 /** EN dictionary — friends and presence. */
 export const friends = {
+  'nav.clans': 'Clans',
   'nav.friends': 'Friends',
   'friends.title': 'Friends',
   'friends.subtitle': 'Presence is a beating heart: whoever is playing shows the game, whoever stops beating goes offline.',

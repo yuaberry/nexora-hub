@@ -1,5 +1,13 @@
 /** EN dictionary — achievements and points. */
 export const achievements = {
+  'reputation.level.bronze': 'Bronze',
+  'reputation.level.silver': 'Silver',
+  'reputation.level.gold': 'Gold',
+  'reputation.level.platinum': 'Platinum',
+  'reputation.level.diamond': 'Diamond',
+  'reputation.title': 'Reputation',
+  'reputation.next': '{remaining} points to {level}',
+  'reputation.max': 'Maximum level.',
   'nav.achievements': 'Achievements',
   'achievements.title': 'Achievements',
   'achievements.subtitle': 'Rules over what you actually played — nothing unlocks without sessions.',

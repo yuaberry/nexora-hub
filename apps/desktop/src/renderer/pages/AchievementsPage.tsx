@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Badge, Button, Card, EmptyState, useInterface } from '@nexora/ui';
 import { accessToken } from '../lib/api.js';
+import { ReputationCard } from '../components/ReputationCard.js';
 import type { AchievementProgressView, PointEntryView } from '../../shared/preload-api.js';
 
 /**
@@ -75,6 +76,7 @@ export function AchievementsPage(): ReactNode {
 
   return (
     <div className="nx-stack">
+      <ReputationCard />
       <div className="hub-row hub-row--between">
         <div className="nx-stack">
           <h1 className="nx-title">{t('achievements.title')}</h1>

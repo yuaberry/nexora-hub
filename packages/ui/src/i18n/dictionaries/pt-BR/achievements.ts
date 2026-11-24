@@ -1,5 +1,13 @@
 /** Dicionário PT-BR — conquistas e pontos. */
 export const achievements = {
+  'reputation.level.bronze': 'Bronze',
+  'reputation.level.silver': 'Prata',
+  'reputation.level.gold': 'Ouro',
+  'reputation.level.platinum': 'Platina',
+  'reputation.level.diamond': 'Diamante',
+  'reputation.title': 'Reputação',
+  'reputation.next': 'Faltam {remaining} pontos para {level}',
+  'reputation.max': 'Nível máximo.',
   'nav.achievements': 'Conquistas',
   'achievements.title': 'Conquistas',
   'achievements.subtitle': 'Regras sobre o que realmente jogou — nada se desbloqueia sem sessões.',

@@ -660,7 +660,25 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5e — Eventos da comunidade (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5f — Reputação (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/community/reputation.ts`) — os limiares
+      declarados (Bronze → Diamante) e o progresso honesto: a fracção é
+      aritmética, e no nível máximo não há objectivo fingido — 5 testes.
+- [x] **API** — `GET /api/v1/reputation`: lê o **saldo de pontos real** (sem
+      tabela nova, sem número próprio) e devolve nível, nível seguinte,
+      fracção e o que falta — 2 testes.
+- [x] **Interface** — cartão "Reputação" no topo das Conquistas: nível,
+      pontos, barra de progresso e o que falta para o próximo.
+
+### Prova de execução real (2026-11-24)
+
+- conta nova: `{"points":0,"level":"bronze","next":"silver","remaining":100}`;
+- o cartão na página de Conquistas mostrou **Bronze · 0 · "Faltam 100 pontos
+  para Prata"**;
+- `pnpm typecheck` limpo; **728 testes verdes** no total.\n\n## Fase 5e — Eventos da comunidade (2026-11-24)
 
 ### Entregue
 

@@ -22,6 +22,8 @@ export interface LocalGameRecord {
   readonly cover: string | null;
   /** `true` quando a capa foi escolhida pelo utilizador (nunca auto-substituída). */
   readonly coverChosen: boolean;
+  /** Descrição curta da loja, em texto simples (guardada para funcionar offline). */
+  readonly description: string | null;
   /** `null` quando a entrada veio do catálogo (o jogo não está instalado). */
   readonly installPath: string | null;
   /** `null` quando não há executável conhecido (entrada de catálogo). */
@@ -64,6 +66,7 @@ export class LocalLibrary {
         title text not null,
         cover text,
         cover_chosen integer not null default 0,
+        description text,
         install_path text,
         executable_path text,
         steam_app_id text,
@@ -88,6 +91,11 @@ export class LocalLibrary {
     }
     try {
       this.db.exec('alter table games add column cover_chosen integer not null default 0;');
+    } catch {
+      // a coluna já existe — nada a fazer
+    }
+    try {
+      this.db.exec('alter table games add column description text;');
     } catch {
       // a coluna já existe — nada a fazer
     }
@@ -156,6 +164,7 @@ export class LocalLibrary {
         title text not null,
         cover text,
         cover_chosen integer not null default 0,
+        description text,
         install_path text,
         executable_path text,
         steam_app_id text,
@@ -167,8 +176,8 @@ export class LocalLibrary {
         created_at text not null,
         updated_at text not null
       );
-      insert into games_migrated (id, external_key, title, cover, cover_chosen, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at)
-        select id, external_key, title, cover, cover_chosen, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at from games;
+      insert into games_migrated (id, external_key, title, cover, cover_chosen, description, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at)
+        select id, external_key, title, cover, cover_chosen, null as description, install_path, executable_path, steam_app_id, tags, adult, favorite, last_played_at, total_seconds, created_at, updated_at from games;
       drop table games;
       alter table games_migrated rename to games;
     `);
@@ -369,6 +378,22 @@ export class LocalLibrary {
     return row === undefined ? null : toRecord(row as Record<string, unknown>);
   }
 
+  /**
+   * Guarda a descrição curta de um jogo (vista da loja, para uso offline).
+   *
+   * `null` não apaga o que lá está: uma resposta vazia da loja não deve
+   * limpar uma descrição que já foi buscada com sucesso.
+   */
+  setDescription(id: number, description: string | null): LocalGameRecord | null {
+    if (this.findById(id) === null || description === null) {
+      return this.findById(id);
+    }
+    this.db
+      .prepare('update games set description = ?, updated_at = ? where id = ?')
+      .run(description, new Date().toISOString(), id);
+    return this.findById(id);
+  }
+
   // ---- DLCs declaradas pela loja ----------------------------------------
 
   /**
@@ -502,6 +527,7 @@ function toRecord(row: Record<string, unknown>): LocalGameRecord {
     title: String(row['title']),
     cover: typeof row['cover'] === 'string' ? row['cover'] : null,
     coverChosen: Number(row['cover_chosen'] ?? 0) === 1,
+    description: typeof row['description'] === 'string' ? row['description'] : null,
     installPath: typeof row['install_path'] === 'string' ? row['install_path'] : null,
     executablePath: typeof row['executable_path'] === 'string' ? row['executable_path'] : null,
     steamAppId: typeof steamAppId === 'string' && steamAppId !== '' ? steamAppId : null,

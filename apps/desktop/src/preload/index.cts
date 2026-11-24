@@ -108,6 +108,7 @@ const api: DesktopApi = {
     open: (appId) => ipcRenderer.invoke('steam:open', appId) as Promise<{ ok: boolean }>,
     lookup: (appId) => ipcRenderer.invoke('steam:lookup', appId) as Promise<{ readonly ok: boolean; readonly app?: import('@nexora/core').SteamAppSummary; readonly message?: string }>,
     search: (term) => ipcRenderer.invoke('steam:search', term) as Promise<{ readonly ok: boolean; readonly items?: readonly import('@nexora/core').SteamAppSummary[]; readonly message?: string }>,
+    describe: (gameId) => ipcRenderer.invoke('steam:describe', gameId) as Promise<{ readonly ok: boolean; readonly description?: string; readonly message?: string }>,
     dlcs: (gameId) => ipcRenderer.invoke('steam:dlcs', gameId) as Promise<{ readonly ok: boolean; readonly items?: readonly import('../shared/preload-api.js').DlcView[]; readonly truncated?: number; readonly message?: string }>,
     sync: () => ipcRenderer.invoke('steam:sync') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly added?: number; readonly unchanged?: number; readonly titles?: readonly string[]; readonly message?: string }>,
     coverOptions: (gameId) => ipcRenderer.invoke('steam:coverOptions', gameId) as Promise<{ readonly ok: boolean; readonly options?: readonly { path: string; label: string }[]; readonly message?: string }>,

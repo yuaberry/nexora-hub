@@ -4,6 +4,8 @@ export const steamSync = {
   'steam.sync.running': 'A sincronizar…',
   'steam.sync.unchanged': 'Nada mudou na Steam desde a última vez.',
   'steam.sync.done': '{added} jogos novos, {updated} actualizados a partir dos manifestos da Steam.',
+  'about.title': 'Sobre o jogo',
+  'about.none': 'A loja não deu descrição para este jogo.',
   'covers.title': 'Capa',
   'covers.choose': 'Escolher ficheiro…',
   'covers.steamImages': 'Imagens da Steam',

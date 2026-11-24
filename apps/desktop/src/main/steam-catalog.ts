@@ -23,6 +23,7 @@ import {
   parseSteamLibraryFolders,
   steamAppFromDetails,
   steamAppsFromSearch,
+  steamShortDescription,
   type SteamAppSummary,
 } from '@nexora/core';
 import { steamRoots } from './official-import.js';
@@ -112,7 +113,23 @@ export async function lookupSteamDlcs(
 }
 
 /**
- * Os appids instalados no disco (todas as bibliotecas da Steam).
+ * A descrição curta de um jogo, em texto simples.
+ *
+ * O mesmo pedido dos detalhes, lido para outra pergunta. `null` quando a loja
+ * não conhece o app ou não dá descrição.
+ */
+export async function lookupSteamDescription(
+  appId: string,
+  fetch: JsonFetch = fetchJson,
+): Promise<string | null> {
+  if (!isSteamAppId(appId)) {
+    return null;
+  }
+  const url = `${STORE_API}/appdetails?appids=${appId}&cc=br&l=pt`;
+  return steamShortDescription(await fetch(url, TIMEOUT_MS));
+}
+
+/** Os appids instalados no disco (todas as bibliotecas da Steam).
  *
  * Lido do `libraryfolders.vdf`: é o mesmo ficheiro que a importação usa, e
  * responde à única pergunta que importa aqui — "este app está no disco?" —

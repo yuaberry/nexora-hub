@@ -70,6 +70,59 @@ export function isSteamAppId(value: unknown): value is string {
   return typeof value === 'string' && /^\d{1,12}$/.test(value);
 }
 
+/**
+ * A descrição curta de um app, em texto simples.
+ *
+ * A loja devolve `short_description` em HTML; a interface mostra **texto** —
+ * as etiquetas são retiradas e as entidades desfeitas, sem interpretar
+ * marcado (nada de HTML vindo da rede dentro da app).
+ */
+export function steamShortDescription(payload: unknown): string | null {
+  const app = appDataOf(payload);
+  if (app === null) {
+    return null;
+  }
+  const html = app['short_description'];
+  if (typeof html !== 'string' || html.trim() === '') {
+    return null;
+  }
+  return htmlToText(html);
+}
+
+/** Os dados do app dentro da resposta de `appdetails` (ou `null`). */
+function appDataOf(payload: unknown): Record<string, unknown> | null {
+  if (typeof payload !== 'object' || payload === null) {
+    return null;
+  }
+  const entry = Object.values(payload as Record<string, unknown>)[0];
+  if (typeof entry !== 'object' || entry === null) {
+    return null;
+  }
+  const record = entry as Record<string, unknown>;
+  if (record['success'] !== true || typeof record['data'] !== 'object' || record['data'] === null) {
+    return null;
+  }
+  return record['data'] as Record<string, unknown>;
+}
+
+/** HTML → texto: etiquetas fora, entidades desfeitas, espaços apertados. */
+function htmlToText(html: string): string {
+  const text = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
+    .replace(/'/g, "'")
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  return text.length > 1200 ? `${text.slice(0, 1197)}…` : text;
+}
+
 /** Lê um campo de texto de um objecto desconhecido (ou `null`). */
 function stringField(source: Record<string, unknown>, key: string): string | null {
   const value = source[key];

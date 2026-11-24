@@ -660,7 +660,26 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5b — Profundidade: herói de página de jogo, galeria e setas (2026-11-23)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5c — Descrição real da loja na página do jogo (2026-11-23)
+
+### Entregue
+
+- [x] **Domínio** — `steamShortDescription` traduz a descrição curta da loja
+      para **texto simples** (etiquetas fora, entidades desfeitas, sem
+      interpretar marcado vindo da rede), com limite declarado — 3 testes.
+- [x] **Cache local** — a descrição fica guardada na base local (coluna nova
+      com migração alinhada); a loja é perguntada **uma vez** e a página
+      passa a lê-la de lá — 3 testes.
+- [x] **Cartão "Sobre"** nos detalhes: a descrição em texto corrido legível;
+      sem AppID, o cartão não existe em vez de fingir.
+
+### Prova de execução real (2026-11-23)
+
+- o Hollow Knight mostrou a descrição real da loja ("Forge your own path in
+      Hollow Knight!…"), e a segunda visita leu-a do cache (sem rede);
+- bug apanhado pelo teste: a migração tinha o `select` desalinhado com o
+      `insert` (a coluna nova entrava na posição errada) — corrigido;
+- `pnpm typecheck` limpo; **687 testes verdes** no total.\n\n## Fase 5b — Profundidade: herói de página de jogo, galeria e setas (2026-11-23)
 
 ### Entregue
 

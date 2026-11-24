@@ -644,6 +644,14 @@ export interface DesktopApi {
       readonly message?: string;
     }>;
     /**
+     * A descrição curta de um jogo (guardada depois da primeira busca).
+     */
+    readonly describe: (gameId: string) => Promise<{
+      readonly ok: boolean;
+      readonly description?: string;
+      readonly message?: string;
+    }>;
+    /**
      * As DLCs declaradas por um jogo da biblioteca.
      *
      * Os nomes vêm da loja; `installed` diz se a pasta do appid está no

@@ -193,4 +193,64 @@ describe('LocalLibrary', () => {
       expect(library.listDlcs('c:/games/x')).toEqual([]);
     });
   });
+
+/**
+   * Descrição da loja — guardada uma vez, para a biblioteca continuar offline.
+   */
+  describe('descrição', () => {
+    it('guarda e devolve a descrição', () => {
+      const record = library.upsert({
+        externalKey: 'steam-app:367520',
+        title: 'Hollow Knight',
+        steamAppId: '367520',
+      });
+      library.setDescription(record.id, 'A descrição do jogo.');
+      expect(library.findById(record.id)?.description).toBe('A descrição do jogo.');
+    });
+
+    it('um null não apaga a descrição que já existe', () => {
+      const record = library.upsert({
+        externalKey: 'steam-app:367520',
+        title: 'Hollow Knight',
+        steamAppId: '367520',
+      });
+      library.setDescription(record.id, 'A descrição do jogo.');
+      library.setDescription(record.id, null);
+      expect(library.findById(record.id)?.description).toBe('A descrição do jogo.');
+    });
+
+    it('uma base com caminhos opcionais migra com a coluna nova', async () => {
+      const dir = mkdtempSync(join(tmpdir(), 'nexora-db-desc-'));
+      const path = join(dir, 'nexora.sqlite');
+      const old = new DatabaseSync(path);
+      old.exec(`
+        create table games (
+          id integer primary key autoincrement,
+          external_key text not null unique,
+          title text not null,
+          cover text,
+          cover_chosen integer not null default 0,
+          install_path text,
+          executable_path text,
+          steam_app_id text,
+          tags text not null default '[]',
+          adult integer not null default 0,
+          favorite integer not null default 0,
+          last_played_at text,
+          total_seconds integer not null default 0,
+          created_at text not null,
+          updated_at text not null
+        );
+        insert into games (external_key, title, created_at, updated_at) values ('a', 'A', 'x', 'y');
+      `);
+      old.close();
+
+      const migrated = new LocalLibrary(path);
+      const entry = migrated.byExternalKey('a');
+      expect(entry?.description).toBeNull();
+      migrated.setDescription(entry?.id ?? 0, 'nova descrição');
+      expect(migrated.byExternalKey('a')?.description).toBe('nova descrição');
+      migrated.close();
+    });
+  });
 });

@@ -9,7 +9,7 @@
 
 import { ipcMain } from 'electron';
 import { isSteamAppId, type SteamAppSummary } from '@nexora/core';
-import { installedSteamAppIds, lookupSteamApp, lookupSteamDlcs, searchSteamApps } from './steam-catalog.js';
+import { installedSteamAppIds, lookupSteamApp, lookupSteamDescription, lookupSteamDlcs, searchSteamApps } from './steam-catalog.js';
 import type { LocalLibrary } from './db.js';
 import { cacheRemoteCover } from './cover-cache.js';
 import type { DlcView } from '../shared/preload-api.js';
@@ -102,6 +102,44 @@ export function registerCatalogIpc(library: LocalLibrary, coversDir: string): vo
         tags: [app.kind === 'game' ? 'steam' : app.kind],
       });
       return { ok: true, duplicate: false, gameId: String(record.id), title: record.title };
+    } catch {
+      return { ok: false, message: 'Loja inacessível.' };
+    }
+  });
+
+  /**
+   * A descrição curta de um jogo da biblioteca.
+   *
+   * A loja é perguntada **uma vez**: a resposta fica guardada na base local e
+   * a página dos detalhes passa a lê-la de lá — a biblioteca continua
+   * completa offline.
+   */
+  ipcMain.handle('steam:describe', async (_event, gameId: unknown): Promise<{
+    readonly ok: boolean;
+    readonly description?: string;
+    readonly message?: string;
+  }> => {
+    const numericId = typeof gameId === 'number' ? gameId : Number(gameId);
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return { ok: false, message: 'Jogo em falta.' };
+    }
+    const entry = library.findById(numericId);
+    if (entry === null) {
+      return { ok: false, message: 'Jogo não encontrado.' };
+    }
+    if (entry.description !== null) {
+      return { ok: true, description: entry.description };
+    }
+    if (entry.steamAppId === null) {
+      return { ok: false, message: 'Jogo sem AppID da Steam.' };
+    }
+    try {
+      const description = await lookupSteamDescription(entry.steamAppId);
+      if (description === null) {
+        return { ok: false, message: 'A loja não deu descrição para este jogo.' };
+      }
+      library.setDescription(numericId, description);
+      return { ok: true, description };
     } catch {
       return { ok: false, message: 'Loja inacessível.' };
     }

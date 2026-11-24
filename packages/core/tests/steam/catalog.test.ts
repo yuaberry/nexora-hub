@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isSteamAppId,
   steamPortraitUrl,
+  steamShortDescription,
   steamAppFromDetails,
   steamAppsFromSearch,
   steamCapsuleUrl,
@@ -106,6 +107,34 @@ describe('steamAppsFromSearch', () => {
   it('resposta sem itens devolve lista vazia', () => {
     expect(steamAppsFromSearch({ total: 0 })).toEqual([]);
     expect(steamAppsFromSearch(null)).toEqual([]);
+  });
+});
+
+describe('steamShortDescription', () => {
+  it('traduz a descrição curta para texto simples', () => {
+    const text = steamShortDescription({
+      '3241660': {
+        success: true,
+        data: {
+          short_description: '<p>R.E.P.O. is an online co-op horror game & more.</p><br>You and up to 5 friends can grab objects.',
+        },
+      },
+    });
+    expect(text).toContain('R.E.P.O. is an online co-op horror game & more.');
+    expect(text).not.toContain('<p>');
+  });
+
+  it('devolve null quando a loja não dá descrição', () => {
+    expect(steamShortDescription({ '999': { success: true, data: {} } })).toBeNull();
+    expect(steamShortDescription({ '999': { success: false } })).toBeNull();
+    expect(steamShortDescription(null)).toBeNull();
+  });
+
+  it('uma descrição longa fica truncada (com reticências honestas)', () => {
+    const long = 'x'.repeat(3000);
+    const text = steamShortDescription({ '1': { success: true, data: { short_description: long } } });
+    expect(text?.endsWith('…')).toBe(true);
+    expect((text ?? '').length).toBeLessThanOrEqual(1200);
   });
 });
 

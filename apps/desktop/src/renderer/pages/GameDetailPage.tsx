@@ -10,6 +10,7 @@ import { CommunitySection } from '../components/CommunitySection.js';
 import { PerformanceCard } from '../components/PerformanceCard.js';
 import { ModsSection } from '../components/ModsSection.js';
 import { DlcSection } from '../components/DlcSection.js';
+import { AboutSection } from '../components/AboutSection.js';
 import { GameImage } from '../components/GameImage.js';
 import { CloudSavesCard } from '../components/CloudSavesCard.js';
 import { CoverSection } from '../components/CoverSection.js';
@@ -214,6 +215,9 @@ export function GameDetailPage({
       <CloudSavesCard gameKey={game.externalKey} />
 
       <CommunitySection gameId={game.externalKey} />
+
+      {/* Sobre: a descrição curta da loja, guardada para uso offline. */}
+      <AboutSection game={game} />
 
       {/* Capa: a automática (a da Steam) e a personalização do utilizador. */}
       <CoverSection game={game} onChanged={() => library.reload()} />

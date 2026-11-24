@@ -660,7 +660,32 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 6a — Modo grande ecrã (2026-11-23)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5b — Profundidade: herói de página de jogo, galeria e setas (2026-11-23)
+
+### Entregue
+
+- [x] **Tokens de elevação** (`--paper-shadow-1/2/3`, `--paper-glow`) — a
+      camada que dá profundidade: cartão pairado levanta, foco acende.
+- [x] **Herói de página de jogo** — a cápsula flutua sobre a arte
+      desfocada (camada `blur(28px)`), o título e as acções à direita; a
+      coluna de informação perdeu a cápsula duplicada.
+- [x] **Galeria de imagens** — as imagens que a Steam guardou passaram a
+      faixa horizontal com elevação ao pairar; tocar numa imagem fá-la
+      tornar-se a capa (o mesmo `library:setCover`, com a marca de escolha).
+- [x] **Setas nas prateleiras** — a fila anda quase uma página; as setas
+      nascem desactivadas nas pontas (e numa fila que caiba inteira).
+- [x] **Correcção apanhada pela prova**: a fila crescia em vez de scrollar
+      (faltava `max-width: 100%` na cadeia do flex).
+
+### Prova de execução real (2026-11-23)
+
+- o herói do Hollow Knight mostra a cápsula (300 px) dentro da arte
+      desfocada;
+- a galeria tem 6 imagens, **as 6 carregadas**, e o clique nelas passa pelo
+      `setCover`;
+- a seta "next" da prateleira andou a fila (319 px — o excedente total da
+      fila de 7 cápsulas) e as filas curtas ficam com as setas desactivadas;
+- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 6a — Modo grande ecrã (2026-11-23)
 
 ### Entregue
 

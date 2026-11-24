@@ -7,6 +7,7 @@ export const steamSync = {
   'covers.title': 'Cover',
   'covers.choose': 'Choose file…',
   'covers.steamImages': 'Steam images',
+  'covers.galleryHint': 'Tap an image to make it the cover',
   'covers.noSteamImages': 'Steam saved no images for this game.',
   'covers.reset': 'Restore automatic cover',
   'covers.custom': 'Cover chosen by you',

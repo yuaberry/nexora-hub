@@ -107,22 +107,24 @@ export function GameDetailPage({
   return (
     <div className="nx-stack">
       <section
-        className="hub-hero"
+        className="hub-hero hub-hero--game"
         style={heroUrl === null ? undefined : { backgroundImage: `url("${heroUrl}")` }}
       >
-        {heroUrl === null && game.cover !== null ? (
-          <div className="hub-hero__logo">
+        {heroUrl === null ? null : (
+          <div className="hub-hero__blur" style={{ backgroundImage: `url("${heroUrl}")` }} />
+        )}
+        <div className="hub-hero__grid">
+          <div className="hub-hero__cover">
             <GameImage
               src={coverUrl(game.cover)}
-              fit="contain"
+              fit={coverFit(game.cover)}
               alt=""
               fallback={<span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>}
             />
           </div>
-        ) : null}
-        <div className="hub-hero__body">
-          <span className="hub-hero__meta">{game.tags.join(' · ')}</span>
-          <strong className="hub-hero__title">{game.title}</strong>
+          <div className="hub-hero__body">
+            <span className="hub-hero__meta">{game.tags.join(' · ')}</span>
+            <strong className="hub-hero__title">{game.title}</strong>
           <div className="hub-row">
             <Button variant="primary" onClick={() => void onPlay()} disabled={!game.installed}>
               {t('common.action.play')}
@@ -142,25 +144,13 @@ export function GameDetailPage({
               {game.favorite ? t('details.favorite') : t('details.notFavorite')}
             </Button>
           </div>
+          </div>
         </div>
       </section>
 
 
       <div className="hub-detail">
-        <div className="nx-cover hub-cover-large">
-          <GameImage
-            src={coverUrl(game.cover)}
-            fit={coverFit(game.cover)}
-            alt=""
-            fallback={<span aria-hidden="true">{game.title.slice(0, 1).toUpperCase()}</span>}
-          />
-        </div>
-
         <div className="nx-stack">
-          <h1 className="nx-title" style={{ fontSize: '1.75rem' }}>
-            {game.title}
-          </h1>
-
           <dl className="hub-kv">
             <div className="hub-kv__row">
               <dt className="hub-kv__key">{t('details.playedTime')}</dt>

@@ -109,17 +109,21 @@ export function CoverSection({
 
         {message === null ? null : <p className="nx-banner"><span>{message}</span></p>}
 
-        <strong>{t('covers.steamImages')}</strong>
+        <div className="hub-row hub-row--between">
+          <strong>{t('covers.steamImages')}</strong>
+          {alternatives.length > 1 ? (
+            <span className="nx-subtitle">{t('covers.galleryHint')}</span>
+          ) : null}
+        </div>
         {options === null ? null : alternatives.length === 0 ? (
           <p className="nx-subtitle">{t('covers.noSteamImages')}</p>
         ) : (
-          <div className="hub-suggestions">
+          <div className="hub-gallery">
             {alternatives.map((option) => (
               <button
                 key={option.path}
                 type="button"
-                className="nx-cover"
-                style={{ width: '5rem', height: '6rem', padding: 0, cursor: 'pointer' }}
+                className="hub-gallery__item"
                 title={option.label}
                 onClick={() => {
                   void setCover(option.path);

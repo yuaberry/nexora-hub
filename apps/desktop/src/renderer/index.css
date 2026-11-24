@@ -140,19 +140,6 @@ body {
     var(--paper-surface-raised);
 }
 
-.hub-hero__logo {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: var(--paper-space-5);
-}
-
-.hub-hero__logo img {
-  max-width: 100%;
-  max-height: 7rem;
-}
-
 .hub-hero__title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -404,9 +391,25 @@ body {
   transition: transform var(--paper-motion), border-color var(--paper-motion);
 }
 
+.hub-capsule__art {
+  transition: transform var(--paper-motion), border-color var(--paper-motion), box-shadow var(--paper-motion);
+}
+
 .hub-capsule__art:hover {
+  border-color: color-mix(in srgb, var(--paper-accent) 60%, var(--paper-line));
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--paper-shadow-2);
+}
+
+.hub-capsule__art:focus-visible {
+  outline: none;
   border-color: var(--paper-accent);
-  transform: translateY(-2px);
+  box-shadow: var(--paper-glow);
+}
+
+.hub-capsule--lg .hub-capsule__art:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: var(--paper-shadow-3);
 }
 
 .hub-capsule__art img {
@@ -460,12 +463,80 @@ body {
 }
 
 
+
+/* Herói de página de jogo — a cápsula flutua sobre a arte desfocada. */
+.hub-hero--game {
+  min-height: 16rem;
+  align-items: center;
+}
+
+.hub-hero__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: var(--paper-space-5);
+  align-items: end;
+  width: 100%;
+}
+
+.hub-hero__cover {
+  aspect-ratio: 2 / 3;
+  border: var(--paper-line-width) solid color-mix(in srgb, var(--paper-line) 70%, transparent);
+  border-radius: var(--paper-radius-lg);
+  overflow: hidden;
+  background: linear-gradient(145deg, var(--paper-placeholder-from), var(--paper-placeholder-to));
+  box-shadow: var(--paper-shadow-2);
+}
+
+.hub-hero__cover img {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Galeria de imagens da Steam — faixa horizontal, elevação ao pairar. */
+.hub-gallery {
+  display: flex;
+  gap: var(--paper-space-3);
+  overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+.hub-gallery__item {
+  flex: 0 0 8rem;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: var(--paper-radius);
+  overflow: hidden;
+  background: var(--paper-surface-raised);
+  cursor: pointer;
+  transition: transform var(--paper-motion), box-shadow var(--paper-motion), border-color var(--paper-motion);
+}
+
+.hub-gallery__item:hover {
+  border-color: var(--paper-accent);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--paper-shadow-2);
+}
+
+.hub-gallery__item img {
+  width: 100%;
+  height: 100%;
+}
+
 /* ---------- Prateleiras (montra horizontal) ------------------------------ */
 
 .hub-shelf {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .hub-shelf__title {
@@ -476,6 +547,8 @@ body {
 .hub-shelf__row {
   display: flex;
   gap: var(--paper-space-4);
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
   padding-bottom: 0.4rem;
   scrollbar-width: thin;
@@ -486,10 +559,36 @@ body {
   min-width: 0;
 }
 
+.hub-shelf__nav {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: var(--paper-line-width) solid var(--paper-line);
+  border-radius: 50%;
+  background: var(--paper-surface-raised);
+  color: var(--paper-ink-strong);
+  cursor: pointer;
+  transition: border-color var(--paper-motion), transform var(--paper-motion);
+}
+
+.hub-shelf__nav:hover {
+  border-color: var(--paper-accent);
+  transform: scale(1.08);
+}
+
+.hub-shelf__nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+}
+
 /* ---------- Herói dos detalhes ------------------------------------------ */
 
 .hub-hero {
   position: relative;
+  isolation: isolate;
   display: flex;
   align-items: flex-end;
   min-height: 13rem;
@@ -503,16 +602,28 @@ body {
   background-position: center 30%;
 }
 
+/* A arte desfocada por baixo: profundidade sem tirar a leitura. */
+.hub-hero__blur {
+  position: absolute;
+  inset: -12%;
+  z-index: -2;
+  background-size: cover;
+  background-position: center 30%;
+  filter: blur(28px) saturate(1.35);
+  opacity: 0.62;
+}
+
 /* O véu que garante a leitura do título sobre qualquer arte. */
 .hub-hero::after {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--paper-surface-deepest) 92%, transparent) 0%,
-    color-mix(in srgb, var(--paper-surface-deepest) 55%, transparent) 45%,
-    color-mix(in srgb, var(--paper-surface-deepest) 15%, transparent) 100%
+    color-mix(in srgb, var(--paper-surface-deepest) 94%, transparent) 0%,
+    color-mix(in srgb, var(--paper-surface-deepest) 62%, transparent) 45%,
+    color-mix(in srgb, var(--paper-surface-deepest) 18%, transparent) 100%
   );
 }
 
@@ -522,19 +633,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-}
-
-.hub-hero__logo {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: var(--paper-space-5);
-}
-
-.hub-hero__logo img {
-  max-width: 100%;
-  max-height: 7rem;
 }
 
 .hub-hero__title {
@@ -665,6 +763,22 @@ body {
 }
 
 /* ---------- Estrutura em duas colunas (estilo launcher) ----------------- */
+
+@keyframes hub-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hub-page {
+  min-width: 0;
+  animation: hub-in var(--paper-motion) ease both;
+}
 
 .hub-shell {
   display: grid;
@@ -809,6 +923,8 @@ body {
 /* ---------- Cabeçalho do conteúdo ------------------------------------- */
 
 .hub-header {
+  background: linear-gradient(to bottom, var(--paper-surface-raised), var(--paper-surface));
+  border-bottom: var(--paper-line-width) solid var(--paper-line);
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;

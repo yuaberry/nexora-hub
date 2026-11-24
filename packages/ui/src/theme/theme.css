@@ -21,6 +21,16 @@
   --paper-radius-sm: 4px;
   --paper-radius: 8px;
   --paper-radius-lg: 14px;
+  /* Elevação — a camada que dá profundidade. Um cartão pairado levanta,
+     um modal paira. Sem sombras, a interface é uma página; com elas, é
+     um aplicativo. */
+  --paper-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.24);
+  --paper-shadow-2: 0 4px 12px rgb(0 0 0 / 0.44), 0 12px 32px rgb(0 0 0 / 0.32);
+  --paper-shadow-3: 0 8px 24px rgb(0 0 0 / 0.48), 0 24px 64px rgb(0 0 0 / 0.4);
+  /* O brilho do acento — o anel que acende ao focar ou pairar. */
+  --paper-glow: 0 0 0 1px color-mix(in srgb, var(--paper-accent) 55%, transparent),
+    0 6px 24px color-mix(in srgb, var(--paper-accent) 22%, transparent);
+
   --paper-space-1: 0.25rem;
   --paper-space-2: 0.5rem;
   --paper-space-3: 0.75rem;

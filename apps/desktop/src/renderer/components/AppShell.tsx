@@ -87,7 +87,7 @@ export function AppShell({
           </div>
         </header>
 
-        {children}
+        <div className="hub-page">{children}</div>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ export const shell = {
   'sidebar.downloadsActive': '{count} download(s) in progress',
   'home.featured': 'Featured',
   'home.featured.subtitle': 'Your last session, ready to continue.',
+  'shelf.prev': 'See previous games',
+  'shelf.next': 'See more games',
   'bigpicture.title': 'Big picture mode',
   'bigpicture.exit': 'Leave big picture mode',
   'bigpicture.hint': 'Arrows to navigate · Enter to open · Escape to leave',

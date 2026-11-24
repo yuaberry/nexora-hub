@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { GameCapsule } from './GameCapsule.js';
+import { useInterface } from '@nexora/ui';
 import type { DesktopGameView } from '../../shared/preload-api.js';
 
 /**
@@ -33,14 +34,65 @@ export function GameShelf({
   readonly onPlay: (gameId: string) => void;
   readonly onToggleFavorite?: (gameId: string) => void;
 }): ReactNode {
+  const { t } = useInterface();
+  const row = useRef<HTMLDivElement>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  /** Faz a fila andar quase uma página, e aprende onde estão as pontas. */
+  const scrollBy = useCallback((direction: -1 | 1) => {
+    const node = row.current;
+    if (node === null) {
+      return;
+    }
+    node.scrollBy({ left: direction * node.clientWidth * 0.8, behavior: 'smooth' });
+  }, []);
+
+  const onScroll = useCallback(() => {
+    const node = row.current;
+    if (node === null) {
+      return;
+    }
+    setAtStart(node.scrollLeft <= 1);
+    setAtEnd(node.scrollLeft + node.clientWidth >= node.scrollWidth - 1);
+  }, []);
+
+  // Uma fila que caiba inteira não tem para onde andar: as setas nascem
+  // desactivadas (e voltam a medir-se quando os jogos mudam).
+  useEffect(() => {
+    onScroll();
+  }, [onScroll, games.length]);
+
   if (games.length === 0) {
     return null;
   }
 
   return (
     <section className="hub-shelf">
-      <strong className="hub-shelf__title">{title}</strong>
-      <div className="hub-shelf__row">
+      <div className="hub-row hub-row--between">
+        <strong className="hub-shelf__title">{title}</strong>
+        <span className="hub-row">
+          <button
+            type="button"
+            className="hub-shelf__nav"
+            aria-label={t('shelf.prev')}
+            disabled={atStart}
+            onClick={() => scrollBy(-1)}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="hub-shelf__nav"
+            aria-label={t('shelf.next')}
+            disabled={atEnd}
+            onClick={() => scrollBy(1)}
+          >
+            ›
+          </button>
+        </span>
+      </div>
+      <div className="hub-shelf__row" ref={row} onScroll={onScroll}>
         {games.map((game) => (
           <div className="hub-shelf__item" key={game.externalKey}>
             <GameCapsule

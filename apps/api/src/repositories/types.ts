@@ -499,6 +499,7 @@ export interface Repositories {
   readonly forums: ForumRepository;
   readonly clans: ClanRepository;
   readonly events: EventRepository;
+  readonly librarySync: SyncedLibraryRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -726,6 +727,42 @@ export interface EventRepository {
   readonly setParticipation: (eventId: string, userId: string, status: 'going' | 'interested' | 'maybe' | null) => Promise<boolean>;
   /** Cancela um evento (só o anfitrião). */
   readonly cancel: (eventId: string, hostId: string) => Promise<boolean>;
+}
+
+/** Uma entrada da biblioteca sincronizada (o que a conta guarda). */
+export interface SyncedEntryRecord {
+  readonly id: string;
+  readonly userId: string;
+  /** A chave externa do jogo (caminho normalizado ou `steam-app:<id>`). */
+  readonly externalKey: string;
+  readonly title: string;
+  readonly steamAppId: string | null;
+  /** A capa **pública** (URL da loja); caminhos locais nunca sobem. */
+  readonly coverUrl: string | null;
+  readonly installed: boolean;
+  readonly favorite: boolean;
+  /** Segundos medidos pelo runner (tempo real de quem joga). */
+  readonly totalSeconds: number;
+  readonly updatedAt: Date;
+}
+
+/** Uma entrada para sincronizar (o que o launcher envia). */
+export interface SyncedEntryInput {
+  readonly externalKey: string;
+  readonly title: string;
+  readonly steamAppId?: string | null;
+  /** Só URLs públicas: um caminho local é rejeitado pela rota. */
+  readonly coverUrl?: string | null;
+  readonly installed?: boolean;
+  readonly favorite?: boolean;
+  readonly totalSeconds?: number;
+}
+
+export interface SyncedLibraryRepository {
+  /** Substitui (ou cria) as entradas do utilizador; devolve as contagens. */
+  readonly sync: (userId: string, entries: readonly SyncedEntryInput[]) => Promise<{ updated: number; added: number }>;
+  /** Lista a biblioteca do utilizador (para a web e outra máquina). */
+  readonly list: (userId: string) => Promise<readonly SyncedEntryRecord[]>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

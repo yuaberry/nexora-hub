@@ -1,5 +1,8 @@
 /** Dicionário PT-BR — colecções, atalhos e scan. */
 export const libraryExtra = {
+  'library.syncAccount': 'Sincronizar com a conta',
+  'library.syncAccount.done': '{added} jogos novos na conta, {updated} actualizados.',
+  'library.syncAccount.failed': 'Não foi possível sincronizar com a conta (entra na tua conta primeiro).',
   'collections.title': 'Coleções',
   'collections.create': 'Criar coleção',
   'collections.add': 'Adicionar à coleção',

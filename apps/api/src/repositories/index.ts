@@ -20,6 +20,7 @@ import { MemoryCommentRepository, MemoryReviewRepository } from './memory-commun
 import { MemoryForumRepository } from './memory-forums.js';
 import { MemoryClanRepository } from './memory-clans.js';
 import { MemoryEventRepository } from './memory-events.js';
+import { MemoryLibrarySyncRepository } from './memory-library-sync.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
 import { PostgresAuthSessionRepository, PostgresMfaRepository } from './postgres-auth.js';
@@ -27,6 +28,7 @@ import { PostgresCommentRepository, PostgresReviewRepository } from './postgres-
 import { PostgresForumRepository } from './postgres-forums.js';
 import { PostgresClanRepository } from './postgres-clans.js';
 import { PostgresEventRepository } from './postgres-events.js';
+import { PostgresLibrarySyncRepository } from './postgres-library-sync.js';
 import { PostgresLibraryRepository, PostgresPlaySessionRepository } from './postgres-game.js';
 import type { Repositories } from './types.js';
 
@@ -50,6 +52,7 @@ export function createMemoryRepositories(): Repositories {
     forums: new MemoryForumRepository(),
     clans: new MemoryClanRepository(),
     events: new MemoryEventRepository(),
+    librarySync: new MemoryLibrarySyncRepository(),
     reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
     wishlist: new MemoryWishlistRepository(),
@@ -87,6 +90,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     forums: new PostgresForumRepository(database.db),
     clans: new PostgresClanRepository(database.db),
     events: new PostgresEventRepository(database.db),
+    librarySync: new PostgresLibrarySyncRepository(database.db),
     reviews: new PostgresReviewRepository(database.db),
     library: new PostgresLibraryRepository(database.db),
     sessions: new PostgresPlaySessionRepository(database.db),

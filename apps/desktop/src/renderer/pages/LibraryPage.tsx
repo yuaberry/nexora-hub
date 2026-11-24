@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Badge, Button, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
 import { useLibrary, ErrorNote } from '../state/desktop.js';
+import { apiRequest, ApiError } from '../lib/api.js';
 import { searchLocalLibrary } from '../lib/catalog.js';
 import { formatPlayTime } from '../lib/format.js';
 import { GameCapsule } from '../components/GameCapsule.js';
@@ -28,6 +29,7 @@ export function LibraryPage({
   const library = useLibrary();
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [syncingAccount, setSyncingAccount] = useState(false);
   const [collections, setCollections] = useState<readonly CollectionView[] | null>(null);
   const [activeCollection, setActiveCollection] = useState<number | null>(null);
   const [collectionGames, setCollectionGames] = useState<readonly string[] | null>(null);
@@ -146,6 +148,42 @@ export function LibraryPage({
     });
   }, [library]);
 
+  /**
+   * Sincroniza a biblioteca com a conta NEXORA.
+   *
+   * Sobe **metadado**: título, appid, favorito e o tempo medido. Caminhos
+   * locais e executáveis ficam nesta máquina — a conta não precisa de saber
+   * onde os ficheiros estão. A capa sobe só quando já é uma URL pública (a
+   * web reconstrói a cápsula a partir do appid).
+   */
+  const onSyncAccount = useCallback(async () => {
+    const jogos = library.value ?? [];
+    if (jogos.length === 0) {
+      return;
+    }
+    setSyncingAccount(true);
+    try {
+      const relatorio = await apiRequest<{ added: number; updated: number }>('/api/v1/library/sync', {
+        method: 'PUT',
+        body: {
+          entries: jogos.map((jogo) => ({
+            externalKey: jogo.externalKey,
+            title: jogo.title,
+            steamAppId: jogo.steamAppId,
+            coverUrl: jogo.cover !== null && jogo.cover.startsWith('http') ? jogo.cover : null,
+            installed: jogo.installed,
+            favorite: jogo.favorite,
+            totalSeconds: jogo.totalSeconds,
+          })),
+        },
+      });
+      setImportMessage(t('library.syncAccount.done', { added: relatorio.added, updated: relatorio.updated }));
+    } catch (error) {
+      setImportMessage(error instanceof ApiError ? error.message : t('library.syncAccount.failed'));
+    }
+    setSyncingAccount(false);
+  }, [library, t]);
+
   const hits = useMemo(() => {
     const inCollection =
       activeCollection === null || collectionGames === null
@@ -185,6 +223,10 @@ export function LibraryPage({
           {/* Sincronização: o que mudou na Steam desde a última vez. */}
           <Button onClick={() => void onSyncSteam()} disabled={syncing}>
             {syncing ? t('steam.sync.running') : t('steam.sync.action')}
+          </Button>
+          {/* Sincronização com a conta: o metadado sobe, os ficheiros ficam. */}
+          <Button onClick={() => void onSyncAccount()} disabled={syncingAccount}>
+            {syncingAccount ? t('steam.sync.running') : t('library.syncAccount')}
           </Button>
           <Button variant="primary" onClick={() => void onImport()}>
             {t('import.choose')}

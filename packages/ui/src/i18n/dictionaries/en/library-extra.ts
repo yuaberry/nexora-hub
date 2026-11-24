@@ -1,5 +1,8 @@
 /** EN dictionary — collections, shortcuts and disk scan. */
 export const libraryExtra = {
+  'library.syncAccount': 'Sync with account',
+  'library.syncAccount.done': '{added} new games on the account, {updated} updated.',
+  'library.syncAccount.failed': 'Could not sync with the account (sign in first).',
   'collections.title': 'Collections',
   'collections.create': 'Create collection',
   'collections.add': 'Add to collection',

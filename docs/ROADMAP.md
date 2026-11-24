@@ -660,7 +660,29 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 8a — Diagnóstico com leituras reais (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 3f — Biblioteca sincronizada com a conta (2026-11-24)
+
+### Entregue
+
+- [x] **API** (`modules/library-sync`) — `PUT /api/v1/library/sync` (envio em
+      lote, até 500 entradas) e `GET /api/v1/library/mine`; a entrada é uma
+      por utilizador e jogo (**sincronizar substitui**, nunca duplica) e o
+      relatório conta o que entrou e o que foi actualizado — migração `0008`,
+      4 testes de integração.
+- [x] **O que sobe é metadado** — título, appid, favorito, tempo medido e a
+      capa **só quando é uma URL pública**: um caminho local é recusado pela
+      rota (os ficheiros do utilizador não sobem para a conta).
+- [x] **Launcher** — botão "Sincronizar com a conta" na Biblioteca, com o
+      relatório honesto do que mudou.
+
+### Prova de execução real (2026-11-24)
+
+- conta nova criada; o botão na界面 sincronizou a biblioteca (7 jogos);
+- a interface mostrou **"7 jogos novos na conta, 0 actualizados"**;
+- a API confirma independentemente: `GET /api/v1/library/mine` devolve 7
+      entradas com os appids da Steam (Counter-Strike 2 → 730, Hollow Knight →
+      367520);
+- `pnpm typecheck` limpo; **740 testes verdes** no total.\n\n## Fase 8a — Diagnóstico com leituras reais (2026-11-24)
 
 ### Entregue
 

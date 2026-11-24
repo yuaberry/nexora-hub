@@ -45,6 +45,24 @@ export interface DesktopGameView {
   readonly totalSeconds: number;
 }
 
+/** Uma verificação do diagnóstico (vista do renderer). */
+export interface DiagnosticCheckView {
+  readonly id: 'disk' | 'load' | 'memory' | 'temperature';
+  readonly status: 'ok' | 'warning' | 'critical' | 'unknown';
+  readonly freeBytes: number | null;
+  readonly totalBytes: number | null;
+  readonly loadPerCore: number | null;
+  readonly memoryPercent: number | null;
+  readonly hottestCelsius: number | null;
+}
+
+/** O relatório de diagnóstico. */
+export interface DiagnosticReportView {
+  readonly checks: readonly DiagnosticCheckView[];
+  readonly overall: 'ok' | 'warning' | 'critical' | 'unknown';
+  readonly at: string;
+}
+
 /** Uso de disco do volume onde os jogos estão. */
 export interface DiskUsageView {
   /** Capacidade total do volume, em bytes (0 = desconhecida). */
@@ -677,6 +695,14 @@ export interface DesktopApi {
     readonly presence: (token: string) => Promise<PresenceView>;
     /** Bate o coração da presença (o jogo em curso pode ser `null`). */
     readonly heartbeat: (gameId: string | null, token: string) => Promise<SocialWriteResult>;
+  };
+  readonly diagnostics: {
+    /**
+     * O relatório de diagnóstico — leituras reais (disco, carga, memória,
+     * temperaturas) com os limiares do núcleo. Uma leitura em falta fica
+     * `unknown`: a interface diz "sem leitura", nunca um número inventado.
+     */
+    readonly report: () => Promise<DiagnosticReportView>;
   };
   readonly telemetry: {
     /** Uma amostra do sistema (CPU, memória, carga, temperaturas). */

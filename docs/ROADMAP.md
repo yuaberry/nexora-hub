@@ -660,7 +660,28 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5f — Reputação (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 8a — Diagnóstico com leituras reais (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/diagnostics/rules.ts`) — os limiares
+      declarados (disco, carga por núcleo, memória, temperatura) e o relatório
+      que monta: uma leitura em falta fica `unknown` (a interface diz "sem
+      leitura", nunca um número inventado) e o estado geral é o **pior** dos
+      estados — 8 testes.
+- [x] **Launcher** (`diagnostics-ipc.ts`) — as leituras reais: o volume onde
+      os jogos estão, a carga e a memória do sistema, e as temperaturas dos
+      sensores (a mesma telemetria do overlay).
+- [x] **Interface** — página "Diagnóstico" (barra lateral): quatro cartões com
+      os valores lidos, o estado de cada um e o conselho honesto; "Ler de
+      novo" relê o sistema.
+
+### Prova de execução real (2026-11-24)
+
+- as quatro leituras desta máquina: **disco 526 GB / 982,8 GB** (normal),
+      **carga 0,42 por núcleo** (normal), **memória 39 %** (normal),
+      **temperatura 64 ºC** (normal) — valores reais, não estimados;
+- `pnpm typecheck` limpo; **735 testes verdes** no total.\n\n## Fase 5f — Reputação (2026-11-24)
 
 ### Entregue
 

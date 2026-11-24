@@ -1,6 +1,7 @@
 /** EN dictionary — friends and presence. */
 export const friends = {
   'nav.clans': 'Clans',
+  'nav.diagnostics': 'Diagnostics',
   'nav.events': 'Events',
   'nav.friends': 'Friends',
   'friends.title': 'Friends',

@@ -23,10 +23,10 @@ export function Sidebar({
   onNavigate,
   onSelectGame,
 }: {
-  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'clans' | 'events' | 'account';
+  readonly route: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'clans' | 'events' | 'diagnostics' | 'account';
   /** Jogo em detalhe (para marcar na lista), ou `null`. */
   readonly activeGameId: string | null;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'clans' | 'events' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'clans' | 'events' | 'diagnostics' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account') => void;
   readonly onSelectGame: (gameId: string) => void;
 }): ReactNode {
   const { t } = useInterface();
@@ -65,7 +65,7 @@ export function Sidebar({
     return games.filter((game) => game.title.toLowerCase().includes(needle));
   }, [games, filter]);
 
-  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'clans' | 'events' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account'; readonly label: string }[] = [
+  const items: readonly { readonly id: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'clans' | 'events' | 'diagnostics' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account'; readonly label: string }[] = [
     { id: 'home', label: t('nav.home') },
     { id: 'library', label: t('nav.library') },
     { id: 'downloads', label: t('nav.downloads') },
@@ -76,6 +76,7 @@ export function Sidebar({
     { id: 'friends', label: t('nav.friends') },
     { id: 'clans', label: t('nav.clans') },
     { id: 'events', label: t('nav.events') },
+    { id: 'diagnostics', label: t('nav.diagnostics') },
     { id: 'optimizer', label: t('nav.optimizer') },
     { id: 'chat', label: t('nav.chat') },
     { id: 'achievements', label: t('nav.achievements') },

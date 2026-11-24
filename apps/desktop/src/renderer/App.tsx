@@ -14,6 +14,7 @@ import { FamilyPage } from './pages/FamilyPage.js';
 import { FriendsPage } from './pages/FriendsPage.js';
 import { ClansPage } from './pages/ClansPage.js';
 import { EventsPage } from './pages/EventsPage.js';
+import { DiagnosticsPage } from './pages/DiagnosticsPage.js';
 import { OptimizerPage } from './pages/OptimizerPage.js';
 import { ChatPage } from './pages/ChatPage.js';
 import { AchievementsPage } from './pages/AchievementsPage.js';
@@ -51,6 +52,7 @@ export type Route =
   | { readonly name: 'achievements' }
   | { readonly name: 'clans' }
   | { readonly name: 'events' }
+  | { readonly name: 'diagnostics' }
   | { readonly name: 'benchmark' }
   | { readonly name: 'account' }
   | { readonly name: 'planned'; readonly module: PlannedModule }
@@ -83,7 +85,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'bigpicture') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'diagnostics' | 'bigpicture') => {
       navigate({ name: target });
     },
     [navigate],
@@ -121,7 +123,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'bigpicture') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'diagnostics' | 'bigpicture') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -182,6 +184,7 @@ function Shell({
       {route.name === 'family' ? <FamilyPage /> : null}
       {route.name === 'clans' ? <ClansPage /> : null}
       {route.name === 'events' ? <EventsPage /> : null}
+      {route.name === 'diagnostics' ? <DiagnosticsPage /> : null}
       {route.name === 'friends' ? (
         <FriendsPage
           onMessage={(friend) =>
@@ -239,6 +242,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.clans');
     case 'events':
       return t('nav.events');
+    case 'diagnostics':
+      return t('nav.diagnostics');
     case 'optimizer':
       return t('nav.optimizer');
     case 'chat':

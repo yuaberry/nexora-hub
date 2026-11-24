@@ -1,6 +1,7 @@
 /** Dicionário PT-BR — amigos e presença. */
 export const friends = {
   'nav.clans': 'Clãs',
+  'nav.diagnostics': 'Diagnóstico',
   'nav.events': 'Eventos',
   'nav.friends': 'Amigos',
   'friends.title': 'Amigos',

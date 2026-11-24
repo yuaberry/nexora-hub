@@ -146,6 +146,9 @@ const api: DesktopApi = {
     cloudRestore: (gameKey, cloudId, token) => ipcRenderer.invoke('saves:cloudRestore', gameKey, cloudId, token) as Promise<{ readonly ok: boolean; readonly revision?: number; readonly message?: string }>,
     cloudDelete: (cloudId, token) => ipcRenderer.invoke('saves:cloudDelete', cloudId, token) as Promise<{ readonly ok: boolean; readonly message?: string }>,
   },
+  diagnostics: {
+    report: () => ipcRenderer.invoke('diagnostics:report') as Promise<import('../shared/preload-api.js').DiagnosticReportView>,
+  },
   telemetry: {
     sample: () => ipcRenderer.invoke('telemetry:sample') as Promise<TelemetrySampleView>,
     reset: () => ipcRenderer.invoke('telemetry:reset') as Promise<{ ok: boolean }>,

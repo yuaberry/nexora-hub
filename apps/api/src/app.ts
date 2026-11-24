@@ -22,6 +22,7 @@ import { registerSourceRoutes } from './modules/sources/routes.js';
 import { registerCommunityRoutes } from './modules/community/routes.js';
 import { registerForumRoutes } from './modules/forums/routes.js';
 import { registerClanRoutes } from './modules/clans/routes.js';
+import { registerEventRoutes } from './modules/events/routes.js';
 import { registerStoreRoutes } from './modules/store/routes.js';
 import { registerStatsRoutes } from './modules/stats/routes.js';
 import { registerFamilyRoutes } from './modules/family/routes.js';
@@ -112,6 +113,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerCommunityRoutes(app, repositories);
   registerForumRoutes(app, repositories);
   registerClanRoutes(app, repositories);
+  registerEventRoutes(app, repositories);
   registerStoreRoutes(app, repositories);
   registerStatsRoutes(app, repositories);
   registerFamilyRoutes(app, repositories);

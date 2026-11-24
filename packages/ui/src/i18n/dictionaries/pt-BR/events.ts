@@ -1,0 +1,22 @@
+/** Dicionário PT-BR — eventos. */
+export const events = {
+  'events.title': 'Eventos',
+  'events.create': 'Criar evento',
+  'events.created': 'Evento criado.',
+  'events.name': 'Título do evento',
+  'events.description': 'Descrição (opcional)',
+  'events.capacity': 'Lotação',
+  'events.startsAt': 'Começa em',
+  'events.upcoming': 'A vir',
+  'events.empty': 'Ainda não há eventos marcados.',
+  'events.join': 'Vou estar lá',
+  'events.joined': 'Presença confirmada.',
+  'events.leave': 'Já não vou',
+  'events.left': 'Presença retirada.',
+  'events.cancel': 'Cancelar evento',
+  'events.cancelled': 'Evento cancelado.',
+  'events.status.going': 'Vou',
+  'events.status.interested': 'Interessado',
+  'events.status.maybe': 'Talvez',
+  'events.failed': 'A operação falhou. Tenta outra vez.',
+} as const;

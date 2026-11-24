@@ -31,7 +31,7 @@ export function AppShell({
   readonly search: string;
   readonly onSearch: (value: string) => void;
   readonly onBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'bigpicture') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'bigpicture') => void;
   readonly onSelectGame: (gameId: string) => void;
   readonly children: ReactNode;
 }): ReactNode {
@@ -40,7 +40,7 @@ export function AppShell({
   const activeGameId = route.name === 'details' ? route.gameId : null;
   // A rota da barra lateral: 'details' ilumina a Biblioteca, e 'planned' não
   // tem entrada própria (os módulos planeados vivem dentro das páginas).
-  const shellRoute: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'clans' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' =
+  const shellRoute: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'clans' | 'events' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' =
     route.name === 'details' ? 'library' : route.name === 'planned' ? 'home' : route.name === 'bigpicture' ? 'home' : route.name;
 
   return (

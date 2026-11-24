@@ -660,7 +660,28 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5d — Clãs (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5e — Eventos da comunidade (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/community/events.ts`) — a lotação é
+      **aplicada** (1–100, só confirmados ocupam lugar), um evento que já
+      começou não aceita entradas, cancelar é só do anfitrião (e cancelar
+      fecha as portas) — 7 testes.
+- [x] **API** (`modules/events`) — criar (com início no futuro; evento de
+      clã exige dono ou oficial), listar a vir, entrar/sair (`going`,
+      `interested`, `maybe`), cancelar; migração `0007` — 4 testes de
+      integração.
+- [x] **Interface** — página "Eventos" (barra lateral): criar com título,
+      descrição, lotação e data; a lista com confirmados/lotação, o meu
+      estado, entrar/sair e cancelar (só o anfitrião).
+
+### Prova de execução real (2026-11-24)
+
+- evento "Noite de R.E.P.O." criado pelo formulário e **apareceu na lista**
+      (0/6);
+- "Vou estar lá" clicado → contagem **1/6** e o selo do meu estado;
+- `pnpm typecheck` limpo; **721 testes verdes** no total.\n\n## Fase 5d — Clãs (2026-11-24)
 
 ### Entregue
 

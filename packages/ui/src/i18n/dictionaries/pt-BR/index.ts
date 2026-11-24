@@ -27,6 +27,7 @@ import { catalog } from './catalog.js';
 import { cloud } from './cloud.js';
 import { forums } from './forums.js';
 import { clans } from './clans.js';
+import { events } from './events.js';
 import { pages } from './pages.js';
 
 /**
@@ -67,5 +68,6 @@ export const ptBR = {
   ...cloud,
   ...forums,
   ...clans,
+  ...events,
   ...pages,
 } as const;

@@ -1,0 +1,22 @@
+/** EN dictionary — events. */
+export const events = {
+  'events.title': 'Events',
+  'events.create': 'Create event',
+  'events.created': 'Event created.',
+  'events.name': 'Event title',
+  'events.description': 'Description (optional)',
+  'events.capacity': 'Capacity',
+  'events.startsAt': 'Starts at',
+  'events.upcoming': 'Upcoming',
+  'events.empty': 'No events scheduled yet.',
+  'events.join': 'I will be there',
+  'events.joined': 'Attendance confirmed.',
+  'events.leave': 'Not going anymore',
+  'events.left': 'Attendance removed.',
+  'events.cancel': 'Cancel event',
+  'events.cancelled': 'Event cancelled.',
+  'events.status.going': 'Going',
+  'events.status.interested': 'Interested',
+  'events.status.maybe': 'Maybe',
+  'events.failed': 'The operation failed. Try again.',
+} as const;

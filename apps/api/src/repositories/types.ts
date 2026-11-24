@@ -498,6 +498,7 @@ export interface Repositories {
   readonly reviews: ReviewRepository;
   readonly forums: ForumRepository;
   readonly clans: ClanRepository;
+  readonly events: EventRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -666,6 +667,65 @@ export interface ClanRepository {
   readonly removeMember: (clanId: string, userId: string) => Promise<boolean>;
   /** Apaga um clã e tudo o que é dele. */
   readonly dissolve: (clanId: string) => Promise<boolean>;
+}
+
+/** Um evento. */
+export interface EventRecord {
+  readonly id: string;
+  readonly clanId: string | null;
+  readonly title: string;
+  readonly description: string;
+  readonly startsAt: Date;
+  readonly capacity: number;
+  readonly hostId: string;
+  readonly goingCount: number;
+  readonly cancelled: boolean;
+  readonly createdAt: Date;
+}
+
+/** Uma participação. */
+export interface EventParticipantRecord {
+  readonly eventId: string;
+  readonly userId: string;
+  /** `going`, `interested` ou `maybe`. */
+  readonly status: string;
+  readonly createdAt: Date;
+}
+
+/** O que a criação de um evento devolve. */
+export type EventCreation =
+  | { readonly ok: true; readonly event: EventRecord }
+  | { readonly ok: false; readonly reason: 'capacity-invalid' | 'past-start' };
+
+export interface EventRepository {
+  /** Cria um evento (o criador é o anfitrião). */
+  readonly create: (input: {
+    clanId: string | null;
+    title: string;
+    description: string;
+    startsAt: Date;
+    capacity: number;
+    hostId: string;
+  }) => Promise<EventCreation>;
+  /** Lista os eventos por vir (dos mais próximos para os mais distantes). */
+  readonly listUpcoming: (limit: number, offset: number) => Promise<readonly EventRecord[]>;
+  /** Procura um evento pelo id. */
+  readonly findById: (eventId: string) => Promise<EventRecord | null>;
+  /** Os participantes de um evento. */
+  readonly participants: (eventId: string) => Promise<readonly EventParticipantRecord[]>;
+  /** A participação de um utilizador num evento (`null` se não participar). */
+  readonly participation: (eventId: string, userId: string) => Promise<EventParticipantRecord | null>;
+  /**
+   * Marca a participação (substitui a anterior) e ajusta os confirmados.
+   *
+   * `going` ocupa um lugar; `interested` e `maybe` não. Sair (`null`) liberta
+   * o lugar. Devolve `false` quando o evento não aceita (cheio, começado,
+   * cancelado) — a regra é do domínio, o repositório só recusa o que a rota
+   * já verificou.
+   */
+  readonly setParticipation: (eventId: string, userId: string, status: 'going' | 'interested' | 'maybe' | null) => Promise<boolean>;
+  /** Cancela um evento (só o anfitrião). */
+  readonly cancel: (eventId: string, hostId: string) => Promise<boolean>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

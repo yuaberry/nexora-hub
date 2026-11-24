@@ -27,6 +27,7 @@ export * from './social/friends.js';
 export * from './social/presence.js';
 export * from './community/forums.js';
 export * from './community/clans.js';
+export * from './community/events.js';
 export * from './telemetry/procfs.js';
 export * from './optimizer/targets.js';
 export * from './optimizer/report.js';

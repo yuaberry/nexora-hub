@@ -81,6 +81,14 @@ export type LaunchResultView =
 /** Motivos de recusa de arranque — chaves de tradução, não texto solto. */
 export type LaunchRefusalKey = 'missing-executable' | 'already-running' | 'not-found' | 'no-runner' | 'not-installed';
 
+/** O que o widget de sessão mostra. */
+export interface WidgetData {
+  /** Jogo em curso, ou `null` (sem sessão). */
+  readonly gameTitle: string | null;
+  /** O relógio da sessão já formatado (`null` sem sessão). */
+  readonly clock: string | null;
+}
+
 /** Resumo de uma sessão em curso. */
 export interface SessionSummaryView {
   readonly sessionId: string;
@@ -715,6 +723,16 @@ export interface DesktopApi {
     readonly similar: (gameId: string) => Promise<RecommendationsView>;
     /** Recomendado para si (exige conta). */
     readonly forYou: (token: string) => Promise<RecommendationsView>;
+  };
+  readonly widget: {
+    /** Mostra ou esconde o widget de sessão (o HUD sempre ao topo). */
+    readonly toggle: () => Promise<{ readonly ok: boolean; readonly visible: boolean }>;
+    /** O widget está visível? */
+    readonly visible: () => Promise<{ readonly visible: boolean }>;
+    /** O botão de parar do HUD (para a sessão real). */
+    readonly stop: () => Promise<{ readonly ok: boolean }>;
+    /** Dados empurrados pelo processo principal (a cada segundo). */
+    readonly onData: (listener: (data: WidgetData) => void) => () => void;
   };
   readonly overlay: {
     /** Assina os dados empurrados pelo processo principal. */

@@ -660,7 +660,32 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 3g — A web mostra a biblioteca sincronizada (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 9a — Widget de sessão (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** — `formatClock` (o relógio `H:MM:SS`/`M:SS`, puro e
+      partilhado) — 4 testes.
+- [x] **Launcher** (`widget.ts`) — janela pequena, sem moldura, sempre ao topo,
+      que empurra o jogo em curso e o relógio **da sessão real** a cada
+      segundo; o botão de parar é o mesmo do launcher (o runner), e sem sessão
+      a janela fecha-se — um HUD sem jogo é um adesivo colado ao ecrã.
+- [x] **Interface** — cartão "Widget de sessão" nas Configurações
+      (mostrar/esconder, com o estado real da janela); o HUD mostra o título,
+      o relógio e o botão de parar.
+
+### Prova de execução real (2026-11-24)
+
+- aberto pelas Configurações: a janela aparece com **"Sem sessão em curso"**;
+- com o R.E.P.O. lançado: **"R.E.P.O. 0:06 Tempo de sessão medido Parar"** —
+      o relógio é o da sessão real;
+- o botão Parar parou a sessão (`corridas: 0`) e a janela **fechou-se**
+      (`isVisible: false`);
+- bug apanhado pela prova: o widget renderizava invisível — as cores vivem
+  nos blocos `[data-theme]` e a página do widget não aplicava o tema ao
+  documento (o `useDocumentPreferences` faltava lá); e o HUD transbordava a
+  janela (faltava o enquadramento `widget.css`);
+- `pnpm typecheck` limpo; **745 testes verdes** no total.\n\n## Fase 3g — A web mostra a biblioteca sincronizada (2026-11-24)
 
 ### Entregue
 

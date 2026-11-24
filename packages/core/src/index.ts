@@ -30,6 +30,7 @@ export * from './community/clans.js';
 export * from './community/events.js';
 export * from './community/reputation.js';
 export * from './diagnostics/rules.js';
+export * from './format/clock.js';
 export * from './telemetry/procfs.js';
 export * from './optimizer/targets.js';
 export * from './optimizer/report.js';

@@ -1,0 +1,24 @@
+/**
+ * Enquadramento do widget — a página é a janela.
+ *
+ * Uma janela pequena e transparente não tem folga: a raiz ocupa tudo, sem
+ * margens do navegador, e o HUD preenche a altura. Sem isto, o conteúdo
+ * transbordava e aparecia uma barra de scroll dentro do HUD.
+ */
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+.nx-widget {
+  height: 100%;
+  box-sizing: border-box;
+}

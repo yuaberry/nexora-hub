@@ -165,6 +165,20 @@ const api: DesktopApi = {
     similar: (gameId) => ipcRenderer.invoke('recommend:similar', gameId) as Promise<RecommendationsView>,
     forYou: (token) => ipcRenderer.invoke('recommend:forYou', token) as Promise<RecommendationsView>,
   },
+  widget: {
+    toggle: () => ipcRenderer.invoke('widget:toggle') as Promise<{ readonly ok: boolean; readonly visible: boolean }>,
+    visible: () => ipcRenderer.invoke('widget:visible') as Promise<{ readonly visible: boolean }>,
+    stop: () => ipcRenderer.invoke('widget:stop') as Promise<{ readonly ok: boolean }>,
+    onData: (listener) => {
+      const handler = (_event: Electron.IpcRendererEvent, data: import('../shared/preload-api.js').WidgetData): void => {
+        listener(data);
+      };
+      ipcRenderer.on('widget:data', handler);
+      return () => {
+        ipcRenderer.removeListener('widget:data', handler);
+      };
+    },
+  },
   overlay: {
     onData: (listener) => {
       const handler = (_event: unknown, data: OverlayData) => listener(data);

@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import {
   Badge,
+  Button,
   Card,
   LOCALE_OPTIONS,
   PlannedNotice,
@@ -33,11 +34,34 @@ export function SettingsPage(): ReactNode {
   const isDesktop = useIsDesktop();
   const appInfo = useAppInfo();
 
+  const [widgetOn, setWidgetOn] = useState(false);
+  const api = globalThis.window?.nexora;
+
+  // O widget de sessão: o HUD sempre ao topo. O estado vive no processo
+  // principal (a janela é dele); o botão apenas pede o alternar.
+  const onToggleWidget = useCallback(async () => {
+    if (api === undefined) {
+      return;
+    }
+    const result = await api.widget.toggle();
+    setWidgetOn(result.visible);
+  }, [api]);
+
+  useEffect(() => {
+    if (api === undefined) {
+      return;
+    }
+    void api.widget.visible().then((result) => {
+      setWidgetOn(result.visible);
+    });
+  }, [api]);
+
   const usage = storage.value;
   const totalBytes = usage?.totalBytes ?? 0;
   const freeBytes = usage?.freeBytes ?? 0;
   const gamesBytes = usage?.gamesBytes ?? 0;
   const otherBytes = Math.max(0, totalBytes - freeBytes - gamesBytes);
+
 
   return (
     <div className="nx-stack">
@@ -47,6 +71,15 @@ export function SettingsPage(): ReactNode {
       </div>
 
       <div className="hub-settings-grid">
+      <Card>
+        <div className="nx-stack">
+          <div className="hub-row hub-row--between">
+            <strong>{t('widget.title')}</strong>
+            <Button onClick={() => void onToggleWidget()}>{widgetOn ? t('widget.hide') : t('widget.show')}</Button>
+          </div>
+          <p className="nx-subtitle">{t('widget.hint')}</p>
+        </div>
+      </Card>
       <Card>
         <div className="nx-stack">
           <strong>{t('settings.appearance')}</strong>

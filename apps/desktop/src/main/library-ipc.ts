@@ -16,6 +16,7 @@ import { DEFAULT_API_BASE_URL } from './config.js';
 import { ensureWinePrefix } from './wine-prefix.js';
 import { startSessionPresence } from './friends-ipc.js';
 import { registerOverlayShortcut, setCurrentGame, unregisterOverlayShortcut } from './overlay.js';
+import { setWidgetSession } from './widget.js';
 import { findGameMode } from './optimizer.js';
 import { installDesktopShortcut } from './shortcuts.js';
 import { openExternal } from './window.js';
@@ -338,6 +339,7 @@ export function registerIpc(dependencies: IpcDependencies): void {
       registerOverlayShortcut();
     }
     setCurrentGame({ title: game.title, startedAt: outcome.session.startedAt });
+    setWidgetSession({ title: game.title, startedAt: outcome.session.startedAt });
 
     const sessionEnd = runner.wait(outcome.session.sessionId);
     if (typeof launchToken === 'string' && launchToken !== '') {
@@ -349,6 +351,7 @@ export function registerIpc(dependencies: IpcDependencies): void {
     void sessionEnd.then((summary) => {
       // O jogo acabou: o overlay perde o jogo em curso e o atalho sai.
       setCurrentGame(null);
+      setWidgetSession(null);
       unregisterOverlayShortcut();
       if (summary !== null && !summary.crashed) {
         library.addPlayedSeconds(game.externalKey, summary.durationSeconds, summary.endedAt ?? new Date().toISOString());

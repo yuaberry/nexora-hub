@@ -25,6 +25,7 @@ import { registerBenchmarkIpc } from './benchmark-ipc.js';
 import { registerModsIpc } from './mods-ipc.js';
 import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerOverlayIpc } from './overlay-ipc.js';
+import { registerWidgetIpc } from './widget-ipc.js';
 import { registerDiagnosticsIpc } from './diagnostics-ipc.js';
 import { registerCoversIpc } from './covers-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
@@ -151,6 +152,9 @@ function bootstrap(): void {
 
   // Diagnóstico: as leituras reais do sistema, num relatório com limiares.
   registerDiagnosticsIpc();
+
+  // Widget de sessão: o Hudson que flutua sobre o jogo.
+  registerWidgetIpc(runner);
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
   registerCoversIpc(library, coverCacheDir(config.databasePath));

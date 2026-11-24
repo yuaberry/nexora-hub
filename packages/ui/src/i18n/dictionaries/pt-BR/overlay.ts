@@ -1,5 +1,12 @@
 /** Dicionário PT-BR — overlay por cima do jogo. */
 export const overlay = {
+  'widget.idle': 'Sem sessão em curso',
+  'widget.elapsed': 'Tempo de sessão medido',
+  'widget.stop': 'Parar',
+  'widget.title': 'Widget de sessão',
+  'widget.show': 'Mostrar widget',
+  'widget.hide': 'Esconder widget',
+  'widget.hint': 'Uma faixa sempre ao topo com o jogo em curso e o relógio da sessão.',
   'overlay.title': 'Overlay',
   'overlay.hint': 'Medidas reais do sistema.',
   'overlay.session': 'Sessão',

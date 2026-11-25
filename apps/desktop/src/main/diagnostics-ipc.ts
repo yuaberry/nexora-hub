@@ -14,6 +14,7 @@
 import { ipcMain } from 'electron';
 import { cpus, freemem, loadavg, totalmem } from 'node:os';
 import { buildReport, type DiagnosticReport } from '@nexora/core';
+import { readBattery } from './battery.js';
 import { TelemetryObserver } from './telemetry.js';
 
 /** A leitura do disco (a mesma da barra de armazenamento). */
@@ -51,7 +52,15 @@ export async function collectDiagnostics(): Promise<DiagnosticReport> {
   });
 }
 
-/** Regista o canal do diagnóstico. */
+/** Regista os canais do diagnóstico e da bateria. */
 export function registerDiagnosticsIpc(): void {
   ipcMain.handle('diagnostics:report', async (): Promise<DiagnosticReport> => collectDiagnostics());
+
+  // O estado da bateria (`null` quando não há — um desktop não tem).
+  ipcMain.handle('diagnostics:battery', (): {
+    readonly percent: number;
+    readonly status: string;
+    readonly charging: boolean;
+    readonly level: 'ok' | 'low' | 'critical';
+  } | null => readBattery());
 }

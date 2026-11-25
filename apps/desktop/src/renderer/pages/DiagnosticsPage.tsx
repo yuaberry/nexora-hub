@@ -22,6 +22,22 @@ const TONE = {
 export function DiagnosticsPage(): ReactNode {
   const { t, locale } = useInterface();
   const [report, setReport] = useState<DiagnosticReportView | null>(null);
+  const [battery, setBattery] = useState<{
+    percent: number;
+    status: string;
+    charging: boolean;
+    level: 'ok' | 'low' | 'critical';
+  } | null | undefined>(undefined);
+
+  // A bateria: `undefined` enquanto não se lê, `null` quando não há (um
+  // desktop não tem bateria — e a interface não finge uma).
+  useEffect(() => {
+    const api = globalThis.window?.nexora;
+    if (api === undefined) {
+      return;
+    }
+    void api.diagnostics.battery().then(setBattery).catch(() => setBattery(null));
+  }, []);
 
   const reload = useCallback(async () => {
     const api = globalThis.window?.nexora;
@@ -86,6 +102,29 @@ export function DiagnosticsPage(): ReactNode {
         <h1 className="nx-title">{t('diagnostics.title')}</h1>
         <Button onClick={() => void reload()}>{t('diagnostics.reread')}</Button>
       </div>
+
+      {battery === undefined ? null : battery === null ? null : (
+        <Card>
+          <div className="nx-stack">
+            <div className="hub-row hub-row--between">
+              <strong>{t('battery.title')}</strong>
+              <span className="hub-row">
+                <Badge tone={battery.level === 'ok' ? 'positive' : battery.level === 'low' ? 'planned' : 'danger'}>
+                  {new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(battery.percent)} %
+                </Badge>
+                <Badge tone="neutral">
+                  {t(battery.charging
+                    ? 'battery.charging'
+                    : battery.status.toLowerCase() === 'full'
+                      ? 'battery.full'
+                      : 'battery.discharging')}
+                </Badge>
+              </span>
+            </div>
+            <span className="hub-progress" style={{ width: `${battery.percent}%` }} />
+          </div>
+        </Card>
+      )}
 
       {report === null ? (
         <p className="nx-subtitle">{t('common.loading')}</p>

@@ -148,6 +148,7 @@ const api: DesktopApi = {
   },
   diagnostics: {
     report: () => ipcRenderer.invoke('diagnostics:report') as Promise<import('../shared/preload-api.js').DiagnosticReportView>,
+    battery: () => ipcRenderer.invoke('diagnostics:battery') as Promise<{ readonly percent: number; readonly status: string; readonly charging: boolean; readonly level: 'ok' | 'low' | 'critical' } | null>,
   },
   telemetry: {
     sample: () => ipcRenderer.invoke('telemetry:sample') as Promise<TelemetrySampleView>,

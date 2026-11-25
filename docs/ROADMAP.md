@@ -660,7 +660,31 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5j — Tarefas por período (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 7a — Bateria no diagnóstico (2026-11-25)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/battery/rules.ts`) — a percentagem, o estado
+      (carregar, na bateria, cheia) e as bandas declaradas; uma leitura
+      impossível não existe (`null`) — 5 testes.
+- [x] **Launcher** (`battery.ts`) — lê o kernel (`/sys/class/power_supply`,
+      pastas `BAT…`) e traduz pelas regras; noutros sistemas, `null`.
+- [x] **Interface** — cartão "Bateria" no Diagnóstico: percentagem, estado e
+      barra, com o tom do nível.
+
+### Prova de execução real (2026-11-25)
+
+- a leitura da app: **98 %, "A carregar"** — igual ao kernel
+      (`/sys/class/power_supply/BAT0`);
+- o cartão aparece no Diagnóstico com a barra e o selo correctos;
+- a mesma página mostrou, honestamente, a **Carga em crítico** (1,52 por
+      núcleo) durante os probes — o diagnóstico diz o que o sistema está a
+      fazer, não o que se gostaria;
+- `pnpm typecheck` limpo; **806 testes verdes** no total.
+
+> **Layouts e remap** (o resto da Fase 7) ficam planeados: precisam de
+> integração ao nível do sistema (comandos de jogo e remapeação de teclas são
+> do sistema operativo, e fingir um remapeador dentro do launcher seria mentir).\n\n## Fase 5j — Tarefas por período (2026-11-25)
 
 ### Entregue
 

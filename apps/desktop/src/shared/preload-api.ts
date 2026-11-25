@@ -729,6 +729,13 @@ export interface DesktopApi {
      * `unknown`: a interface diz "sem leitura", nunca um número inventado.
      */
     readonly report: () => Promise<DiagnosticReportView>;
+    /** O estado da bateria (`null` quando não há — um desktop não tem). */
+    readonly battery: () => Promise<{
+      readonly percent: number;
+      readonly status: string;
+      readonly charging: boolean;
+      readonly level: 'ok' | 'low' | 'critical';
+    } | null>;
   };
   readonly telemetry: {
     /** Uma amostra do sistema (CPU, memória, carga, temperaturas). */

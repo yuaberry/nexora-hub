@@ -660,7 +660,32 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 9b — Remote Play via Moonlight (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 10 — Varredura completa e lançamento 0.3.0 (2026-11-25)
+
+### Entregue
+
+- [x] **Afirmações falsas corrigidas** — a Home e a Biblioteca anunciavam
+      "Saves na nuvem", "Amigos" e "Loja" como **Planejado**, e os três já
+      existem; a página dos planeados e as Configurações tinham notas do
+      mesmo tipo. Nada é anunciado como faltando quando existe (a regra da
+      honestidade vale nos dois sentidos).
+- [x] **Auditoria de canais IPC** — 89 canais registados, 94 invocados: zero
+      canais órfãos, zero canais mortos (contrato completo).
+- [x] **Migrações 0000–0008** aplicadas numa base PostgreSQL real (cluster
+      temporário): todas as tabelas criadas, e a suíte completa correu contra
+      ela — **761 testes verdes, zero ignorados**.
+- [x] **Empacotamento** — os três alvos construídos com a versão 0.3.0
+      (AppImage, deb, NSIS); o Windows precisa de `WINEPREFIX` funcional
+      (documentado no AGENTS.md — a varredura apanhou o falhanço com o
+      prefixo quebrado do sistema).
+- [x] **Lançamento v0.3.0** publicado no GitHub com os três artefactos.
+
+### Prova de execução real (2026-11-25)
+
+- `pnpm typecheck` limpo; **768 testes verdes**;
+- migrações aplicadas e integração correndo contra PostgreSQL real;
+- `nexora-hub-0.3.0-x86_64.AppImage`, `-amd64.deb` e `-x64.exe` construídos;
+- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.3.0\n\n## Fase 9b — Remote Play via Moonlight (2026-11-25)
 
 ### Entregue
 

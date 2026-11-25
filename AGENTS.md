@@ -41,6 +41,7 @@ dedicado (`docs/ARCHITECTURE.md` D7).
 | `pnpm test` | todos os projetos de teste (Vitest 4, `test.projects` na raiz) |
 | `pnpm build` | compila packages, API, web e desktop |
 | `pnpm --filter @nexora/desktop package` | empacota AppImage + deb (`--publish never`) |
+| `pnpm --filter @nexora/desktop package:all` | empacota Linux + Windows — no Windows, se o prefixo do Wine do sistema estiver quebrado, usar `WINEPREFIX=~/wine-build` (prefixo completo) |
 
 Requer Node >= 24 e pnpm 12 (`packageManager` fixado no `package.json`).
 Contentores (opcionais — a API corre sem eles, em modo degradado):

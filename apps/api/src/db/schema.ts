@@ -19,6 +19,7 @@ export * from './forums-schema.js';
 export * from './clans-schema.js';
 export * from './events-schema.js';
 export * from './library-sync-schema.js';
+export * from './screenshots-schema.js';
 export * from './wishlist-schema.js';
 export * from './family-schema.js';
 export * from './friends-schema.js';

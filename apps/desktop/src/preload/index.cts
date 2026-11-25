@@ -169,6 +169,9 @@ const api: DesktopApi = {
     capture: (gameKey) => ipcRenderer.invoke('screens:capture', gameKey) as Promise<{ readonly ok: boolean; readonly shot?: import('../shared/preload-api.js').ScreenshotView }>,
     list: (gameKey) => ipcRenderer.invoke('screens:list', gameKey) as Promise<readonly import('../shared/preload-api.js').ScreenshotView[]>,
     remove: (gameKey, fileName) => ipcRenderer.invoke('screens:remove', gameKey, fileName) as Promise<boolean>,
+    upload: (gameKey, fileName, token) => ipcRenderer.invoke('screens:upload', gameKey, fileName, token) as Promise<{ readonly ok: boolean; readonly shot?: { readonly id: string; readonly gameKey: string; readonly fileName: string; readonly sizeBytes: number; readonly createdAt: string } }>,
+    cloudList: (gameKey, token) => ipcRenderer.invoke('screens:cloudList', gameKey, token) as Promise<readonly { readonly id: string; readonly gameKey: string; readonly fileName: string; readonly sizeBytes: number; readonly createdAt: string }[]>,
+    cloudRemove: (shotId, token) => ipcRenderer.invoke('screens:cloudRemove', shotId, token) as Promise<boolean>,
   },
   remotePlay: {
     detect: () => ipcRenderer.invoke('remotePlay:detect') as Promise<{ readonly binary: string | null }>,

@@ -64,6 +64,13 @@
       "when": 1795420000000,
       "tag": "0008_library_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795450000000,
+      "tag": "0009_screenshots",
+      "breakpoints": true
     }
   ]
 }

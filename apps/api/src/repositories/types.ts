@@ -500,6 +500,7 @@ export interface Repositories {
   readonly clans: ClanRepository;
   readonly events: EventRepository;
   readonly librarySync: SyncedLibraryRepository;
+  readonly screenshots: ScreenshotRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -763,6 +764,29 @@ export interface SyncedLibraryRepository {
   readonly sync: (userId: string, entries: readonly SyncedEntryInput[]) => Promise<{ updated: number; added: number }>;
   /** Lista a biblioteca do utilizador (para a web e outra máquina). */
   readonly list: (userId: string) => Promise<readonly SyncedEntryRecord[]>;
+}
+
+/** Uma captura na nuvem (o índice; o ficheiro vive no disco). */
+export interface ScreenshotRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly gameKey: string;
+  readonly fileName: string;
+  readonly sizeBytes: number;
+  readonly createdAt: Date;
+}
+
+export interface ScreenshotRepository {
+  /** Guarda uma captura (o ficheiro no disco, o índice na memória). */
+  readonly create: (input: { userId: string; gameKey: string; fileName: string; bytes: Buffer }) => Promise<ScreenshotRecord>;
+  /** Lista as capturas do utilizador (de um jogo, quando pedido). */
+  readonly list: (userId: string, gameKey?: string) => Promise<readonly ScreenshotRecord[]>;
+  /** Procura uma captura (só do próprio utilizador). */
+  readonly find: (userId: string, id: string) => Promise<ScreenshotRecord | null>;
+  /** Os bytes de uma captura (`null` quando não existe). */
+  readonly read: (userId: string, id: string) => Buffer | null;
+  /** Apaga uma captura (só do dono). */
+  readonly remove: (userId: string, id: string) => Promise<boolean>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

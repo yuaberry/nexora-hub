@@ -752,6 +752,21 @@ export interface DesktopApi {
     readonly list: (gameKey: string) => Promise<readonly { readonly fileName: string; readonly sizeBytes: number; readonly createdAt: string; readonly path: string }[]>;
     /** Apaga uma captura do jogo. */
     readonly remove: (gameKey: string, fileName: string) => Promise<boolean>;
+    /** Sobe uma captura para a conta. */
+    readonly upload: (gameKey: string, fileName: string, token: string) => Promise<{
+      readonly ok: boolean;
+      readonly shot?: { readonly id: string; readonly gameKey: string; readonly fileName: string; readonly sizeBytes: number; readonly createdAt: string };
+    }>;
+    /** As capturas do jogo na nuvem (as da conta). */
+    readonly cloudList: (gameKey: string, token: string) => Promise<readonly {
+      readonly id: string;
+      readonly gameKey: string;
+      readonly fileName: string;
+      readonly sizeBytes: number;
+      readonly createdAt: string;
+    }[]>;
+    /** Remove uma captura da nuvem. */
+    readonly cloudRemove: (shotId: string, token: string) => Promise<boolean>;
   };
   readonly remotePlay: {
     /** O binário do Moonlight no sistema (`null` quando não está instalado). */

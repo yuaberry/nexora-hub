@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import { createDatabase } from '../db/client.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { Env } from '../config/env.js';
@@ -21,6 +22,7 @@ import { MemoryForumRepository } from './memory-forums.js';
 import { MemoryClanRepository } from './memory-clans.js';
 import { MemoryEventRepository } from './memory-events.js';
 import { MemoryLibrarySyncRepository } from './memory-library-sync.js';
+import { MemoryScreenshotRepository } from './memory-screenshots.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
 import { PostgresAuthSessionRepository, PostgresMfaRepository } from './postgres-auth.js';
@@ -29,6 +31,7 @@ import { PostgresForumRepository } from './postgres-forums.js';
 import { PostgresClanRepository } from './postgres-clans.js';
 import { PostgresEventRepository } from './postgres-events.js';
 import { PostgresLibrarySyncRepository } from './postgres-library-sync.js';
+import { PostgresScreenshotRepository } from './postgres-screenshots.js';
 import { PostgresLibraryRepository, PostgresPlaySessionRepository } from './postgres-game.js';
 import type { Repositories } from './types.js';
 
@@ -53,6 +56,7 @@ export function createMemoryRepositories(): Repositories {
     clans: new MemoryClanRepository(),
     events: new MemoryEventRepository(),
     librarySync: new MemoryLibrarySyncRepository(),
+    screenshots: new MemoryScreenshotRepository(join(process.cwd(), 'data', 'screenshots')),
     reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
     wishlist: new MemoryWishlistRepository(),
@@ -91,6 +95,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     clans: new PostgresClanRepository(database.db),
     events: new PostgresEventRepository(database.db),
     librarySync: new PostgresLibrarySyncRepository(database.db),
+    screenshots: new PostgresScreenshotRepository(database.db, join(process.cwd(), 'data', 'screenshots')),
     reviews: new PostgresReviewRepository(database.db),
     library: new PostgresLibraryRepository(database.db),
     sessions: new PostgresPlaySessionRepository(database.db),

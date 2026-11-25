@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Button, Card, useInterface } from '@nexora/ui';
 import { coverUrl } from '../lib/media.js';
+import { accessToken } from '../lib/api.js';
 import type { ScreenshotView } from '../../shared/preload-api.js';
+
+/** Uma captura na nuvem (a da conta). */
+interface CloudShot {
+  readonly id: string;
+  readonly gameKey: string;
+  readonly fileName: string;
+  readonly sizeBytes: number;
+  readonly createdAt: string;
+}
 
 /**
  * Capturas — os momentos do jogo, guardados.
@@ -15,6 +25,7 @@ export function ScreensCard({ gameKey }: { readonly gameKey: string }): ReactNod
   const api = globalThis.window?.nexora;
 
   const [shots, setShots] = useState<readonly ScreenshotView[] | null>(null);
+  const [cloud, setCloud] = useState<readonly CloudShot[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
@@ -22,6 +33,8 @@ export function ScreensCard({ gameKey }: { readonly gameKey: string }): ReactNod
       return;
     }
     setShots(await api.screens.list(gameKey));
+    const token = accessToken();
+    setCloud(token === null ? [] : await api.screens.cloudList(gameKey, token));
   }, [api, gameKey]);
 
   useEffect(() => {
@@ -48,6 +61,37 @@ export function ScreensCard({ gameKey }: { readonly gameKey: string }): ReactNod
     [api, gameKey, reload],
   );
 
+  const onUpload = useCallback(
+    async (fileName: string) => {
+      if (api === undefined) {
+        return;
+      }
+      const token = accessToken();
+      if (token === null) {
+        setMessage(t('cloud.login'));
+        return;
+      }
+      const result = await api.screens.upload(gameKey, fileName, token);
+      setMessage(result.ok ? t('screens.uploaded') : t('screens.uploadFailed'));
+      await reload();
+    },
+    [api, gameKey, reload, t],
+  );
+
+  const onCloudRemove = useCallback(
+    async (shotId: string) => {
+      if (api === undefined) {
+        return;
+      }
+      const token = accessToken();
+      if (token !== null) {
+        await api.screens.cloudRemove(shotId, token);
+      }
+      await reload();
+    },
+    [api, reload],
+  );
+
   return (
     <Card>
       <div className="nx-stack">
@@ -72,16 +116,26 @@ export function ScreensCard({ gameKey }: { readonly gameKey: string }): ReactNod
                   loading="lazy"
                   style={{ width: '100%', height: '100%' }}
                 />
-                <button
-                  type="button"
-                  className="nx-widget__stop"
-                  style={{ position: 'absolute', top: '0.25rem', right: '0.25rem' }}
-                  onClick={() => {
-                    void onRemove(shot.fileName);
-                  }}
-                >
-                  {t('screens.remove')}
-                </button>
+                <span style={{ position: 'absolute', top: '0.25rem', left: '0.25rem', display: 'flex', gap: '0.25rem' }}>
+                  <button
+                    type="button"
+                    className="nx-widget__stop"
+                    onClick={() => {
+                      void onUpload(shot.fileName);
+                    }}
+                  >
+                    {t('screens.upload')}
+                  </button>
+                  <button
+                    type="button"
+                    className="nx-widget__stop"
+                    onClick={() => {
+                      void onRemove(shot.fileName);
+                    }}
+                  >
+                    {t('screens.remove')}
+                  </button>
+                </span>
               </div>
             ))}
             <span className="nx-subtitle">
@@ -91,6 +145,29 @@ export function ScreensCard({ gameKey }: { readonly gameKey: string }): ReactNod
               )}{' '}
               MB
             </span>
+          </div>
+        )}
+
+        <strong>{t('screens.cloud')}</strong>
+        {cloud.length === 0 ? (
+          <p className="nx-subtitle">{t('screens.cloudEmpty')}</p>
+        ) : (
+          <div className="hub-gallery">
+            {cloud.map((shot) => (
+              <div key={shot.id} className="hub-gallery__item" style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  className="nx-widget__stop"
+                  style={{ position: 'absolute', top: '0.25rem', right: '0.25rem', zIndex: 1 }}
+                  onClick={() => {
+                    void onCloudRemove(shot.id);
+                  }}
+                >
+                  {t('screens.remove')}
+                </button>
+                <span className="nx-subtitle" style={{ padding: '0.4rem' }}>{shot.fileName}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>

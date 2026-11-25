@@ -660,7 +660,28 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5h — Capturas de ecrã (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5i — Capturas na nuvem (2026-11-25)
+
+### Entregue
+
+- [x] **API** (`modules/screenshots`) — subir (PNG no corpo, com jogo e nome
+      validados), listar as minhas (por jogo quando pedido), descarregar e
+      apagar; migração `0009`; a captura de outro utilizador devolve **404** —
+      4 testes de integração.
+- [x] **Launcher** — o processo principal lê o ficheiro e sobe com a sessão;
+      canais para subir, listar na nuvem e remover da nuvem.
+- [x] **Interface** — cartão "Capturas" com as locais (Enviar/Remover) e a
+      secção "Na nuvem (conta)" com o que já subiu.
+
+### Prova de execução real (2026-11-25)
+
+- a captura local subiu pelo botão "Enviar" — a API confirma **1 captura** na
+      conta;
+- o download devolve os **mesmos 249 155 bytes** com a assinatura PNG
+      (`89 50`) — ida e volta completas;
+- o cartão mostrou "Captura enviada para a conta", as três locais com
+      Enviar/Remover e a da nuvem listada;
+- `pnpm typecheck` limpo; **791 testes verdes** no total.\n\n## Fase 5h — Capturas de ecrã (2026-11-25)
 
 ### Entregue
 

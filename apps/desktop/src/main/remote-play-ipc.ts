@@ -9,6 +9,7 @@
 import { ipcMain } from 'electron';
 import { isHostAddress, type MoonlightApp } from '@nexora/core';
 import { findMoonlight, listApps, pairHost, streamApp } from './remote-play.js';
+import { findSunshine, startSunshine, sunshineStatus } from './sunshine.js';
 
 /** Regista os canais do Remote Play. */
 export function registerRemotePlayIpc(): void {
@@ -42,6 +43,26 @@ export function registerRemotePlayIpc(): void {
       return { ok: false };
     }
     return { ok: true, items: await listApps(binary, host.trim()) };
+  });
+
+  // O estado do anfitrião desta máquina (Sunshine instalado? a correr? endereço).
+  ipcMain.handle('remotePlay:sunshine', async (): Promise<{
+    readonly ok: boolean;
+    readonly binary: string | null;
+    readonly running: boolean;
+    readonly url: string | null;
+  }> => {
+    const estado = await sunshineStatus();
+    return { ok: true, ...estado };
+  });
+
+  // Dá o anfitrião a arrancar (o Sunshine vive sozinho).
+  ipcMain.handle('remotePlay:sunshineStart', async (): Promise<{ readonly ok: boolean }> => {
+    const binary = await findSunshine();
+    if (binary === null) {
+      return { ok: false };
+    }
+    return { ok: startSunshine(binary) };
   });
 
   // Jogar um título do anfitrião (o Moonlight vive sozinho, desacoplado).

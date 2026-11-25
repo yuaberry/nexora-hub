@@ -29,6 +29,7 @@ export function RemotePlayPage(): ReactNode {
   const [host, setHost] = useState('');
   const [apps, setApps] = useState<readonly RemoteApp[] | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [sun, setSun] = useState<{ binary: string | null; running: boolean; url: string | null } | null>(null);
 
   useEffect(() => {
     if (api === undefined) {
@@ -39,6 +40,16 @@ export function RemotePlayPage(): ReactNode {
     });
   }, [api]);
 
+  // O anfitrião desta máquina (Sunshine): instalado, a correr, endereço.
+  useEffect(() => {
+    if (api === undefined) {
+      return;
+    }
+    void api.remotePlay.sunshine().then((result) => {
+      setSun({ binary: result.binary, running: result.running, url: result.url });
+    });
+  }, [api]);
+
   const onPair = useCallback(async () => {
     if (api === undefined || !isHostAddress(host)) {
       return;
@@ -46,6 +57,20 @@ export function RemotePlayPage(): ReactNode {
     const result = await api.remotePlay.pair(host.trim());
     setMessage(result.ok ? t('remotePlay.paired') : t('remotePlay.pairFailed'));
   }, [api, host, t]);
+
+  const onStartHost = useCallback(async () => {
+    if (api === undefined) {
+      return;
+    }
+    const result = await api.remotePlay.sunshineStart();
+    setMessage(result.ok ? t('remotePlay.hostcard.started') : t('remotePlay.hostcard.startFailed'));
+    // O estado da porta pode demorar um instante: volta a perguntar.
+    setTimeout(() => {
+      void api.remotePlay.sunshine().then((estado) => {
+        setSun({ binary: estado.binary, running: estado.running, url: estado.url });
+      });
+    }, 3_000);
+  }, [api, t]);
 
   const onList = useCallback(async () => {
     if (api === undefined || !isHostAddress(host)) {
@@ -72,12 +97,45 @@ export function RemotePlayPage(): ReactNode {
     );
   }
 
+
   return (
     <div className="nx-stack">
       <div className="hub-row hub-row--between">
         <h1 className="nx-title">{t('remotePlay.title')}</h1>
         <Badge tone="positive">{binary}</Badge>
       </div>
+
+      {sun === null ? null : (
+        <Card>
+          <div className="nx-stack">
+            <div className="hub-row hub-row--between">
+              <strong>{t('remotePlay.hostcard.title')}</strong>
+              <span className="hub-row">
+                <Badge tone={sun.binary === null ? 'planned' : 'neutral'}>
+                  {sun.binary === null ? t('remotePlay.hostcard.notInstalled') : t('remotePlay.hostcard.installed')}
+                </Badge>
+                <Badge tone={sun.running ? 'positive' : 'planned'}>
+                  {sun.running ? t('remotePlay.hostcard.running') : t('remotePlay.hostcard.stopped')}
+                </Badge>
+              </span>
+            </div>
+            {sun.url === null ? null : (
+              <>
+                <span className="nx-subtitle">{t('remotePlay.hostcard.address')}</span>
+                <strong className="hub-break">{sun.url}</strong>
+                <span className="nx-subtitle">{t('remotePlay.hostcard.hint')}</span>
+              </>
+            )}
+            {sun.binary === null ? null : (
+              <div className="hub-row">
+                <Button onClick={() => void onStartHost()} disabled={sun.running}>
+                  {t('remotePlay.hostcard.start')}
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div className="nx-stack">

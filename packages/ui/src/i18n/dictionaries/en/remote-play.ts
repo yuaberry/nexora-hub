@@ -1,4 +1,4 @@
-/** EN dictionary — Remote Play (Moonlight). */
+/** EN dictionary — Remote Play (Moonlight + Sunshine). */
 export const remotePlay = {
   'remotePlay.title': 'Remote Play',
   'remotePlay.missing.title': 'Moonlight not found',
@@ -14,4 +14,14 @@ export const remotePlay = {
   'remotePlay.apps': 'Host games',
   'remotePlay.appsEmpty': 'The host returned no games.',
   'remotePlay.play': 'Play',
+  'remotePlay.hostcard.title': 'This machine as host (Sunshine)',
+  'remotePlay.hostcard.installed': 'Sunshine installed',
+  'remotePlay.hostcard.notInstalled': 'Sunshine not installed',
+  'remotePlay.hostcard.running': 'Running',
+  'remotePlay.hostcard.stopped': 'Stopped',
+  'remotePlay.hostcard.start': 'Start host',
+  'remotePlay.hostcard.address': 'Address for other devices',
+  'remotePlay.hostcard.hint': 'Open this address on another device to pair (the PIN shows on the host screen).',
+  'remotePlay.hostcard.started': 'Host starting — check the status above.',
+  'remotePlay.hostcard.startFailed': 'Could not start Sunshine.',
 } as const;

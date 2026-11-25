@@ -660,7 +660,34 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 10 — Varredura completa e lançamento 0.3.0 (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 9c — Sunshine (o anfitrião) e Remote Play completo (2026-11-25)
+
+### Entregue
+
+- [x] **Instalados e provados na máquina**: Moonlight 6.2.0 (cliente,
+      `~/.local/opt/moonlight`) e Sunshine 2026.1123.40502 (anfitrião,
+      `~/.local/opt/sunshine`), ambos em `~/.local/bin` — o `--version` dos
+      dois responde.
+- [x] **Domínio** (`remote/sunshine.ts`) — as portas documentadas (47984,
+      47989, 47990), o endereço web (`https://<ip>:47990`) e o que é um
+      endereço de rede local — 4 testes.
+- [x] **Launcher** (`sunshine.ts`) — detecta o binário, pergunta **à porta**
+      se está a correr (um processo que arrancou e morreu não é anfitrião),
+      dá-o a arrancar desacoplado e diz o endereço — 5 testes.
+- [x] **Interface** — cartal "Esta máquina como anfitriã (Sunshine)" na
+      página Remote Play: instalado, a correr, endereço, e iniciar.
+
+### Prova de execução real (2026-11-25)
+
+- a detecção do cliente encontrou **`moonlight-qt`** instalado;
+- a detecção do anfitrião encontrou **`sunshine`**, e o estado deu
+      `running: true` com `https://192.168.15.142:47990`;
+- confirmação independente: o processo real (`sunshine`, pid 458789) escuta
+      nas **três portas** e a web responde (307 → login);
+- o cartão da interface mostrou exactamente esse estado;
+- bug apanhado pela prova: a página aparecia **preta** — um `useCallback`
+  depois de um retorno condicional (React #310); corrigido;
+- `pnpm typecheck` limpo; **777 testes verdes** no total.\n\n## Fase 10 — Varredura completa e lançamento 0.3.0 (2026-11-25)
 
 ### Entregue
 

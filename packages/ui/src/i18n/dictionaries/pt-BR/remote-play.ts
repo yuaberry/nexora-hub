@@ -1,4 +1,4 @@
-/** Dicionário PT-BR — Remote Play (Moonlight). */
+/** Dicionário PT-BR — Remote Play (Moonlight + Sunshine). */
 export const remotePlay = {
   'remotePlay.title': 'Remote Play',
   'remotePlay.missing.title': 'Moonlight não encontrado',
@@ -14,4 +14,14 @@ export const remotePlay = {
   'remotePlay.apps': 'Jogos do anfitrião',
   'remotePlay.appsEmpty': 'O anfitrião não devolveu jogos.',
   'remotePlay.play': 'Jogar',
+  'remotePlay.hostcard.title': 'Esta máquina como anfitriã (Sunshine)',
+  'remotePlay.hostcard.installed': 'Sunshine instalado',
+  'remotePlay.hostcard.notInstalled': 'Sunshine não instalado',
+  'remotePlay.hostcard.running': 'A correr',
+  'remotePlay.hostcard.stopped': 'Parado',
+  'remotePlay.hostcard.start': 'Iniciar anfitrião',
+  'remotePlay.hostcard.address': 'Endereço para outros aparelhos',
+  'remotePlay.hostcard.hint': 'Abre este endereço noutro aparelho para emparelhar (o PIN aparece no ecrã do anfitrião).',
+  'remotePlay.hostcard.started': 'Anfitrião a arrancar — confirma o estado acima.',
+  'remotePlay.hostcard.startFailed': 'Não foi possível iniciar o Sunshine.',
 } as const;

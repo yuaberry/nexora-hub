@@ -170,6 +170,8 @@ const api: DesktopApi = {
     pair: (host) => ipcRenderer.invoke('remotePlay:pair', host) as Promise<{ readonly ok: boolean }>,
     apps: (host) => ipcRenderer.invoke('remotePlay:apps', host) as Promise<{ readonly ok: boolean; readonly items?: readonly { readonly index: number; readonly title: string }[] }>,
     stream: (host, appIndex) => ipcRenderer.invoke('remotePlay:stream', host, appIndex) as Promise<{ readonly ok: boolean }>,
+    sunshine: () => ipcRenderer.invoke('remotePlay:sunshine') as Promise<{ readonly ok: boolean; readonly binary: string | null; readonly running: boolean; readonly url: string | null }>,
+    sunshineStart: () => ipcRenderer.invoke('remotePlay:sunshineStart') as Promise<{ readonly ok: boolean }>,
   },
   widget: {
     toggle: () => ipcRenderer.invoke('widget:toggle') as Promise<{ readonly ok: boolean; readonly visible: boolean }>,

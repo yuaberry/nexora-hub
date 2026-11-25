@@ -745,6 +745,15 @@ export interface DesktopApi {
     }>;
     /** Joga um título do anfitrião (o Moonlight vive sozinho). */
     readonly stream: (host: string, appIndex: number) => Promise<{ readonly ok: boolean }>;
+    /** O anfitrião desta máquina (Sunshine): binário, se está a correr, endereço web. */
+    readonly sunshine: () => Promise<{
+      readonly ok: boolean;
+      readonly binary: string | null;
+      readonly running: boolean;
+      readonly url: string | null;
+    }>;
+    /** Dá o anfitrião (Sunshine) a arrancar. */
+    readonly sunshineStart: () => Promise<{ readonly ok: boolean }>;
   };
   readonly widget: {
     /** Mostra ou esconde o widget de sessão (o HUD sempre ao topo). */

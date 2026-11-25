@@ -660,7 +660,20 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 9c — Sunshine (o anfitrião) e Remote Play completo (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 11 — Lançamento 0.4.0 (2026-11-25)
+
+### Entregue
+
+- [x] **Remote Play completo** — Moonlight (cliente) e Sunshine (anfitrião)
+      instalados, detectados e integrados; prova real com o Sunshine a correr
+      nas três portas documentadas e a web a responder.
+- [x] **Lançamento v0.4.0** publicado no GitHub com os três artefactos
+      (AppImage, deb, NSIS).
+
+### Prova de execução real (2026-11-25)
+
+- `pnpm typecheck` limpo; **777 testes verdes**;
+- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.4.0\n\n## Fase 9c — Sunshine (o anfitrião) e Remote Play completo (2026-11-25)
 
 ### Entregue
 

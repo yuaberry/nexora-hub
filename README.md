@@ -6,7 +6,7 @@
 
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
-[![Versão](https://img.shields.io/badge/versão-0.4.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
+[![Versão](https://img.shields.io/badge/versão-0.5.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
 [![Testes](https://img.shields.io/badge/testes-806%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)

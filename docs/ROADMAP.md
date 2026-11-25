@@ -660,7 +660,20 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 7a — Bateria no diagnóstico (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 12 — Lançamento 0.5.0 (2026-11-25)
+
+### Entregue
+
+- [x] **Capturas na nuvem, tarefas e bateria** — as três fases desde a 0.4.0,
+      cada uma com prova de execução real.
+- [x] **Big Picture revalidado** depois de todas as mudanças (ecrã inteiro,
+      cápsulas grandes, setas e Escape).
+- [x] **Lançamento v0.5.0** publicado com os três artefactos.
+
+### Prova de execução real (2026-11-25)
+
+- `pnpm typecheck` limpo; **806 testes verdes**;
+- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.5.0\n\n## Fase 7a — Bateria no diagnóstico (2026-11-25)
 
 ### Entregue
 

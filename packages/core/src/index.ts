@@ -42,6 +42,7 @@ export * from './mods/detect.js';
 export * from './mods/install.js';
 export * from './remote/moonlight.js';
 export * from './remote/sunshine.js';
+export * from './screens/rules.js';
 export * from './recommend/similar.js';
 export * from './steam/images.js';
 export * from './steam/catalog.js';

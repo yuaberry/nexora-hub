@@ -165,6 +165,11 @@ const api: DesktopApi = {
     similar: (gameId) => ipcRenderer.invoke('recommend:similar', gameId) as Promise<RecommendationsView>,
     forYou: (token) => ipcRenderer.invoke('recommend:forYou', token) as Promise<RecommendationsView>,
   },
+  screens: {
+    capture: (gameKey) => ipcRenderer.invoke('screens:capture', gameKey) as Promise<{ readonly ok: boolean; readonly shot?: import('../shared/preload-api.js').ScreenshotView }>,
+    list: (gameKey) => ipcRenderer.invoke('screens:list', gameKey) as Promise<readonly import('../shared/preload-api.js').ScreenshotView[]>,
+    remove: (gameKey, fileName) => ipcRenderer.invoke('screens:remove', gameKey, fileName) as Promise<boolean>,
+  },
   remotePlay: {
     detect: () => ipcRenderer.invoke('remotePlay:detect') as Promise<{ readonly binary: string | null }>,
     pair: (host) => ipcRenderer.invoke('remotePlay:pair', host) as Promise<{ readonly ok: boolean }>,

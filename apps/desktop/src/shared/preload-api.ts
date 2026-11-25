@@ -98,6 +98,15 @@ export interface ModInstallResult {
   readonly reason?: 'no-folder' | 'not-a-mod' | 'too-large' | 'already-exists' | 'cancelled' | 'copy-failed';
 }
 
+/** Uma captura de ecrã guardada. */
+export interface ScreenshotView {
+  readonly fileName: string;
+  readonly sizeBytes: number;
+  readonly createdAt: string;
+  /** O caminho completo (servido à interface pelo esquema interno). */
+  readonly path: string;
+}
+
 /** Resumo de uma sessão em curso. */
 export interface SessionSummaryView {
   readonly sessionId: string;
@@ -732,6 +741,17 @@ export interface DesktopApi {
     readonly similar: (gameId: string) => Promise<RecommendationsView>;
     /** Recomendado para si (exige conta). */
     readonly forYou: (token: string) => Promise<RecommendationsView>;
+  };
+  readonly screens: {
+    /** Captura o ecrã e guarda-o na pasta do jogo. */
+    readonly capture: (gameKey: string) => Promise<{
+      readonly ok: boolean;
+      readonly shot?: { readonly fileName: string; readonly sizeBytes: number; readonly createdAt: string; readonly path: string };
+    }>;
+    /** As capturas do jogo (das mais recentes para as mais antigas). */
+    readonly list: (gameKey: string) => Promise<readonly { readonly fileName: string; readonly sizeBytes: number; readonly createdAt: string; readonly path: string }[]>;
+    /** Apaga uma captura do jogo. */
+    readonly remove: (gameKey: string, fileName: string) => Promise<boolean>;
   };
   readonly remotePlay: {
     /** O binário do Moonlight no sistema (`null` quando não está instalado). */

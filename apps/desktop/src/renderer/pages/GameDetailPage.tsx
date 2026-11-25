@@ -11,6 +11,7 @@ import { ForumSection } from '../components/ForumSection.js';
 import { PerformanceCard } from '../components/PerformanceCard.js';
 import { ModsSection } from '../components/ModsSection.js';
 import { DlcSection } from '../components/DlcSection.js';
+import { ScreensCard } from '../components/ScreensCard.js';
 import { AboutSection } from '../components/AboutSection.js';
 import { GameImage } from '../components/GameImage.js';
 import { CloudSavesCard } from '../components/CloudSavesCard.js';
@@ -222,6 +223,9 @@ export function GameDetailPage({
 
       {/* Sobre: a descrição curta da loja, guardada para uso offline. */}
       <AboutSection game={game} />
+
+      {/* Capturas: os momentos do jogo, no disco do utilizador. */}
+      <ScreensCard gameKey={game.externalKey} />
 
       {/* Capa: a automática (a da Steam) e a personalização do utilizador. */}
       <CoverSection game={game} onChanged={() => library.reload()} />

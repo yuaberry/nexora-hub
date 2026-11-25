@@ -29,6 +29,7 @@ import { registerOverlayIpc } from './overlay-ipc.js';
 import { registerWidgetIpc } from './widget-ipc.js';
 import { registerDiagnosticsIpc } from './diagnostics-ipc.js';
 import { registerRemotePlayIpc } from './remote-play-ipc.js';
+import { registerScreensIpc } from './screens-ipc.js';
 import { registerCoversIpc } from './covers-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { registerSaveCloudIpc } from './save-cloud-ipc.js';
@@ -163,6 +164,9 @@ function bootstrap(): void {
 
   // Remote Play: o Moonlight do sistema, encaminhado.
   registerRemotePlayIpc();
+
+  // Capturas de ecrã: o clique guarda um momento na pasta do jogo.
+  registerScreensIpc();
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
   registerCoversIpc(library, coverCacheDir(config.databasePath));

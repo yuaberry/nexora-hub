@@ -660,7 +660,28 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 11 — Lançamento 0.4.0 (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5h — Capturas de ecrã (2026-11-25)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/screens/rules.ts`) — o nome do ficheiro (o
+      jogo pelo último segmento do caminho, não o caminho inteiro), a pasta
+      por jogo, e o que é aceitável (extensão e limite declarado) — 5 testes.
+- [x] **Launcher** (`screens.ts`) — captura o **ecrã inteiro** (o jogo a correr
+      está no ecrã), guarda na pasta do jogo, lista e remove (um nome que não
+      está na lista nunca é apagado) — 5 testes com ficheiros reais.
+- [x] **Interface** — cartão "Capturas" nos detalhes: capturar, galeria (as
+      imagens servidas pelo mesmo esquema interno das capas) e remover.
+
+### Prova de execução real (2026-11-25)
+
+- a captura pelo botão guardou um PNG de **249 KB** em
+      `~/.config/NEXORA HUB/screenshots/hollow-knight/…`;
+- a galeria mostrou **3 imagens** (duas capturas mais a anterior) com a
+      primeira a carregar a 1920 px de largura, e o total "3 · 0,8 MB";
+- `pnpm typecheck` limpo; **787 testes verdes** no total.
+
+> Falta a subida para a nuvem ("screenshot sobe na nuvem"): o próximo lote.\n\n## Fase 11 — Lançamento 0.4.0 (2026-11-25)
 
 ### Entregue
 

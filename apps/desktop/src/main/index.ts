@@ -30,6 +30,7 @@ import { registerWidgetIpc } from './widget-ipc.js';
 import { registerDiagnosticsIpc } from './diagnostics-ipc.js';
 import { registerRemotePlayIpc } from './remote-play-ipc.js';
 import { registerScreensIpc } from './screens-ipc.js';
+import { registerTasksIpc } from './tasks-ipc.js';
 import { registerCoversIpc } from './covers-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { registerSaveCloudIpc } from './save-cloud-ipc.js';
@@ -167,6 +168,9 @@ function bootstrap(): void {
 
   // Capturas de ecrã: o clique guarda um momento na pasta do jogo.
   registerScreensIpc();
+
+  // Tarefas: desafios por período, com pontos reais.
+  registerTasksIpc();
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
   registerCoversIpc(library, coverCacheDir(config.databasePath));

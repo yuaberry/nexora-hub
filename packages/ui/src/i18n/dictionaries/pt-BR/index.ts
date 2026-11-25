@@ -30,6 +30,7 @@ import { clans } from './clans.js';
 import { events } from './events.js';
 import { diagnostics } from './diagnostics.js';
 import { remotePlay } from './remote-play.js';
+import { tasks } from './tasks.js';
 import { syncedLibrary } from './synced-library.js';
 import { pages } from './pages.js';
 
@@ -74,6 +75,7 @@ export const ptBR = {
   ...events,
   ...diagnostics,
   ...remotePlay,
+  ...tasks,
   ...syncedLibrary,
   ...pages,
 } as const;

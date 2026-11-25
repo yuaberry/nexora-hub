@@ -660,7 +660,30 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5i — Capturas na nuvem (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5j — Tarefas por período (2026-11-25)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/tasks/rules.ts`) — as tarefas declaradas
+      (jogar uma hora hoje, lançar um jogo hoje, três jogos diferentes esta
+      semana), a medida por período e a avaliação do progresso — 6 testes.
+- [x] **API** (`modules/tasks`) — progresso medido pelas **sessões reais**,
+      reclamação uma por utilizador/tarefa/período (a chave composta impede o
+      pagamento duplicado), pontos pela mesma trilha auditada das conquistas;
+      migração `0010` — 4 testes de integração.
+- [x] **Interface** — cartão "Tarefas" nas Conquistas: progresso, prémio,
+      reclamar (só o que está completo) e "Recompensa recebida".
+
+### Prova de execução real (2026-11-25)
+
+- as tarefas mediram o real: **1/1** lançamentos e **1/3** jogos distintos
+      depois de uma sessão real;
+- reclamar a tarefa completa: **"5 pontos atribuídos"**, a tarefa passou a
+      "Recompensa recebida" e o saldo foi de 10 (conquista de primeiro jogo)
+      para **15**;
+- o botão de uma tarefa incompleta fica desactivado — reclamar o que não está
+      completo é recusado pela API (403).
+- `pnpm typecheck` limpo; **801 testes verdes** no total.\n\n## Fase 5i — Capturas na nuvem (2026-11-25)
 
 ### Entregue
 

@@ -71,6 +71,13 @@
       "when": 1795450000000,
       "tag": "0009_screenshots",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795480000000,
+      "tag": "0010_task_claims",
+      "breakpoints": true
     }
   ]
 }

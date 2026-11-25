@@ -165,6 +165,10 @@ const api: DesktopApi = {
     similar: (gameId) => ipcRenderer.invoke('recommend:similar', gameId) as Promise<RecommendationsView>,
     forYou: (token) => ipcRenderer.invoke('recommend:forYou', token) as Promise<RecommendationsView>,
   },
+  tasks: {
+    list: (token) => ipcRenderer.invoke('tasks:list', token) as Promise<{ readonly ok: boolean; readonly items: readonly { readonly id: string; readonly cadence: 'daily' | 'weekly'; readonly metric: 'play-seconds' | 'games-launched' | 'distinct-games'; readonly target: number; readonly reward: number; readonly value: number; readonly complete: boolean; readonly fraction: number; readonly claimed: boolean }[]; readonly pending?: number; readonly message?: string }>,
+    claim: (taskId, token) => ipcRenderer.invoke('tasks:claim', taskId, token) as Promise<{ readonly ok: boolean; readonly awarded?: number; readonly message?: string }>,
+  },
   screens: {
     capture: (gameKey) => ipcRenderer.invoke('screens:capture', gameKey) as Promise<{ readonly ok: boolean; readonly shot?: import('../shared/preload-api.js').ScreenshotView }>,
     list: (gameKey) => ipcRenderer.invoke('screens:list', gameKey) as Promise<readonly import('../shared/preload-api.js').ScreenshotView[]>,

@@ -742,6 +742,31 @@ export interface DesktopApi {
     /** Recomendado para si (exige conta). */
     readonly forYou: (token: string) => Promise<RecommendationsView>;
   };
+  readonly tasks: {
+    /** As tarefas do utilizador (com o progresso e o que já foi reclamado). */
+    readonly list: (token: string) => Promise<{
+      readonly ok: boolean;
+      readonly items: readonly {
+        readonly id: string;
+        readonly cadence: 'daily' | 'weekly';
+        readonly metric: 'play-seconds' | 'games-launched' | 'distinct-games';
+        readonly target: number;
+        readonly reward: number;
+        readonly value: number;
+        readonly complete: boolean;
+        readonly fraction: number;
+        readonly claimed: boolean;
+      }[];
+      readonly pending?: number;
+      readonly message?: string;
+    }>;
+    /** Reclama os pontos de uma tarefa completa. */
+    readonly claim: (taskId: string, token: string) => Promise<{
+      readonly ok: boolean;
+      readonly awarded?: number;
+      readonly message?: string;
+    }>;
+  };
   readonly screens: {
     /** Captura o ecrã e guarda-o na pasta do jogo. */
     readonly capture: (gameKey: string) => Promise<{

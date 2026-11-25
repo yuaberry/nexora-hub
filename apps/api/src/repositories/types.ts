@@ -501,6 +501,7 @@ export interface Repositories {
   readonly events: EventRepository;
   readonly librarySync: SyncedLibraryRepository;
   readonly screenshots: ScreenshotRepository;
+  readonly taskClaims: TaskClaimRepository;
   readonly users: UserRepository;
   readonly authSessions: AuthSessionRepository;
   readonly mfa: MfaRepository;
@@ -787,6 +788,13 @@ export interface ScreenshotRepository {
   readonly read: (userId: string, id: string) => Buffer | null;
   /** Apaga uma captura (só do dono). */
   readonly remove: (userId: string, id: string) => Promise<boolean>;
+}
+
+export interface TaskClaimRepository {
+  /** Reclama (devolve `false` quando já foi paga no período). */
+  readonly claim: (userId: string, taskId: string, periodKey: string) => Promise<boolean>;
+  /** As reclamações do utilizador nos períodos dados (`<taskId>::<period>`). */
+  readonly listPeriod: (userId: string, periodKeys: readonly string[]) => Promise<readonly string[]>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

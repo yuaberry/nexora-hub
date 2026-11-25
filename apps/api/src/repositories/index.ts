@@ -23,6 +23,7 @@ import { MemoryClanRepository } from './memory-clans.js';
 import { MemoryEventRepository } from './memory-events.js';
 import { MemoryLibrarySyncRepository } from './memory-library-sync.js';
 import { MemoryScreenshotRepository } from './memory-screenshots.js';
+import { MemoryTaskClaimRepository } from './memory-task-claims.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
 import { PostgresAuthSessionRepository, PostgresMfaRepository } from './postgres-auth.js';
@@ -32,6 +33,7 @@ import { PostgresClanRepository } from './postgres-clans.js';
 import { PostgresEventRepository } from './postgres-events.js';
 import { PostgresLibrarySyncRepository } from './postgres-library-sync.js';
 import { PostgresScreenshotRepository } from './postgres-screenshots.js';
+import { PostgresTaskClaimRepository } from './postgres-task-claims.js';
 import { PostgresLibraryRepository, PostgresPlaySessionRepository } from './postgres-game.js';
 import type { Repositories } from './types.js';
 
@@ -57,6 +59,7 @@ export function createMemoryRepositories(): Repositories {
     events: new MemoryEventRepository(),
     librarySync: new MemoryLibrarySyncRepository(),
     screenshots: new MemoryScreenshotRepository(join(process.cwd(), 'data', 'screenshots')),
+    taskClaims: new MemoryTaskClaimRepository(),
     reviews: new MemoryReviewRepository(),
     library: new MemoryLibraryRepository(),
     wishlist: new MemoryWishlistRepository(),
@@ -96,6 +99,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     events: new PostgresEventRepository(database.db),
     librarySync: new PostgresLibrarySyncRepository(database.db),
     screenshots: new PostgresScreenshotRepository(database.db, join(process.cwd(), 'data', 'screenshots')),
+    taskClaims: new PostgresTaskClaimRepository(database.db),
     reviews: new PostgresReviewRepository(database.db),
     library: new PostgresLibraryRepository(database.db),
     sessions: new PostgresPlaySessionRepository(database.db),

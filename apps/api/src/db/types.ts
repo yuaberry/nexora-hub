@@ -57,4 +57,5 @@ export type AuditAction =
   | 'chat.message'
   | 'achievement.unlocked'
   | 'save.upload'
-  | 'save.delete';
+  | 'save.delete'
+  | 'task.claim';

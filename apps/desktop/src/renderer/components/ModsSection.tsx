@@ -34,6 +34,33 @@ export function ModsSection({
     setMessage(null);
   }, [api, installPath]);
 
+  /**
+   * Instala um modo (o diálogo é do sistema, o plano é do domínio).
+   *
+   * A resposta diz o que aconteceu: instalado, ou o motivo da recusa —
+   * incluindo "já existe um com esse nome", que é melhor que substituir em
+   * silêncio. Cancelar o diálogo não é erro e não mostra mensagem.
+   */
+  const onInstall = useCallback(async () => {
+    if (api === undefined) {
+      return;
+    }
+    const result = await api.mods.install(installPath ?? '');
+    if (result.ok) {
+      setMessage(t('mods.installed', { name: result.fileName ?? '' }));
+      await reload();
+      return;
+    }
+    if (result.reason === 'cancelled') {
+      return;
+    }
+    setMessage(
+      result.reason === undefined
+        ? t('mods.installFailed')
+        : t(`mods.reason.${result.reason}` as 'mods.reason.notAMod'),
+    );
+  }, [api, installPath, reload, t]);
+
   useEffect(() => {
     void reload();
   }, [reload]);
@@ -46,7 +73,12 @@ export function ModsSection({
       <div className="nx-stack">
         <div className="hub-row hub-row--between">
           <strong>{t('mods.title')}</strong>
-          <Button onClick={() => void reload()}>{t('mods.rescan')}</Button>
+          <span className="hub-row">
+            {installPath === null ? null : (
+              <Button onClick={() => void onInstall()}>{t('mods.install')}</Button>
+            )}
+            <Button onClick={() => void reload()}>{t('mods.rescan')}</Button>
+          </span>
         </div>
 
         {message === null ? null : <p className="nx-banner"><span>{message}</span></p>}

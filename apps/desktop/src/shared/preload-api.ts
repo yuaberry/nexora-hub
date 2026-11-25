@@ -89,6 +89,15 @@ export interface WidgetData {
   readonly clock: string | null;
 }
 
+/** O resultado de uma instalação de modo. */
+export interface ModInstallResult {
+  readonly ok: boolean;
+  /** O nome do ficheiro instalado. */
+  readonly fileName?: string;
+  /** O motivo da recusa (chave de tradução). */
+  readonly reason?: 'no-folder' | 'not-a-mod' | 'too-large' | 'already-exists' | 'cancelled' | 'copy-failed';
+}
+
 /** Resumo de uma sessão em curso. */
 export interface SessionSummaryView {
   readonly sessionId: string;
@@ -767,6 +776,14 @@ export interface DesktopApi {
   readonly mods: {
     /** Procura os modos na pasta de instalação de um jogo. */
     readonly scan: (installPath: string) => Promise<ModsScanView>;
+    /**
+     * Instala um modo (o diálogo é do sistema, o plano é do domínio).
+     *
+     * `ok: false` com `reason: 'cancelled'` quando o utilizador fecha o
+     * diálogo — cancelar não é erro. Um nome que já existe é recusado em
+     * vez de substituído em silêncio.
+     */
+    readonly install: (installPath: string) => Promise<ModInstallResult>;
   };
   readonly benchmark: {
     /** Corre o benchmark completo e guarda a corrida. */

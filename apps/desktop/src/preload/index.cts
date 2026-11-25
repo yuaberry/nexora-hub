@@ -196,6 +196,7 @@ const api: DesktopApi = {
   },
   mods: {
     scan: (installPath) => ipcRenderer.invoke('mods:scan', installPath) as Promise<ModsScanView>,
+    install: (installPath) => ipcRenderer.invoke('mods:install', installPath) as Promise<import('../shared/preload-api.js').ModInstallResult>,
   },
   benchmark: {
     run: () => ipcRenderer.invoke('benchmark:run') as Promise<{ readonly ok: boolean; readonly run?: BenchmarkRunView }>,

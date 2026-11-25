@@ -39,6 +39,7 @@ export * from './achievements/achievements.js';
 export * from './benchmark/spec.js';
 export * from './benchmark/workloads.js';
 export * from './mods/detect.js';
+export * from './mods/install.js';
 export * from './recommend/similar.js';
 export * from './steam/images.js';
 export * from './steam/catalog.js';

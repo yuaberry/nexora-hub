@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.2.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-745%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-755%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -152,6 +152,9 @@ código de saída, tempo gravado).
   para os dois lados compararem-se sem adivinhar
 
 ### 🧩 Modos
+- **Detector real** — lê os `.jar` da pasta de mods e diz o carregador
+- **Instalação em 1 clique** — um `.jar` escolhido entra na pasta do jogo; um
+  nome repetido é recusado em vez de substituído em silêncio
 - **Detector de modos** — lê a pasta `mods` do jogo e diz **quantos são e de
   que carregador** (Fabric, Quilt, Forge, NeoForge), com o nome e a versão de
   cada um lidos do manifesto dentro do `.jar`
@@ -298,7 +301,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **745 verdes** (164 contra PostgreSQL real) |
+| **Testes** | **755 verdes** (164 contra PostgreSQL real) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real (último: capas da loja que não carregavam no Electron, logo cortado em moldura retrato, import perdido que silenciava o cache) |
 | **Build** | Linux + Windows empacotados a cada versão |

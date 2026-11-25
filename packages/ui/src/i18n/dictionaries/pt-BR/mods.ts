@@ -1,5 +1,13 @@
 /** Dicionário PT-BR — detector de modos. */
 export const mods = {
+  'mods.install': 'Instalar modo…',
+  'mods.installed': '{name} instalado.',
+  'mods.installFailed': 'Não foi possível instalar o modo.',
+  'mods.reason.noFolder': 'Este jogo não tem pasta de modos.',
+  'mods.reason.notAMod': 'Só um .jar é um modo.',
+  'mods.reason.tooLarge': 'O ficheiro é demasiado grande.',
+  'mods.reason.alreadyExists': 'Já existe um modo com esse nome — remove-o à mão primeiro.',
+  'mods.reason.copyFailed': 'Não foi possível copiar o ficheiro.',
   'nav.mods': 'Mods',
   'mods.title': 'Mods',
   'mods.subtitle': 'Os modos que o jogo tem instalados, com o carregador de cada um.',

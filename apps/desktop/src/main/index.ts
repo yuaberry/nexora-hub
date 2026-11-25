@@ -23,6 +23,7 @@ import { registerOptimizerIpc } from './optimizer-ipc.js';
 import { registerChatIpc } from './chat-ipc.js';
 import { registerBenchmarkIpc } from './benchmark-ipc.js';
 import { registerModsIpc } from './mods-ipc.js';
+import { registerModsInstallIpc } from './mods-install.js';
 import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerOverlayIpc } from './overlay-ipc.js';
 import { registerWidgetIpc } from './widget-ipc.js';
@@ -143,6 +144,9 @@ function bootstrap(): void {
 
   // Detector de modos: lê os .jar da pasta mods com as ferramentas do sistema.
   registerModsIpc();
+
+  // Instalação de modos: o plano no domínio antes de copiar.
+  registerModsInstallIpc();
 
   // Recomendações: algoritmo declarado sobre o catálogo, servido pela API.
   registerRecommendIpc();

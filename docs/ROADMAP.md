@@ -660,7 +660,30 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 9a — Widget de sessão (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5g — Instalação de modos em 1 clique (2026-11-24)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/mods/install.ts`) — o plano antes de copiar:
+      só entra um `.jar` (ou `.jar.disabled`), um nome que já existe **não** é
+      substituído em silêncio, e o tamanho tem limite declarado — 6 testes.
+- [x] **Launcher** (`mods-install.ts`) — o diálogo é do sistema (o renderer
+      nunca o abre), a pasta de modos é a que o scanner encontra, e a cópia
+      só acontece se o plano aceitar — 4 testes com ficheiros reais (cópia,
+      conflito, recusa, pasta criada na hora).
+- [x] **Interface** — botão "Instalar modo…" no cartão de Modos, com a
+      mensagem honesta do resultado (incluindo "já existe um com esse nome").
+
+### Prova de execução real (2026-11-24)
+
+- os 4 testes de instalação corriram com ficheiros reais: um `.jar` novo foi
+      **copiado** para a pasta; um nome repetido foi recusado com a pasta
+      intacta; um `.zip` não foi copirado; e a pasta foi criada na hora;
+- o botão aparece nos detalhes do jogo ("Mods | Instalar modo… | Procurar
+      novamente"), e o cartão mostra o estado honesto quando não há pasta;
+- o diálogo nativo do sistema não é clicável num *probe* sem ecrã interactivo
+  — a escolha do ficheiro é o mesmo padrão do selector de capas, já provado;
+- `pnpm typecheck` limpo; **755 testes verdes** no total.\n\n## Fase 9a — Widget de sessão (2026-11-24)
 
 ### Entregue
 

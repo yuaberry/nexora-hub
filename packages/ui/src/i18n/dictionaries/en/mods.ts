@@ -1,5 +1,13 @@
 /** EN dictionary — mod detector. */
 export const mods = {
+  'mods.install': 'Install mod…',
+  'mods.installed': '{name} installed.',
+  'mods.installFailed': 'Could not install the mod.',
+  'mods.reason.noFolder': 'This game has no mods folder.',
+  'mods.reason.notAMod': 'Only a .jar is a mod.',
+  'mods.reason.tooLarge': 'The file is too large.',
+  'mods.reason.alreadyExists': 'A mod with that name already exists — remove it by hand first.',
+  'mods.reason.copyFailed': 'Could not copy the file.',
   'nav.mods': 'Mods',
   'mods.title': 'Mods',
   'mods.subtitle': 'The mods installed in the game, with the loader of each one.',

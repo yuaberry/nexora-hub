@@ -660,7 +660,31 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 5g — Instalação de modos em 1 clique (2026-11-24)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 9b — Remote Play via Moonlight (2026-11-25)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/remote/moonlight.ts`) — os comandos
+      (emparelhar, listar, jogar), a leitura da lista do anfitrião (linhas
+      `N. Nome` do `moonlight list`) e a validação do endereço — 7 testes.
+- [x] **Launcher** (`remote-play.ts`) — detecta o binário no PATH, corre os
+      comandos com tempo limite, e lança o *streaming* **desacoplado** (o
+      Moonlight vive sozinho) — 6 testes com executor falso.
+- [x] **Interface** — página "Remote Play" (barra lateral): detecta o binário;
+      sem ele, diz **"Moonlight não encontrado"** e o que instalar; com ele,
+      emparelhar, listar os jogos do anfitrião e jogar. Endereço inválido é
+      recusado antes de tocar no binário.
+
+### Prova de execução real (2026-11-25)
+
+- a detecção real nesta máquina devolveu `binary: null` — o Moonlight não
+      está instalado, e a interface diz isso em vez de fingir;
+- emparelhar sem binário → `ok: false`; com endereço inválido → `ok: false`
+      (a validação do domínio);
+- **Sunshine**: quando o Moonlight estiver instalado e a funcionar, o passo
+  seguinte é ligar também o anfitrião (Sunshine) — por agora fica declarado
+  como tal, não fingido;
+- `pnpm typecheck` limpo; **768 testes verdes** no total.\n\n## Fase 5g — Instalação de modos em 1 clique (2026-11-24)
 
 ### Entregue
 

@@ -165,6 +165,12 @@ const api: DesktopApi = {
     similar: (gameId) => ipcRenderer.invoke('recommend:similar', gameId) as Promise<RecommendationsView>,
     forYou: (token) => ipcRenderer.invoke('recommend:forYou', token) as Promise<RecommendationsView>,
   },
+  remotePlay: {
+    detect: () => ipcRenderer.invoke('remotePlay:detect') as Promise<{ readonly binary: string | null }>,
+    pair: (host) => ipcRenderer.invoke('remotePlay:pair', host) as Promise<{ readonly ok: boolean }>,
+    apps: (host) => ipcRenderer.invoke('remotePlay:apps', host) as Promise<{ readonly ok: boolean; readonly items?: readonly { readonly index: number; readonly title: string }[] }>,
+    stream: (host, appIndex) => ipcRenderer.invoke('remotePlay:stream', host, appIndex) as Promise<{ readonly ok: boolean }>,
+  },
   widget: {
     toggle: () => ipcRenderer.invoke('widget:toggle') as Promise<{ readonly ok: boolean; readonly visible: boolean }>,
     visible: () => ipcRenderer.invoke('widget:visible') as Promise<{ readonly visible: boolean }>,

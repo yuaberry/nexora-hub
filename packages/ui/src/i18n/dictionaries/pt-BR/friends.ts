@@ -1,6 +1,7 @@
 /** Dicionário PT-BR — amigos e presença. */
 export const friends = {
   'nav.clans': 'Clãs',
+  'nav.remotePlay': 'Remote Play',
   'nav.diagnostics': 'Diagnóstico',
   'nav.events': 'Eventos',
   'nav.friends': 'Amigos',

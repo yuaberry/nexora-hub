@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import { Badge, Button, EmptyState, PlannedBadge, useInterface, type Translator } from '@nexora/ui';
+import { Button, EmptyState, useInterface, type Translator } from '@nexora/ui';
 import { useLibrary, useRunner } from '../state/desktop.js';
 import { formatPlayTime } from '../lib/format.js';
 import { accessToken } from '../lib/api.js';
@@ -143,13 +143,6 @@ export function HomePage({
         onPlay={onPlay}
         onToggleFavorite={onToggleFavorite}
       />
-
-      <div className="hub-planned-row">
-        <PlannedBadge label={t('planned.badge')} />
-        <Badge tone="planned">{t('nav.cloudSaves')}</Badge>
-        <Badge tone="planned">{t('nav.friends')}</Badge>
-        <Badge tone="planned">{t('planned.store')}</Badge>
-      </div>
     </div>
   );
 }

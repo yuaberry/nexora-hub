@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   LOCALE_OPTIONS,
-  PlannedNotice,
   SCALE_MODES,
   Select,
   StorageBarView,
@@ -187,7 +186,6 @@ export function SettingsPage(): ReactNode {
       <Card>
         <div className="nx-stack">
           <strong>{t('settings.account')}</strong>
-          <PlannedNotice badge={t('planned.badge')} title={t('planned.account')} hint={t('planned.cloudSync')} />
           <div className="hub-suggestions">
             <span className="nx-label">{t('settings.hotbars.max')}</span>
             <Badge>

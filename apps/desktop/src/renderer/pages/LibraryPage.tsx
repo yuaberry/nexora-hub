@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Badge, Button, EmptyState, PlannedBadge, useInterface } from '@nexora/ui';
+import { Button, EmptyState, useInterface } from '@nexora/ui';
 import { useLibrary, ErrorNote } from '../state/desktop.js';
 import { apiRequest, ApiError } from '../lib/api.js';
 import { searchLocalLibrary } from '../lib/catalog.js';
@@ -300,13 +300,6 @@ export function LibraryPage({
         </div>
       )}
 
-      <div className="hub-planned-row">
-        <PlannedBadge label={t('planned.badge')} />
-        <Badge tone="planned">{t('nav.cloudSaves')}</Badge>
-        <Badge tone="planned">{t('nav.friends')}</Badge>
-        <Badge tone="planned">{t('planned.store')}</Badge>
-        <Badge tone="planned">{t('planned.overlay')}</Badge>
-      </div>
     </div>
   );
 }

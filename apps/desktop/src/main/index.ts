@@ -28,6 +28,7 @@ import { registerRecommendIpc } from './recommend-ipc.js';
 import { registerOverlayIpc } from './overlay-ipc.js';
 import { registerWidgetIpc } from './widget-ipc.js';
 import { registerDiagnosticsIpc } from './diagnostics-ipc.js';
+import { registerRemotePlayIpc } from './remote-play-ipc.js';
 import { registerCoversIpc } from './covers-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { registerSaveCloudIpc } from './save-cloud-ipc.js';
@@ -159,6 +160,9 @@ function bootstrap(): void {
 
   // Widget de sessão: o Hudson que flutua sobre o jogo.
   registerWidgetIpc(runner);
+
+  // Remote Play: o Moonlight do sistema, encaminhado.
+  registerRemotePlayIpc();
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
   registerCoversIpc(library, coverCacheDir(config.databasePath));

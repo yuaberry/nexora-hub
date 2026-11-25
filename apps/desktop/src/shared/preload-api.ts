@@ -733,6 +733,19 @@ export interface DesktopApi {
     /** Recomendado para si (exige conta). */
     readonly forYou: (token: string) => Promise<RecommendationsView>;
   };
+  readonly remotePlay: {
+    /** O binário do Moonlight no sistema (`null` quando não está instalado). */
+    readonly detect: () => Promise<{ readonly binary: string | null }>;
+    /** Emparelha com um anfitrião (o PIN aparece no ecrã do Moonlight). */
+    readonly pair: (host: string) => Promise<{ readonly ok: boolean }>;
+    /** Os jogos do anfitrião (a lista do Moonlight). */
+    readonly apps: (host: string) => Promise<{
+      readonly ok: boolean;
+      readonly items?: readonly { readonly index: number; readonly title: string }[];
+    }>;
+    /** Joga um título do anfitrião (o Moonlight vive sozinho). */
+    readonly stream: (host: string, appIndex: number) => Promise<{ readonly ok: boolean }>;
+  };
   readonly widget: {
     /** Mostra ou esconde o widget de sessão (o HUD sempre ao topo). */
     readonly toggle: () => Promise<{ readonly ok: boolean; readonly visible: boolean }>;

@@ -20,6 +20,7 @@ import { OptimizerPage } from './pages/OptimizerPage.js';
 import { ChatPage } from './pages/ChatPage.js';
 import { AchievementsPage } from './pages/AchievementsPage.js';
 import { BenchmarkPage } from './pages/BenchmarkPage.js';
+import { PluginsPage } from './pages/PluginsPage.js';
 import { BigPicturePage } from './pages/BigPicturePage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
@@ -57,6 +58,7 @@ export type Route =
   | { readonly name: 'remotePlay' }
   | { readonly name: 'benchmark' }
   | { readonly name: 'account' }
+  | { readonly name: 'plugins' }
   | { readonly name: 'planned'; readonly module: PlannedModule }
   | { readonly name: 'bigpicture' };
 
@@ -87,7 +89,7 @@ export function App({ initialLocale }: { readonly initialLocale?: 'pt-BR' | 'en'
   }, []);
 
   const onNavigate = useCallback(
-    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'diagnostics' | 'remotePlay' | 'bigpicture') => {
+    (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'diagnostics' | 'remotePlay' | 'bigpicture' | 'plugins') => {
       navigate({ name: target });
     },
     [navigate],
@@ -125,7 +127,7 @@ function Shell({
   readonly setSearch: (value: string) => void;
   readonly navigate: (route: Route) => void;
   readonly goBack: () => void;
-  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'diagnostics' | 'remotePlay' | 'bigpicture') => void;
+  readonly onNavigate: (target: 'home' | 'library' | 'downloads' | 'settings' | 'store' | 'stats' | 'family' | 'friends' | 'optimizer' | 'chat' | 'achievements' | 'benchmark' | 'account' | 'clans' | 'events' | 'diagnostics' | 'remotePlay' | 'bigpicture' | 'plugins') => void;
 }): ReactNode {
   const { t } = useInterface();
   const library = useLibraryForSearch();
@@ -216,6 +218,7 @@ function Shell({
           />
         ) : null}
       {route.name === 'planned' ? <PlannedPage /> : null}
+      {route.name === 'plugins' ? <PluginsPage /> : null}
     </AppShell>
   );
 }
@@ -259,6 +262,8 @@ function routeTitle(route: Route, t: Translator): string {
       return t('nav.benchmark');
     case 'account':
       return t('auth.title');
+    case 'plugins':
+      return t('nav.plugins');
     default:
       return t('planned.title');
   }

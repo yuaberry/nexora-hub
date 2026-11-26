@@ -33,6 +33,7 @@ import { remotePlay } from './remote-play.js';
 import { tasks } from './tasks.js';
 import { syncedLibrary } from './synced-library.js';
 import { pages } from './pages.js';
+import { plugins } from './plugins.js';
 
 /**
  * Dicionário EN — formato **plano**, chaves explícitas.
@@ -75,5 +76,6 @@ export const en = {
   ...remotePlay,
   ...tasks,
   ...syncedLibrary,
+  ...plugins,
   ...pages,
 };

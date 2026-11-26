@@ -33,6 +33,7 @@ import { remotePlay } from './remote-play.js';
 import { tasks } from './tasks.js';
 import { syncedLibrary } from './synced-library.js';
 import { pages } from './pages.js';
+import { plugins } from './plugins.js';
 
 /**
  * Dicionário PT-BR — a fonte de verdade da forma.
@@ -77,5 +78,6 @@ export const ptBR = {
   ...remotePlay,
   ...tasks,
   ...syncedLibrary,
+  ...plugins,
   ...pages,
 } as const;

@@ -25,6 +25,7 @@
     "@nexora/cloud": "workspace:*",
     "@nexora/core": "workspace:*",
     "@nexora/download": "workspace:*",
+    "@nexora/plugins": "workspace:*",
     "@nexora/protocol": "workspace:*",
     "@nexora/runner": "workspace:*",
     "@nexora/sources": "workspace:*",

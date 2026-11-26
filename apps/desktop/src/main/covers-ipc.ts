@@ -21,6 +21,7 @@ import { steamCoverAlternatives, steamCoverFor } from './steam-images.js';
 import { localCoverFile } from './disk-scan.js';
 import { syncSteamLibrary } from './steam-sync.js';
 import { hydrateCovers } from './covers-hydrate.js';
+import { isCapabilityActive, type PluginsStore } from './plugins-state.js';
 import type { LocalLibrary } from './db.js';
 
 /** Extensões de imagem aceites como capa. */
@@ -57,17 +58,27 @@ async function pickCoverFile(): Promise<string | null> {
  * Regista os canais das capas e da sincronização.
  *
  * `coversDir` é a pasta do cache das imagens da loja (ao lado da base local):
- * é para lá que a hidratação guarda as cápsulas buscadas.
+ * é para lá que a hidratação guarda as cápsulas buscadas. `plugins` é o
+ * registo dos plugins: sincronizar e hidratar são capacidades que um plugin
+ * activo declara — sem plugin activo, o canal diz-o em vez de fingir.
  */
-export function registerCoversIpc(library: LocalLibrary, coversDir: string): void {
+export function registerCoversIpc(
+  library: LocalLibrary,
+  coversDir: string,
+  plugins: PluginsStore,
+): void {
   // Sincroniza com o que a Steam tem agora.
   ipcMain.handle('steam:sync', (): {
     readonly ok: boolean;
-    readonly updated: number;
-    readonly added: number;
-    readonly unchanged: number;
-    readonly titles: readonly string[];
+    readonly updated?: number;
+    readonly added?: number;
+    readonly unchanged?: number;
+    readonly titles?: readonly string[];
+    readonly reasonKey?: string;
   } => {
+    if (!isCapabilityActive(plugins, 'steam:sync')) {
+      return { ok: false, reasonKey: 'plugins.off' };
+    }
     const report = syncSteamLibrary(library);
     return { ok: true, ...report };
   });
@@ -129,10 +140,14 @@ export function registerCoversIpc(library: LocalLibrary, coversDir: string): voi
    */
   ipcMain.handle('covers:hydrate', async (): Promise<{
     readonly ok: boolean;
-    readonly updated: number;
-    readonly failed: number;
-    readonly skipped: number;
+    readonly updated?: number;
+    readonly failed?: number;
+    readonly skipped?: number;
+    readonly reasonKey?: string;
   }> => {
+    if (!isCapabilityActive(plugins, 'steam:cover')) {
+      return { ok: false, reasonKey: 'plugins.off' };
+    }
     const report = await hydrateCovers(library, coversDir);
     return { ok: true, ...report };
   });

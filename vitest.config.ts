@@ -16,6 +16,7 @@ export default defineConfig({
       'packages/download',
       'packages/runner',
       'packages/cloud',
+      'packages/plugins',
       'packages/ui',
       'apps/api',
       'apps/web',

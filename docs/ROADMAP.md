@@ -629,7 +629,9 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
       entradas remotas sem imagem mostram o placeholder;
 - bug apanhado pelos testes: `writeFile` perdeu o import na refacção —
       a excepção era engolida pelo `catch` e a capa nunca era guardada;
-- `pnpm typecheck` limpo; **655 testes verdes** no total.\n\n## Fase 3e — Capas unificadas e parede de jogos (2026-11-22)
+- `pnpm typecheck` limpo; **655 testes verdes** no total.
+
+## Fase 3e — Capas unificadas e parede de jogos (2026-11-22)
 
 ### Entregue
 
@@ -660,7 +662,9 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 13 — Teste final: R.E.P.O. pelo NEXORA HUB → Steam → servidores oficiais (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.
+
+## Fase 13 — Teste final: R.E.P.O. pelo NEXORA HUB → Steam → servidores oficiais (2026-11-25)
 
 ### Objectivo
 
@@ -700,7 +704,9 @@ jogo pela plataforma).
 - lançamento pelo runner do hub: `{"ok":true,"session":{…,"processId":…}}`;
 - handoff pelo hub (`api.steam.open('3241660')` → `pedido: true`);
 - cliente Steam com sessão activa e ligação Valve establelecida;
-- diálogo do cliente: *"Nenhuma licença"* para o R.E.P.O.\n\n## Fase 12 — Lançamento 0.5.0 (2026-11-25)
+- diálogo do cliente: *"Nenhuma licença"* para o R.E.P.O.
+
+## Fase 12 — Lançamento 0.5.0 (2026-11-25)
 
 ### Entregue
 
@@ -713,7 +719,9 @@ jogo pela plataforma).
 ### Prova de execução real (2026-11-25)
 
 - `pnpm typecheck` limpo; **806 testes verdes**;
-- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.5.0\n\n## Fase 7a — Bateria no diagnóstico (2026-11-25)
+- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.5.0
+
+## Fase 7a — Bateria no diagnóstico (2026-11-25)
 
 ### Entregue
 
@@ -737,7 +745,9 @@ jogo pela plataforma).
 
 > **Layouts e remap** (o resto da Fase 7) ficam planeados: precisam de
 > integração ao nível do sistema (comandos de jogo e remapeação de teclas são
-> do sistema operativo, e fingir um remapeador dentro do launcher seria mentir).\n\n## Fase 5j — Tarefas por período (2026-11-25)
+> do sistema operativo, e fingir um remapeador dentro do launcher seria mentir).
+
+## Fase 5j — Tarefas por período (2026-11-25)
 
 ### Entregue
 
@@ -760,7 +770,9 @@ jogo pela plataforma).
       para **15**;
 - o botão de uma tarefa incompleta fica desactivado — reclamar o que não está
       completo é recusado pela API (403).
-- `pnpm typecheck` limpo; **801 testes verdes** no total.\n\n## Fase 5i — Capturas na nuvem (2026-11-25)
+- `pnpm typecheck` limpo; **801 testes verdes** no total.
+
+## Fase 5i — Capturas na nuvem (2026-11-25)
 
 ### Entregue
 
@@ -781,7 +793,9 @@ jogo pela plataforma).
       (`89 50`) — ida e volta completas;
 - o cartão mostrou "Captura enviada para a conta", as três locais com
       Enviar/Remover e a da nuvem listada;
-- `pnpm typecheck` limpo; **791 testes verdes** no total.\n\n## Fase 5h — Capturas de ecrã (2026-11-25)
+- `pnpm typecheck` limpo; **791 testes verdes** no total.
+
+## Fase 5h — Capturas de ecrã (2026-11-25)
 
 ### Entregue
 
@@ -802,7 +816,9 @@ jogo pela plataforma).
       primeira a carregar a 1920 px de largura, e o total "3 · 0,8 MB";
 - `pnpm typecheck` limpo; **787 testes verdes** no total.
 
-> Falta a subida para a nuvem ("screenshot sobe na nuvem"): o próximo lote.\n\n## Fase 11 — Lançamento 0.4.0 (2026-11-25)
+> Falta a subida para a nuvem ("screenshot sobe na nuvem"): o próximo lote.
+
+## Fase 11 — Lançamento 0.4.0 (2026-11-25)
 
 ### Entregue
 
@@ -815,7 +831,9 @@ jogo pela plataforma).
 ### Prova de execução real (2026-11-25)
 
 - `pnpm typecheck` limpo; **777 testes verdes**;
-- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.4.0\n\n## Fase 9c — Sunshine (o anfitrião) e Remote Play completo (2026-11-25)
+- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.4.0
+
+## Fase 9c — Sunshine (o anfitrião) e Remote Play completo (2026-11-25)
 
 ### Entregue
 
@@ -842,7 +860,9 @@ jogo pela plataforma).
 - o cartão da interface mostrou exactamente esse estado;
 - bug apanhado pela prova: a página aparecia **preta** — um `useCallback`
   depois de um retorno condicional (React #310); corrigido;
-- `pnpm typecheck` limpo; **777 testes verdes** no total.\n\n## Fase 10 — Varredura completa e lançamento 0.3.0 (2026-11-25)
+- `pnpm typecheck` limpo; **777 testes verdes** no total.
+
+## Fase 10 — Varredura completa e lançamento 0.3.0 (2026-11-25)
 
 ### Entregue
 
@@ -867,7 +887,9 @@ jogo pela plataforma).
 - `pnpm typecheck` limpo; **768 testes verdes**;
 - migrações aplicadas e integração correndo contra PostgreSQL real;
 - `nexora-hub-0.3.0-x86_64.AppImage`, `-amd64.deb` e `-x64.exe` construídos;
-- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.3.0\n\n## Fase 9b — Remote Play via Moonlight (2026-11-25)
+- release: https://github.com/yuaberry/nexora-hub/releases/tag/v0.3.0
+
+## Fase 9b — Remote Play via Moonlight (2026-11-25)
 
 ### Entregue
 
@@ -891,7 +913,9 @@ jogo pela plataforma).
 - **Sunshine**: quando o Moonlight estiver instalado e a funcionar, o passo
   seguinte é ligar também o anfitrião (Sunshine) — por agora fica declarado
   como tal, não fingido;
-- `pnpm typecheck` limpo; **768 testes verdes** no total.\n\n## Fase 5g — Instalação de modos em 1 clique (2026-11-24)
+- `pnpm typecheck` limpo; **768 testes verdes** no total.
+
+## Fase 5g — Instalação de modos em 1 clique (2026-11-24)
 
 ### Entregue
 
@@ -914,7 +938,9 @@ jogo pela plataforma).
       novamente"), e o cartão mostra o estado honesto quando não há pasta;
 - o diálogo nativo do sistema não é clicável num *probe* sem ecrã interactivo
   — a escolha do ficheiro é o mesmo padrão do selector de capas, já provado;
-- `pnpm typecheck` limpo; **755 testes verdes** no total.\n\n## Fase 9a — Widget de sessão (2026-11-24)
+- `pnpm typecheck` limpo; **755 testes verdes** no total.
+
+## Fase 9a — Widget de sessão (2026-11-24)
 
 ### Entregue
 
@@ -939,7 +965,9 @@ jogo pela plataforma).
   nos blocos `[data-theme]` e a página do widget não aplicava o tema ao
   documento (o `useDocumentPreferences` faltava lá); e o HUD transbordava a
   janela (faltava o enquadramento `widget.css`);
-- `pnpm typecheck` limpo; **745 testes verdes** no total.\n\n## Fase 3g — A web mostra a biblioteca sincronizada (2026-11-24)
+- `pnpm typecheck` limpo; **745 testes verdes** no total.
+
+## Fase 3g — A web mostra a biblioteca sincronizada (2026-11-24)
 
 ### Entregue
 
@@ -957,7 +985,9 @@ jogo pela plataforma).
       web passa a mostrá-los com a cápsula por appid;
 - teste de estrutura: a secção renderiza com o título, a explicação honesta
       da origem da arte e o estado de carregamento;
-- `pnpm typecheck` limpo; **741 testes verdes** no total.\n\n## Fase 3f — Biblioteca sincronizada com a conta (2026-11-24)
+- `pnpm typecheck` limpo; **741 testes verdes** no total.
+
+## Fase 3f — Biblioteca sincronizada com a conta (2026-11-24)
 
 ### Entregue
 
@@ -979,7 +1009,9 @@ jogo pela plataforma).
 - a API confirma independentemente: `GET /api/v1/library/mine` devolve 7
       entradas com os appids da Steam (Counter-Strike 2 → 730, Hollow Knight →
       367520);
-- `pnpm typecheck` limpo; **740 testes verdes** no total.\n\n## Fase 8a — Diagnóstico com leituras reais (2026-11-24)
+- `pnpm typecheck` limpo; **740 testes verdes** no total.
+
+## Fase 8a — Diagnóstico com leituras reais (2026-11-24)
 
 ### Entregue
 
@@ -1000,7 +1032,9 @@ jogo pela plataforma).
 - as quatro leituras desta máquina: **disco 526 GB / 982,8 GB** (normal),
       **carga 0,42 por núcleo** (normal), **memória 39 %** (normal),
       **temperatura 64 ºC** (normal) — valores reais, não estimados;
-- `pnpm typecheck` limpo; **735 testes verdes** no total.\n\n## Fase 5f — Reputação (2026-11-24)
+- `pnpm typecheck` limpo; **735 testes verdes** no total.
+
+## Fase 5f — Reputação (2026-11-24)
 
 ### Entregue
 
@@ -1018,7 +1052,9 @@ jogo pela plataforma).
 - conta nova: `{"points":0,"level":"bronze","next":"silver","remaining":100}`;
 - o cartão na página de Conquistas mostrou **Bronze · 0 · "Faltam 100 pontos
   para Prata"**;
-- `pnpm typecheck` limpo; **728 testes verdes** no total.\n\n## Fase 5e — Eventos da comunidade (2026-11-24)
+- `pnpm typecheck` limpo; **728 testes verdes** no total.
+
+## Fase 5e — Eventos da comunidade (2026-11-24)
 
 ### Entregue
 
@@ -1039,7 +1075,9 @@ jogo pela plataforma).
 - evento "Noite de R.E.P.O." criado pelo formulário e **apareceu na lista**
       (0/6);
 - "Vou estar lá" clicado → contagem **1/6** e o selo do meu estado;
-- `pnpm typecheck` limpo; **721 testes verdes** no total.\n\n## Fase 5d — Clãs (2026-11-24)
+- `pnpm typecheck` limpo; **721 testes verdes** no total.
+
+## Fase 5d — Clãs (2026-11-24)
 
 ### Entregue
 
@@ -1063,7 +1101,9 @@ jogo pela plataforma).
 - a vista da segunda conta mostra o clã com o papel "Membro";
 - bug real corrigido: a aceitação do convite não verificava o email da
   sessão — qualquer utilizador aceitaria qualquer convite;
-- `pnpm typecheck` limpo; **710 testes verdes** no total.\n\n## Fase 5c — Fóruns de jogo (2026-11-24)
+- `pnpm typecheck` limpo; **710 testes verdes** no total.
+
+## Fase 5c — Fóruns de jogo (2026-11-24)
 
 ### Entregue
 
@@ -1092,7 +1132,9 @@ jogo pela plataforma).
 - tópico aberto, resposta "Fica na Cidade das Lágrimas." enviada e **visível
       no tópico**;
 - o POST directo pelo proxy da app devolveu 201 (caminho com barras incluído);
-- `pnpm typecheck` limpo; **698 testes verdes** no total.\n\n## Fase 5c — Descrição real da loja na página do jogo (2026-11-23)
+- `pnpm typecheck` limpo; **698 testes verdes** no total.
+
+## Fase 5c — Descrição real da loja na página do jogo (2026-11-23)
 
 ### Entregue
 
@@ -1111,7 +1153,9 @@ jogo pela plataforma).
       Hollow Knight!…"), e a segunda visita leu-a do cache (sem rede);
 - bug apanhado pelo teste: a migração tinha o `select` desalinhado com o
       `insert` (a coluna nova entrava na posição errada) — corrigido;
-- `pnpm typecheck` limpo; **687 testes verdes** no total.\n\n## Fase 5b — Profundidade: herói de página de jogo, galeria e setas (2026-11-23)
+- `pnpm typecheck` limpo; **687 testes verdes** no total.
+
+## Fase 5b — Profundidade: herói de página de jogo, galeria e setas (2026-11-23)
 
 ### Entregue
 
@@ -1136,7 +1180,9 @@ jogo pela plataforma).
       `setCover`;
 - a seta "next" da prateleira andou a fila (319 px — o excedente total da
       fila de 7 cápsulas) e as filas curtas ficam com as setas desactivadas;
-- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 6a — Modo grande ecrã (2026-11-23)
+- `pnpm typecheck` limpo; **681 testes verdes** no total.
+
+## Fase 6a — Modo grande ecrã (2026-11-23)
 
 ### Entregue
 
@@ -1156,7 +1202,9 @@ jogo pela plataforma).
   grandes;
 - `ArrowRight` moveu o foco de "Hollow Knight" para "R.E.P.O."; `Escape`
   voltou ao launcher (`.hub-big` ausente, `.hub-shell` presente);
-- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 5a — Montra visual: prateleiras, destaque com arte e herói dos detalhes (2026-11-23)
+- `pnpm typecheck` limpo; **681 testes verdes** no total.
+
+## Fase 5a — Montra visual: prateleiras, destaque com arte e herói dos detalhes (2026-11-23)
 
 ### Entregue
 
@@ -1180,7 +1228,9 @@ jogo pela plataforma).
       e 5 jogos; "Surpreenda-me" presente;
 - Detalhes do Hollow Knight: herói com a arte de fundo (`nexora://cover/…`),
       título e os quatro botões; um único "Voltar" (o do shell);
-- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 4a — Saves na nuvem (2026-11-23)
+- `pnpm typecheck` limpo; **681 testes verdes** no total.
+
+## Fase 4a — Saves na nuvem (2026-11-23)
 
 ### Entregue
 
@@ -1217,7 +1267,9 @@ jogo pela plataforma).
 - bug apanhado pela prova: a cápsula da biblioteca passava o **id da base** à
   navegação (que procura pela chave externa) — os detalhes não abriam;
   corrigido nos dois sítios (Biblioteca e Início);
-- `pnpm typecheck` limpo; **681 testes verdes** no total.\n\n## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
+- `pnpm typecheck` limpo; **681 testes verdes** no total.
+
+## Fase 3c — Imagens da Steam, sincronização e capas personalizáveis (2026-11-22)
 
 ### Entregue
 
@@ -1654,3 +1706,49 @@ animados continuam planeados.
 
 Conta NEXORA dentro do launcher (necessária para comentar/reviewar no
 desktop), chat, fóruns, clãs — fases próprias.
+
+## Fase 14 — Plugins (2026-11-26)
+
+### Entregue
+
+- [x] **`packages/plugins`** (novo) — o contrato dos plugins: o **manifesto
+      declarativo** (id, nome, versão, autor, chaves de tradução e uma lista
+      fechada de capacidades), a validação pura e o registo (instalar,
+      activar, desactivar, remover, serializar/ler). Um plugin **não é
+      código**: liga capacidades que a plataforma já implementa a este
+      computador — a fronteira de confiança é a mesma do resto do projecto.
+- [x] **Plugin de origem** — `steam-integration` (v1.0.0, NEXORA), instalado
+      no primeiro arranque, activo por omissão.
+- [x] **Capacidades aplicadas de facto** — exactamente três, cada uma com o
+      seu ponto de aplicação real: `steam:sync` (relê os manifestos),
+      `steam:cover` (hidrata as capas com a arte pública da loja) e
+      `steam:dlc` (lista as DLCs declaradas). Desactivar o plugin desliga as
+      três, e cada canal recusa com o motivo `plugins.off` — a interface diz
+      qual é o interruptor em vez de fingir que a loja falhou.
+- [x] **`apps/desktop`** — `plugins-state.ts` (o registo em `plugins.json`,
+      ao lado da base local), `plugins-ipc.ts` (listar, instalar a partir de
+      um `manifest.json` escolhido pelo utilizador, activar/desactivar,
+      remover, reinstalar o de origem, consultar o estado de uma capacidade)
+      e a página **Plugins** na barra lateral (PT-BR e EN).
+- [x] **Honestidade** — a lista de capacidades é fechada e corresponde a
+      comportamento real: uma capacidade que ninguém lê seria um interruptor
+      que não faz nada, e por isso não existe.
+
+### Prova de execução real (2026-11-26)
+
+- `pnpm typecheck` limpo; **824 testes verdes** (mais 18: 12 do contrato dos
+  plugins + 6 do registo no disco);
+- app real (Electron 42, perfil isolado): no arranque o plugin de origem
+  ficou instalado e activo, com as três capacidades;
+- com o plugin **desactivado**, `steam:sync` e `steam:dlcs` recusaram com
+  `{"ok":false,"reasonKey":"plugins.off"}`; ao **activar** de novo, a
+  sincronização correu (`ok:true`, nada a actualizar) — o gate é real;
+- a página **Plugins** abriu pela barra lateral, com o plugin, o estado
+  "Activo", as acções e as capacidades em português.
+
+### Fora do escopo desta fase (deliberadamente)
+
+Código de terceiros a correr dentro do launcher (seria um buraco de segurança
+com a assinatura do utilizador), capacidades novas antes de o comportamento
+existir e qualquer forma de contorno de licença das lojas — ver
+`docs/LEGAL.md`.

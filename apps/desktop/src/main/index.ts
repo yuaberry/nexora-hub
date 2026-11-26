@@ -36,6 +36,8 @@ import { registerCatalogIpc } from './catalog-ipc.js';
 import { registerSaveCloudIpc } from './save-cloud-ipc.js';
 import { coverCacheDir } from './cover-cache.js';
 import { registerFamilyIpc } from './family-ipc.js';
+import { registerPluginsIpc } from './plugins-ipc.js';
+import { ensureBuiltinPlugin, openPluginsStore, type PluginsStore } from './plugins-state.js';
 import type { AppInfoView } from '../shared/preload-api.js';
 
 /**
@@ -78,6 +80,9 @@ let mainWindow: import('electron').BrowserWindow | null = null;
 let library: LocalLibrary | null = null;
 let runner: LocalGameRunner | null = null;
 
+/** O registo dos plugins (criado no arranque; depois é do utilizador). */
+let plugins: PluginsStore | null = null;
+
 /** Informações do executável — a versão é a do package, nunca inventada. */
 function appInfo(): AppInfoView {
   return {
@@ -112,6 +117,13 @@ function bootstrap(): void {
 
   library = new LocalLibrary(config.databasePath);
   runner = new LocalGameRunner();
+
+  // Plugins: o registo dos plugin ativos, no disco do utilizador. O plugin
+  // de origem é instalado no primeiro arranque — e daí em diante o utilizador
+  // é dono de o desactivar ou remover.
+  plugins = openPluginsStore(app.getPath('userData'));
+  ensureBuiltinPlugin(plugins, new Date().toISOString());
+  registerPluginsIpc(plugins);
 
   registerIpc({ library, runner, appInfo: appInfo() });
 
@@ -173,11 +185,11 @@ function bootstrap(): void {
   registerTasksIpc();
 
   // Capas e sincronização: imagens da Steam e a personalização do utilizador.
-  registerCoversIpc(library, coverCacheDir(config.databasePath));
+  registerCoversIpc(library, coverCacheDir(config.databasePath), plugins);
 
   // Catálogo público da Steam: procurar pelo AppID ou pelo nome e guardar
   // metadados na biblioteca local (a instalação continua a ser da loja).
-  registerCatalogIpc(library, coverCacheDir(config.databasePath));
+  registerCatalogIpc(library, coverCacheDir(config.databasePath), plugins);
 
   // Saves na nuvem: snapshots locais que sobem e descem com a conta.
   registerSaveCloudIpc(saves, library, config.apiBaseUrl);

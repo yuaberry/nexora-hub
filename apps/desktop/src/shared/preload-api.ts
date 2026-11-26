@@ -22,6 +22,37 @@ export interface DlcView {
   readonly installed: boolean;
 }
 
+/** Uma capacidade que a plataforma aplica (o nome é traduzido pela UI). */
+export interface PluginCapabilityView {
+  /** O identificador estável (`steam:sync`). */
+  readonly id: string;
+  /** A chave de tradução do nome. */
+  readonly nameKey: string;
+}
+
+/** Um plugin instalado, visto pela interface. */
+export interface PluginView {
+  readonly id: string;
+  readonly name: string;
+  readonly version: string;
+  readonly author: string;
+  /** A chave de tradução da descrição. */
+  readonly descriptionKey: string;
+  readonly capabilities: readonly string[];
+  readonly enabled: boolean;
+  readonly installedAt: string;
+}
+
+/** O manifesto de um plugin (o que um ficheiro `manifest.json` contém). */
+export interface PluginManifestView {
+  readonly id: string;
+  readonly name: string;
+  readonly version: string;
+  readonly author: string;
+  readonly descriptionKey: string;
+  readonly capabilities: readonly string[];
+}
+
 /** Uma entrada da biblioteca local (vista do renderer). */
 export interface DesktopGameView {
   readonly id: string;
@@ -663,6 +694,8 @@ export interface DesktopApi {
       readonly unchanged?: number;
       readonly titles?: readonly string[];
       readonly message?: string;
+      /** Motivo da recusa quando a capacidade está desligada (`plugins.off`). */
+      readonly reasonKey?: string;
     }>;
     /** As imagens que a Steam guardou para um jogo (para escolher entre elas). */
     readonly coverOptions: (gameId: string) => Promise<{
@@ -706,6 +739,8 @@ export interface DesktopApi {
       readonly items?: readonly DlcView[];
       readonly truncated?: number;
       readonly message?: string;
+      /** Motivo da recusa quando a capacidade está desligada (`plugins.off`). */
+      readonly reasonKey?: string;
     }>;
   };
   readonly friends: {
@@ -854,6 +889,8 @@ export interface DesktopApi {
       readonly updated?: number;
       readonly failed?: number;
       readonly skipped?: number;
+      /** Motivo da recusa quando a capacidade está desligada (`plugins.off`). */
+      readonly reasonKey?: string;
     }>;
     /** Abre o selector de ficheiro de imagem. */
     readonly pick: () => Promise<{ readonly ok: boolean; readonly path?: string }>;
@@ -942,6 +979,26 @@ export interface DesktopApi {
   };
   readonly shortcuts: {
     readonly create: (gameId: string) => Promise<ShortcutResultView>;
+  };
+  readonly plugins: {
+    /**
+     * Os plugins instalados, as capacidades que a plataforma aplica e o
+     * plugin de origem quando não está instalado (pode ser reinstalado).
+     */
+    readonly list: () => Promise<{
+      readonly ok: boolean;
+      readonly items: readonly PluginView[];
+      readonly capabilities: readonly PluginCapabilityView[];
+      readonly available: PluginManifestView | null;
+    }>;
+    /** Activa ou desactiva um plugin (o efeito é imediato). */
+    readonly setEnabled: (pluginId: string, enabled: boolean) => Promise<{ readonly ok: boolean; readonly reasonKey?: string }>;
+    /** Remove um plugin do registo. */
+    readonly remove: (pluginId: string) => Promise<{ readonly ok: boolean; readonly reasonKey?: string }>;
+    /** Instala a partir de um `manifest.json` escolhido pelo utilizador. */
+    readonly install: () => Promise<{ readonly ok: boolean; readonly reasonKey?: string; readonly plugin?: PluginView }>;
+    /** Reinstala o plugin que a NEXORA envia (depois de removido). */
+    readonly installBuiltin: () => Promise<{ readonly ok: boolean; readonly reasonKey?: string }>;
   };
   readonly scan: {
     readonly disks: () => Promise<ScanResultView>;

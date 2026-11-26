@@ -90,6 +90,20 @@ const api: DesktopApi = {
   shortcuts: {
     create: (gameId) => ipcRenderer.invoke('shortcuts:create', gameId) as Promise<ShortcutResultView>,
   },
+  plugins: {
+    // Plugins: manifestos declarativos, validados no processo principal. O
+    // renderer nunca vê o caminho do registo — só a lista e o resultado.
+    list: () => ipcRenderer.invoke('plugins:list') as Promise<{
+      readonly ok: boolean;
+      readonly items: readonly import('../shared/preload-api.js').PluginView[];
+      readonly capabilities: readonly import('../shared/preload-api.js').PluginCapabilityView[];
+      readonly available: import('../shared/preload-api.js').PluginManifestView | null;
+    }>,
+    setEnabled: (pluginId, enabled) => ipcRenderer.invoke('plugins:setEnabled', pluginId, enabled) as Promise<{ readonly ok: boolean; readonly reasonKey?: string }>,
+    remove: (pluginId) => ipcRenderer.invoke('plugins:remove', pluginId) as Promise<{ readonly ok: boolean; readonly reasonKey?: string }>,
+    install: () => ipcRenderer.invoke('plugins:install') as Promise<{ readonly ok: boolean; readonly reasonKey?: string; readonly plugin?: import('../shared/preload-api.js').PluginView }>,
+    installBuiltin: () => ipcRenderer.invoke('plugins:installBuiltin') as Promise<{ readonly ok: boolean; readonly reasonKey?: string }>,
+  },
   scan: {
     disks: () => ipcRenderer.invoke('library:scan') as Promise<ScanResultView>,
     // A importação oficial lê os manifestos das lojas no disco — o caminho
@@ -109,8 +123,8 @@ const api: DesktopApi = {
     lookup: (appId) => ipcRenderer.invoke('steam:lookup', appId) as Promise<{ readonly ok: boolean; readonly app?: import('@nexora/core').SteamAppSummary; readonly message?: string }>,
     search: (term) => ipcRenderer.invoke('steam:search', term) as Promise<{ readonly ok: boolean; readonly items?: readonly import('@nexora/core').SteamAppSummary[]; readonly message?: string }>,
     describe: (gameId) => ipcRenderer.invoke('steam:describe', gameId) as Promise<{ readonly ok: boolean; readonly description?: string; readonly message?: string }>,
-    dlcs: (gameId) => ipcRenderer.invoke('steam:dlcs', gameId) as Promise<{ readonly ok: boolean; readonly items?: readonly import('../shared/preload-api.js').DlcView[]; readonly truncated?: number; readonly message?: string }>,
-    sync: () => ipcRenderer.invoke('steam:sync') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly added?: number; readonly unchanged?: number; readonly titles?: readonly string[]; readonly message?: string }>,
+    dlcs: (gameId) => ipcRenderer.invoke('steam:dlcs', gameId) as Promise<{ readonly ok: boolean; readonly items?: readonly import('../shared/preload-api.js').DlcView[]; readonly truncated?: number; readonly message?: string; readonly reasonKey?: string }>,
+    sync: () => ipcRenderer.invoke('steam:sync') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly added?: number; readonly unchanged?: number; readonly titles?: readonly string[]; readonly message?: string; readonly reasonKey?: string }>,
     coverOptions: (gameId) => ipcRenderer.invoke('steam:coverOptions', gameId) as Promise<{ readonly ok: boolean; readonly options?: readonly { path: string; label: string }[]; readonly message?: string }>,
   },
   store: {
@@ -210,7 +224,7 @@ const api: DesktopApi = {
     toggle: () => ipcRenderer.invoke('overlay:toggle') as Promise<{ ok: boolean; visible: boolean }>,
   },
   covers: {
-    hydrate: () => ipcRenderer.invoke('covers:hydrate') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly failed?: number; readonly skipped?: number }>,
+    hydrate: () => ipcRenderer.invoke('covers:hydrate') as Promise<{ readonly ok: boolean; readonly updated?: number; readonly failed?: number; readonly skipped?: number; readonly reasonKey?: string }>,
     pick: () => ipcRenderer.invoke('covers:pick') as Promise<{ ok: boolean; path?: string }>,
     set: (gameId, path) => ipcRenderer.invoke('library:setCover', gameId, path) as Promise<{ ok: boolean; message?: string }>,
     reset: (gameId) => ipcRenderer.invoke('library:resetCover', gameId) as Promise<{ ok: boolean; message?: string }>,

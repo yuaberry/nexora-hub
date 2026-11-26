@@ -10,6 +10,7 @@
 import { ipcMain } from 'electron';
 import { isSteamAppId, type SteamAppSummary } from '@nexora/core';
 import { installedSteamAppIds, lookupSteamApp, lookupSteamDescription, lookupSteamDlcs, searchSteamApps } from './steam-catalog.js';
+import { isCapabilityActive, type PluginsStore } from './plugins-state.js';
 import type { LocalLibrary } from './db.js';
 import { cacheRemoteCover } from './cover-cache.js';
 import type { DlcView } from '../shared/preload-api.js';
@@ -19,8 +20,17 @@ function validAppId(value: unknown): string | null {
   return isSteamAppId(value) ? value : null;
 }
 
-/** Regista os canais do catálogo da Steam. */
-export function registerCatalogIpc(library: LocalLibrary, coversDir: string): void {
+/**
+ * Regista os canais do catálogo da Steam.
+ *
+ * `plugins` é o registo dos plugins: listar as DLCs é uma capacidade que um
+ * plugin activo declara — sem plugin activo, o canal diz-o em vez de fingir.
+ */
+export function registerCatalogIpc(
+  library: LocalLibrary,
+  coversDir: string,
+  plugins: PluginsStore,
+): void {
   // Os detalhes de um AppID (nome, tipo, gratuito, DLCs declaradas).
   ipcMain.handle('steam:lookup', async (_event, appId: unknown): Promise<{
     readonly ok: boolean;
@@ -157,7 +167,11 @@ export function registerCatalogIpc(library: LocalLibrary, coversDir: string): vo
     readonly items?: readonly DlcView[];
     readonly truncated?: number;
     readonly message?: string;
+    readonly reasonKey?: string;
   }> => {
+    if (!isCapabilityActive(plugins, 'steam:dlc')) {
+      return { ok: false, reasonKey: 'plugins.off' };
+    }
     const numericId = typeof gameId === 'number' ? gameId : Number(gameId);
     if (!Number.isInteger(numericId) || numericId <= 0) {
       return { ok: false, message: 'Jogo em falta.' };

@@ -31,7 +31,13 @@ export function DlcSection({ game }: { readonly game: DesktopGameView }): ReactN
     const result = await api.steam.dlcs(game.id);
     setLoading(false);
     if (!result.ok) {
-      setMessage(result.message ?? t('catalog.dlc.failed'));
+      // Capacidade desligada: a secção explica o interruptor em vez de fingir
+      // que a loja falhou.
+      setMessage(
+        result.reasonKey === 'plugins.off'
+          ? t('plugins.off')
+          : (result.message ?? t('catalog.dlc.failed')),
+      );
       setItems(null);
       return;
     }

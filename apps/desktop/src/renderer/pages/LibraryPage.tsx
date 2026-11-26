@@ -115,7 +115,13 @@ export function LibraryPage({
     const result = await api.steam.sync();
     setSyncing(false);
     if (!result.ok) {
-      setImportMessage(result.message ?? t('error.generic'));
+      // Uma capacidade desligada por um plugin não é um erro da Steam: a
+      // interface diz qual é o interruptor, e o utilizador decide.
+      setImportMessage(
+        result.reasonKey === 'plugins.off'
+          ? t('plugins.off')
+          : (result.message ?? t('error.generic')),
+      );
       return;
     }
     const updated = result.updated ?? 0;

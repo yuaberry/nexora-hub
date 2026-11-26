@@ -30,7 +30,8 @@
       "@nexora/download": ["packages/download/src/index.ts"],
       "@nexora/runner": ["packages/runner/src/index.ts"],
       "@nexora/cloud": ["packages/cloud/src/index.ts"],
-      "@nexora/ui": ["packages/ui/src/index.ts"]
+      "@nexora/ui": ["packages/ui/src/index.ts"],
+      "@nexora/plugins": ["packages/plugins/src/index.ts"]
     }
   }
 }

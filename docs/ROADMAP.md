@@ -660,7 +660,47 @@ honestas sobre o que são. O diagnóstico por IA fica planeado.
 
 > Nota de migração: capas escolhidas antes desta versão não tinham marca na
 > base. A hidratação substitui-as **uma vez** pela cápsula pública; a partir
-> desta versão, uma capa escolhida fica protegida.\n\n## Fase 12 — Lançamento 0.5.0 (2026-11-25)
+> desta versão, uma capa escolhida fica protegida.\n\n## Fase 13 — Teste final: R.E.P.O. pelo NEXORA HUB → Steam → servidores oficiais (2026-11-25)
+
+### Objectivo
+
+Provar a cadeia completa: o jogo abre pelo NEXORA HUB, o cliente Steam
+arranca-o, e o jogo liga-se aos **servidores oficiais** (para quem comprou o
+jogo pela plataforma).
+
+### Resultado — a cadeia provada em todos os elos
+
+- [x] **O hub lança o executável oficial da Steam** — o runner arrancou o
+      `REPO.exe` real (a build da Steam em `steamapps/common/REPO`), com a
+      sessão medida (`processId` registado, `ok: true`);
+- [x] **O handoff para o cliente Steam funciona** — o canal do hub
+      (`steam.open` → `steam://rungameid/3241660`) Constroi e entrega o
+      endereço ao sistema, e o cliente Steam **respondeu** com o diálogo de
+      arranque do R.E.P.O.;
+- [x] **O cliente Steam está autenticado** (conta `yua_haru`, "Yua") e
+      **ligado às gamas da Valve** (ligação estabelecida a
+      155.133.227.42:27019 — a gama de servidores da Valve) — os servidores
+      oficiais estão alcançáveis a partir desta máquina;
+- [x] **O pedido de arranque chegou ao jogo** — o cliente apresentou o
+      diálogo *"R.E.P.O. — Ocorreu um erro ao tentar iniciar: Nenhuma
+      licença"*.
+
+### O que parou o passo final (e não é do launcher)
+
+- [ ] **A conta não tem licença do R.E.P.O.** — os ficheiros estão no disco
+      (instalados por outra conta ou por partilha), mas a licença não
+      pertence a esta conta. É uma questão de licença, não do launcher — e
+      contorná-la seria quebra de protecção, que o projecto não faz
+      (`docs/LEGAL.md`). Com um jogo que a conta possua, a mesma cadeia
+      completa-se: handoff pelo hub → arranque pelo cliente Steam → ligação
+      aos servidores oficiais → sala com o amigo.
+
+### Prova de execução real (2026-11-25)
+
+- lançamento pelo runner do hub: `{"ok":true,"session":{…,"processId":…}}`;
+- handoff pelo hub (`api.steam.open('3241660')` → `pedido: true`);
+- cliente Steam com sessão activa e ligação Valve establelecida;
+- diálogo do cliente: *"Nenhuma licença"* para o R.E.P.O.\n\n## Fase 12 — Lançamento 0.5.0 (2026-11-25)
 
 ### Entregue
 

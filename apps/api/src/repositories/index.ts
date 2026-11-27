@@ -24,6 +24,7 @@ import { MemoryEventRepository } from './memory-events.js';
 import { MemoryLibrarySyncRepository } from './memory-library-sync.js';
 import { MemoryScreenshotRepository } from './memory-screenshots.js';
 import { MemoryTaskClaimRepository } from './memory-task-claims.js';
+import { MemoryCosmeticRepository } from './memory-cosmetics.js';
 import { MemoryLibraryRepository, MemoryPlaySessionRepository } from './memory-game.js';
 import { PostgresAuditRepository, PostgresUserRepository } from './postgres-users.js';
 import { PostgresAuthSessionRepository, PostgresMfaRepository } from './postgres-auth.js';
@@ -34,6 +35,7 @@ import { PostgresEventRepository } from './postgres-events.js';
 import { PostgresLibrarySyncRepository } from './postgres-library-sync.js';
 import { PostgresScreenshotRepository } from './postgres-screenshots.js';
 import { PostgresTaskClaimRepository } from './postgres-task-claims.js';
+import { PostgresCosmeticRepository } from './postgres-cosmetics.js';
 import { PostgresLibraryRepository, PostgresPlaySessionRepository } from './postgres-game.js';
 import type { Repositories } from './types.js';
 
@@ -68,6 +70,7 @@ export function createMemoryRepositories(): Repositories {
     presence: new MemoryPresenceRepository(),
     chat: new MemoryChatRepository(),
     achievements: new MemoryAchievementRepository(),
+    cosmetics: new MemoryCosmeticRepository(),
     sessions: new MemoryPlaySessionRepository(),
     audit: new MemoryAuditRepository(),
     mode: 'memory',
@@ -110,6 +113,7 @@ export function createRepositories(env: Env): { repositories: Repositories; clos
     presence: new PostgresPresenceRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     chat: new PostgresChatRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     achievements: new PostgresAchievementRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
+    cosmetics: new PostgresCosmeticRepository(database.db as unknown as NodePgDatabase<Record<string, unknown>>),
     mode: 'postgres',
     close: async () => {
       await database.close();

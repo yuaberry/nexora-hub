@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { useInterface } from '@nexora/ui';
+import { Badge, useInterface } from '@nexora/ui';
 import { useLibrary } from '../state/desktop.js';
 import { useAuth } from '../state/auth.js';
 import { initials } from './GameTile.js';
 import type { DownloadTaskView } from '../../shared/preload-api.js';
 import { coverFit, coverUrl } from '../lib/media.js';
+import { apiRequest } from '../lib/api.js';
 import { GameImage } from './GameImage.js';
 
 /**
@@ -36,6 +37,39 @@ export function Sidebar({
   const [active, setActive] = useState<readonly DownloadTaskView[]>([]);
 
   const games = library.value ?? [];
+
+  // O selo equipado (cosmético do tipo `badge`): aparece ao lado do nome —
+  // é a prova de que o que se comprou se vê.
+  const [badge, setBadge] = useState<string | null>(null);
+  const loadBadge = useCallback(async () => {
+    if (user === null) {
+      setBadge(null);
+      return;
+    }
+    try {
+      const body = await apiRequest<{ items?: readonly { id: string; equipped: boolean }[] }>('/api/v1/cosmetics');
+      const equipado = body.items?.find((item) => item.equipped);
+      setBadge(equipado?.id ?? null);
+    } catch {
+      setBadge(null);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    void loadBadge();
+  }, [loadBadge]);
+
+  // Comprar, equipar ou tirar um selo noutra página actualiza o daqui: o
+  // aviso vem do cartão de cosméticos, e a barra lateral volta a lê-lo.
+  useEffect(() => {
+    const onChange = (): void => {
+      void loadBadge();
+    };
+    globalThis.addEventListener('nexora:cosmetics-changed', onChange);
+    return () => {
+      globalThis.removeEventListener('nexora:cosmetics-changed', onChange);
+    };
+  }, [loadBadge]);
 
   const loadActive = useCallback(async () => {
     const api = globalThis.window?.nexora;
@@ -152,7 +186,10 @@ export function Sidebar({
         {active.length === 0 ? t('sidebar.noDownloads') : t('sidebar.downloadsActive', { count: active.length })}
         {user === null ? null : (
           <div className="nx-stack" style={{ marginTop: '0.5rem' }}>
-            <span className="hub-break">{t('auth.signedInAs', { name: user.displayName })}</span>
+            <span className="hub-break">
+              {t('auth.signedInAs', { name: user.displayName })}
+              {badge === null ? null : <Badge>{t(badgeName(badge))}</Badge>}
+            </span>
             <button type="button" className="hub-sidebar__item" onClick={switchAccount}>
               {t('auth.switch')}
             </button>
@@ -161,4 +198,15 @@ export function Sidebar({
       </div>
     </aside>
   );
+}
+/** A chave do nome do selo equipado (explícita — o catálogo é conhecido). */
+function badgeName(id: string): 'cosmetic.badge.owl.name' | 'cosmetic.badge.marathon.name' | 'cosmetic.badge.century.name' {
+  switch (id) {
+    case 'badge-owl':
+      return 'cosmetic.badge.owl.name';
+    case 'badge-marathon':
+      return 'cosmetic.badge.marathon.name';
+    default:
+      return 'cosmetic.badge.century.name';
+  }
 }

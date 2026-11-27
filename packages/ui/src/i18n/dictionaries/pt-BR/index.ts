@@ -34,6 +34,7 @@ import { tasks } from './tasks.js';
 import { syncedLibrary } from './synced-library.js';
 import { pages } from './pages.js';
 import { plugins } from './plugins.js';
+import { cosmetics } from './cosmetics.js';
 
 /**
  * Dicionário PT-BR — a fonte de verdade da forma.
@@ -79,5 +80,6 @@ export const ptBR = {
   ...tasks,
   ...syncedLibrary,
   ...plugins,
+  ...cosmetics,
   ...pages,
 } as const;

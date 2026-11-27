@@ -353,6 +353,47 @@ describeIfDatabase('integração com PostgreSQL real', () => {
 
     await app.close();
   });
+
+  it('os cosméticos compram e equipam sobre as tabelas reais', async () => {
+    // Regressão: as tabelas dos cosméticos e do equipado são novas — este
+    // teste garante que a compra grava uma linha por par (e a segunda compra
+    // do mesmo cosmético é recusada pela chave primária, não pela memória) e
+    // que equipar substitui o que estava no tipo, sem deixar dois selos.
+    await runMigrations(DATABASE_URL as string);
+    const env = loadEnv({ DATABASE_URL, NODE_ENV: 'test' } as NodeJS.ProcessEnv);
+    const { repositories, close } = createRepositories(env);
+
+    const stamp = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+    const user = await repositories.users.create({
+      email: `cosmeticos-pg-${stamp}@nexora.local`,
+      displayName: 'Cosméticos PG',
+      passwordHash: 'ab'.repeat(32),
+      passwordSalt: 'cd'.repeat(8),
+    });
+
+    // Pontos pelo livro (a moeda real da economia).
+    await repositories.achievements.addPoints({ userId: user.id, delta: 20, reason: 'achievement.first-session', entityId: 'first-session' });
+
+    // Comprar duas vezes o mesmo cosmético: a segunda é recusada pela base.
+    expect(await repositories.cosmetics.own(user.id, 'badge-owl', new Date())).toBe(true);
+    expect(await repositories.cosmetics.own(user.id, 'badge-owl', new Date())).toBe(false);
+    expect(await repositories.cosmetics.listOwned(user.id)).toHaveLength(1);
+
+    // Equipar por tipo: substitui, não acumula.
+    await repositories.cosmetics.equip(user.id, 'badge', 'badge-owl', new Date());
+    await repositories.cosmetics.own(user.id, 'badge-marathon', new Date());
+    await repositories.cosmetics.equip(user.id, 'badge', 'badge-marathon', new Date());
+    const equipado = await repositories.cosmetics.equipped(user.id);
+    expect(equipado).toHaveLength(1);
+    expect(equipado[0]?.cosmeticId).toBe('badge-marathon');
+
+    // Desequipar apaga a linha do tipo.
+    expect(await repositories.cosmetics.unequip(user.id, 'badge')).toBe(true);
+    expect(await repositories.cosmetics.unequip(user.id, 'badge')).toBe(false);
+    expect(await repositories.cosmetics.equipped(user.id)).toHaveLength(0);
+
+    await close();
+  });
 });
 
 describe('modo de persistência reportado', () => {

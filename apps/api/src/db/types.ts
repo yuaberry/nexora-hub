@@ -56,6 +56,9 @@ export type AuditAction =
   | 'chat.open'
   | 'chat.message'
   | 'achievement.unlocked'
+  | 'cosmetic.purchased'
+  | 'cosmetic.equipped'
+  | 'cosmetic.unequipped'
   | 'save.upload'
   | 'save.delete'
   | 'task.claim';

@@ -514,6 +514,7 @@ export interface Repositories {
   readonly presence: PresenceRepository;
   readonly chat: ChatRepository;
   readonly achievements: AchievementRepository;
+  readonly cosmetics: CosmeticRepository;
   /** Modo efectivo de persistência (reportado em `/health`). */
   readonly mode: 'memory' | 'postgres';
   close: () => Promise<void>;
@@ -795,6 +796,40 @@ export interface TaskClaimRepository {
   readonly claim: (userId: string, taskId: string, periodKey: string) => Promise<boolean>;
   /** As reclamações do utilizador nos períodos dados (`<taskId>::<period>`). */
   readonly listPeriod: (userId: string, periodKeys: readonly string[]) => Promise<readonly string[]>;
+}
+
+/** Um cosmético comprado por um utilizador. */
+export interface CosmeticRecord {
+  readonly userId: string;
+  readonly cosmeticId: string;
+  readonly acquiredAt: Date;
+}
+
+/** O cosmético equipado de um tipo, para um utilizador. */
+export interface EquippedRecord {
+  readonly userId: string;
+  /** O tipo (`badge`). */
+  readonly kind: string;
+  readonly cosmeticId: string;
+  readonly updatedAt: Date;
+}
+
+export interface CosmeticRepository {
+  /** Os cosméticos que o utilizador tem, dos mais recentes. */
+  readonly listOwned: (userId: string) => Promise<readonly CosmeticRecord[]>;
+  /**
+   * Regista a compra (idempotente pelo par utilizador/cosmético).
+   *
+   * Devolve `false` quando já era teu — é assim que os pontos não saem duas
+   * vezes pelo mesmo cosmético, mesmo com dois pedidos em paralelo.
+   */
+  readonly own: (userId: string, cosmeticId: string, now: Date) => Promise<boolean>;
+  /** O que está equipado, por tipo. */
+  readonly equipped: (userId: string) => Promise<readonly EquippedRecord[]>;
+  /** Equipa (substitui o que estava equipado no tipo). */
+  readonly equip: (userId: string, kind: string, cosmeticId: string, now: Date) => Promise<void>;
+  /** Tira o que está equipado num tipo (`false` quando não havia nada). */
+  readonly unequip: (userId: string, kind: string) => Promise<boolean>;
 }
 
 /** Uma review de um jogo (uma por utilizador). */

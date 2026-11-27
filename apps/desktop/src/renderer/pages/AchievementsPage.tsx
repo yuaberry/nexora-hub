@@ -3,6 +3,7 @@ import { Badge, Button, Card, EmptyState, useInterface } from '@nexora/ui';
 import { accessToken } from '../lib/api.js';
 import { ReputationCard } from '../components/ReputationCard.js';
 import { TasksCard } from '../components/TasksCard.js';
+import { CosmeticsCard } from '../components/CosmeticsCard.js';
 import type { AchievementProgressView, PointEntryView } from '../../shared/preload-api.js';
 
 /**
@@ -79,6 +80,7 @@ export function AchievementsPage(): ReactNode {
     <div className="nx-stack">
       <ReputationCard />
       <TasksCard />
+      <CosmeticsCard />
       <div className="hub-row hub-row--between">
         <div className="nx-stack">
           <h1 className="nx-title">{t('achievements.title')}</h1>

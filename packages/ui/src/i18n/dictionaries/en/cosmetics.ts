@@ -1,0 +1,20 @@
+/** EN dictionary — cosmetics. */
+export const cosmetics = {
+  'cosmetics.title': 'Cosmetics',
+  'cosmetics.subtitle': 'Badges bought with the points you earned by playing.',
+  'cosmetics.cost': '{cost} points',
+  'cosmetics.missing': '{missing} points to go',
+  'cosmetics.owned': 'Owned',
+  'cosmetics.equipped': 'Equipped',
+  'cosmetics.buy': 'Buy',
+  'cosmetics.equip': 'Equip',
+  'cosmetics.unequip': 'Remove',
+  'cosmetics.purchased': 'Purchase confirmed — {cost} points.',
+  'cosmetics.unequipped': 'Badge removed.',
+  'cosmetic.badge.owl.name': 'Night Owl',
+  'cosmetic.badge.owl.description': 'For those who play while the rest of the house sleeps.',
+  'cosmetic.badge.marathon.name': 'Marathon Runner',
+  'cosmetic.badge.marathon.description': 'Two straight hours in a single session — no breaks.',
+  'cosmetic.badge.century.name': 'Centurion',
+  'cosmetic.badge.century.description': 'One hundred hours measured by the launcher, not promised.',
+} as const;

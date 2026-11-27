@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.5.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-824%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-844%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -96,6 +96,15 @@ código de saída, tempo gravado).
   novos, todos diferentes); a capa que escolheste **nunca** é mexida
 - **Personalizável** — escolhe outra entre as imagens da Steam ou um ficheiro
   teu, e volta à automática quando quiseres
+
+### 🏆 Cosméticos
+- **Selos comprados com pontos reais** — a mesma moeda das conquistas e das
+  tarefas; nenhum preço inventado e nenhum selo sem pontos
+- **O saldo desce no livro** — comprar é uma entrada negativa no livro de
+  pontos, com o motivo declarado (`cosmetic.<id>`); comprar duas vezes é
+  recusado pela regra **e** pela chave da base
+- **O que equipas vê-se** — o selo aparece ao lado do teu nome na barra
+  lateral e nas Conquistas, e sai quando o tiras
 
 ### 🧩 Plugins
 - **Extensões declarativas** — um plugin é um `manifest.json` que declara
@@ -254,6 +263,9 @@ Os ficheiros de cada lançamento estão em
 <td><img src="docs/screenshots/mods.png" alt="Modos"/><br/><sub><b>Modos</b> — 42 modos detectados, com o carregador de cada um.</sub></td>
 </tr>
 <tr>
+<td width="50%"><img src="docs/screenshots/cosmetics.png" alt="Cosméticos"/><br/><sub><b>Cosméticos</b> — selos comprados com pontos reais, equipados ao lado do nome.</sub></td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/overlay.png" alt="Overlay"/><br/><sub><b>Overlay</b> — medidas reais por cima do jogo (Shift+Tab).</sub></td>
 </tr>
 <tr>
@@ -319,7 +331,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **824 verdes** (integração PostgreSQL real incluída) |
+| **Testes** | **844 verdes** (integração PostgreSQL real incluída) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real (último: capas da loja que não carregavam no Electron, logo cortado em moldura retrato, import perdido que silenciava o cache) |
 | **Build** | Linux + Windows empacotados a cada versão |

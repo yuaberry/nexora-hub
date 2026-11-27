@@ -78,6 +78,13 @@
       "when": 1795480000000,
       "tag": "0010_task_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795742400000,
+      "tag": "0011_cosmetics",
+      "breakpoints": true
     }
   ]
 }

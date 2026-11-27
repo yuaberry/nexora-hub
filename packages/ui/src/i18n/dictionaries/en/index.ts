@@ -34,6 +34,7 @@ import { tasks } from './tasks.js';
 import { syncedLibrary } from './synced-library.js';
 import { pages } from './pages.js';
 import { plugins } from './plugins.js';
+import { cosmetics } from './cosmetics.js';
 
 /**
  * Dicionário EN — formato **plano**, chaves explícitas.
@@ -77,5 +78,6 @@ export const en = {
   ...tasks,
   ...syncedLibrary,
   ...plugins,
+  ...cosmetics,
   ...pages,
 };

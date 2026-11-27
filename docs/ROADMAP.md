@@ -1752,3 +1752,47 @@ Código de terceiros a correr dentro do launcher (seria um buraco de segurança
 com a assinatura do utilizador), capacidades novas antes de o comportamento
 existir e qualquer forma de contorno de licença das lojas — ver
 `docs/LEGAL.md`.
+
+## Fase 15 — Cosméticos (2026-11-27)
+
+### Entregue
+
+- [x] **Domínio** (`packages/core/cosmetics`) — o catálogo declarado de selos
+      (`badge-owl`, `badge-marathon`, `badge-century`), a avaliação pura da
+      compra (existe? já é teu? chega o saldo?) e do equipar (só o que é teu),
+      mais "quanto falta" — 13 testes.
+- [x] **API** (`modules/cosmetics`) — listar o catálogo com o que é teu, o que
+      está equipado e o saldo; comprar (a posse primeiro, os pontos a saírem
+      do livro com o motivo `cosmetic.<id>`, escrita auditada); equipar e
+      desequipar. Migração `0011`, repositórios em memória e PostgreSQL — 7
+      testes de integração.
+- [x] **Launcher** — cartão **Cosméticos** nas Conquistas (saldo, custo, o que
+      falta, comprar/equipar/tirar) e o selo **ao lado do nome** na barra
+      lateral, em PT-BR e EN.
+- [x] **A regra que o livro impõe** — comprar é uma entrada **negativa** no
+      livro de pontos (o saldo continua a ser a soma, nunca um campo), e a
+      base recusa a segunda compra do mesmo cosmético pela chave primária.
+
+### Prova de execução real (2026-11-27)
+
+- `pnpm typecheck` limpo; **844 testes verdes** (mais 20: 13 do domínio + 7 da
+  API), com a API em **PostgreSQL real** (migração `0011` aplicada);
+- caminho real do utilizador numa conta nova: registo → **duas sessões reais
+  terminadas** → conquista da primeira sessão (10) + coruja (30, a sessão
+  começou de madrugada) + tarefa diária reclamada (5) = **45 pontos**;
+- compra do primeiro selo pela API: saldo **45 → 30**, o selo passou a ser
+  teu e a estar equipado; comprar outra vez recusa com `already-owned` e o
+  saldo não mexe;
+- na interface (Electron 42, perfil isolado): o cartão mostrou **30 pontos**,
+  o selo *Coruja* "É teu / Equipado / Tirar", e os outros dois com "faltam 10
+  pontos" e "faltam 90 pontos" — com o botão **desactivado**, não fingido;
+- **bug apanhado pela prova**: o selo na barra lateral não se actualizava
+  depois de equipar ou tirar (a sidebar lia uma vez). Corrigido com um aviso
+  `nexora:cosmetics-changed` do cartão para a sidebar — e reprovado: ao
+  **tirar**, o nome ficou sem selo; ao **equipar**, o selo voltou.
+
+### Fora do escopo desta fase (deliberadamente)
+
+Lojas de pontos por dinheiro real, cosméticos que dão vantagem (um selo não
+mede nem acelera nada) e tipos novos de cosmético antes de haver onde os
+aplicar — o catálogo cresce com o comportamento.

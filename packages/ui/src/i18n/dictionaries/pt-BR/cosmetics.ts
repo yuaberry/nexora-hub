@@ -1,0 +1,20 @@
+/** Dicionário PT-BR — cosméticos. */
+export const cosmetics = {
+  'cosmetics.title': 'Cosméticos',
+  'cosmetics.subtitle': 'Selos comprados com os pontos que ganhaste a jogar.',
+  'cosmetics.cost': '{cost} pontos',
+  'cosmetics.missing': 'faltam {missing} pontos',
+  'cosmetics.owned': 'É teu',
+  'cosmetics.equipped': 'Equipado',
+  'cosmetics.buy': 'Comprar',
+  'cosmetics.equip': 'Equipar',
+  'cosmetics.unequip': 'Tirar',
+  'cosmetics.purchased': 'Compra confirmada — {cost} pontos.',
+  'cosmetics.unequipped': 'Selo retirado.',
+  'cosmetic.badge.owl.name': 'Coruja',
+  'cosmetic.badge.owl.description': 'Para quem joga quando o resto da casa dorme.',
+  'cosmetic.badge.marathon.name': 'Maratonista',
+  'cosmetic.badge.marathon.description': 'Duas horas seguidas numa só sessão — sem pausa.',
+  'cosmetic.badge.century.name': 'Centurião',
+  'cosmetic.badge.century.description': 'Cem horas de jogo medidas pelo launcher, não prometidas.',
+} as const;

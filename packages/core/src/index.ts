@@ -45,6 +45,7 @@ export * from './remote/sunshine.js';
 export * from './screens/rules.js';
 export * from './tasks/rules.js';
 export * from './battery/rules.js';
+export * from './cosmetics/cosmetics.js';
 export * from './recommend/similar.js';
 export * from './steam/images.js';
 export * from './steam/catalog.js';

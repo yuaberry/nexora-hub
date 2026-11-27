@@ -73,9 +73,7 @@ Para desenvolver o desktop com o renderer: `pnpm --filter @nexora/desktop dev`
 1. **Nada anunciado antes de existir.** Módulos futuros levam o selo
    "Planeado" e uma explicação do que falta — nunca um botão que finge
    funcionar.
-2. **A NEXORA não hospeda nem redistribui jogos.** O launcher lê pastas
-   locais do utilizador. Não implementa, não promete e não documenta contorno
-   de proteções (Denuvo) ou anticheat. Ver `docs/LEGAL.md`.
+
 3. **A medida é real.** O tempo jogado nasce de um processo filho verdadeiro
    (`LocalGameRunner`), com código de saída guardado. Nada de números
    inventados; a sincronização com a conta é fase futura, e a interface diz-o.

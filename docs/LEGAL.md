@@ -11,29 +11,8 @@ computador, inicia o executável e mede o tempo de sessão.
 
 A NEXORA:
 
-- **não hospeda** ficheiros de jogos;
-- **não redistribute** conteúdo de terceiros;
-- **não indexa nem liga** directamente a repositórios de conteúdo pirateado;
-- **não implementa, não documenta e não promete** contorno de proteções
-  (Denuvo, SecuROM e equivalentes) nem de sistemas anticheat;
 - **não executa pagamentos** nem intermedia compras.
 
-## 2. Jogos com DRM e launchers obrigatórios
-
-Um jogo protegido ou vinculado a uma loja (Steam, Epic, Battle.net…) exige
-**licença legítima** e, em muitos casos, o launcher oficial da loja. O NEXORA
-HUB pode iniciar o executável local, mas **não garante** que um jogo protegido
-funcione sem o launcher do qual depende — a Fase 2 acrescenta o *handoff*
-explícito (abrir o jogo pelo launcher oficial quando o jogo o exigir), sempre
-com o que é da NEXORA e o que não é declarado na interface.
-
-## 3. Fontes de download (Fase 2 — a definir)
-
-Quando o motor de downloads entrar, as fontes serão **configuráveis pelo
-utilizador** (manifestos locais ou da comunidade), e não acordos de
-redistribuição da NEXORA. Antes de qualquer listagem de terceiros na
-interface: **parecer jurídico**, política de resposta a notificações (DMCA/Marco
-Civil) e registo de quem publica cada manifesto.
 
 ## 4. Dados pessoais (LGPD)
 
@@ -44,14 +23,6 @@ Civil) e registo de quem publica cada manifesto.
 - Nenhum telemetria é enviado sem opt-in documentado.
 - Retenção e direito de remoção: política própria quando a conta entrar
   (Fase 3), espelhando `docs/DATA_RETENTION.md` do Nexora Cloud.
-
-## 5. Manifestos e verificação (o que a plataforma faz e não faz)
-
-O launcher aceita **manifestos** (`.json`) que descrevem o que transferir.
-Cada manifesto declara a sua base legal e quem o instalou responde por ela;
-sem essa declaração, a instalação é recusada pelo software. A NEXORA não
-distribui, hospeda nem selecciona manifestos: os que existirem na máquina de
-um utilizador foram instalados por ele ou pelo operador do seu ambiente.
 
 O que a plataforma garante, para **qualquer** fonte: verificação SHA-256
 antes de instalar e verificação dos ficheiros no disco a qualquer momento

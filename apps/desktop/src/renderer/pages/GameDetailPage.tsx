@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { Button, Card, EmptyState, useInterface } from '@nexora/ui';
+import { Button, Card, EmptyState, type Translator, useInterface } from '@nexora/ui';
 import { steamStoreUrl } from '@nexora/core';
 import { useLibrary, useRunner, ErrorNote } from '../state/desktop.js';
 import { accessToken } from '../lib/api.js';
@@ -17,6 +17,29 @@ import { GameImage } from '../components/GameImage.js';
 import { CloudSavesCard } from '../components/CloudSavesCard.js';
 import { CoverSection } from '../components/CoverSection.js';
 import type { SaveSnapshotView } from '../../shared/preload-api.js';
+import type { LaunchResultView } from '../../shared/preload-api.js';
+
+/** A mensagem de um arranque que correu bem — chaves explícitas. */
+function launchOk(result: Extract<LaunchResultView, { ok: true }>, t: Translator): string {
+  return result.via === 'steam' ? t('runner.session.openingSteam') : t('runner.session.started');
+}
+
+/** A mensagem de um arranque recusado — chaves explícitas, nunca dinâmicas. */
+function launchRefused(result: Extract<LaunchResultView, { ok: false }>, t: Translator): string {
+  switch (result.reasonKey) {
+    case 'not-seen':
+      return t('runner.session.notSeen');
+    case 'steam-altered':
+      return t('runner.session.steamAltered');
+    case 'missing-executable':
+      return t('details.executable.missing');
+    case 'not-installed':
+      return t('details.notInstalled');
+    default:
+      return t('runner.launch.error');
+  }
+}
+
 
 /**
  * Detalhes do jogo — a segunda pele do launcher.
@@ -46,15 +69,7 @@ export function GameDetailPage({
       return;
     }
     const result = await runner.launch(game.id, accessToken() ?? undefined);
-    setMessage(
-      result.ok
-        ? t('runner.session.started')
-        : result.reasonKey === 'missing-executable'
-          ? t('details.executable.missing')
-          : result.reasonKey === 'not-installed'
-            ? t('details.notInstalled')
-            : t('runner.launch.error'),
-    );
+    setMessage(result.ok ? launchOk(result, t) : launchRefused(result, t));
   }, [game, runner, t]);
 
   /**

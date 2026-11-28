@@ -1796,3 +1796,62 @@ existir e qualquer forma de contorno de licença das lojas — ver
 Lojas de pontos por dinheiro real, cosméticos que dão vantagem (um selo não
 mede nem acelera nada) e tipos novos de cosmético antes de haver onde os
 aplicar — o catálogo cresce com o comportamento.
+
+## Fase 16 — Arranque correcto: o caminho oficial (2026-11-28)
+
+### Entregue
+
+- [x] **Jogos da loja abrem pelo cliente oficial** (`library-ipc`) — um jogo
+      com AppID da Steam é encaminhado pelo cliente oficial, com ambiente
+      **limpo** (`LD_PRELOAD`, `LD_AUDIT`, `LD_LIBRARY_PATH` e as variáveis
+      `SLS*` removidas antes do arranque). O launcher não corre o `.exe` pelo
+      Wine do sistema: era isso que fazia os jogos "não acontecer nada" ou
+      crashar.
+- [x] **A sessão passa a ser medida pela observação** (`@nexora/runner`) —
+      `observe()` abre uma sessão que nasce pendente, começa a contar quando
+      o processo real do jogo aparece na tabela e acaba quando ele sai. O
+      `origin` da sessão diz quem abriu o jogo (`official` vs `local`) e o
+      `stop` de uma sessão observada pága a **medição**, não o jogo — o
+      processo não é do launcher.
+- [x] **O cliente alterado é detectado e recusado com motivo**
+      (`steam-client.ts` + chave `runner.session.steamAltered`) — se o cliente
+      da Steam em execução carrega uma biblioteca de auditoria de outra
+      ferramenta, o launcher diz qual é e o que fazer, em vez de mandar um
+      pedido ao vazio.
+- [x] **A importação oficial vê todos os jogos instalados**
+      (`official-import.ts`) — o `libraryfolders.vdf` é lido de `steamapps/`
+      **e** de `config/`, e os manifestos do disco entram sempre na união: um
+      ficheiro desactualizado (ou em falta) já não esconde jogos instalados.
+      As raízes são deduplas pelo caminho real (`~/.steam/steam` é um atalho).
+- [x] **Clicar em Jogar diz sempre o que aconteceu** — mensagens novas no
+      Início, na Biblioteca e nos detalhes (a abrir no cliente da Steam, a
+      sessão começou, o jogo não apareceu, o cliente está alterado).
+
+### Prova de execução real (2026-11-28)
+
+- `pnpm typecheck` limpo; **849 testes verdes** (mais 5: 3 do ambiente do
+  cliente e a correcção do teste da importação);
+- a app real (Electron 42, perfil do utilizador) conduzida pelo DevTools:
+  a importação oficial passou a encontrar **TBH: Task Bar Hero** — que a
+  versão anterior não via, porque o `libraryfolders.vdf` desta máquina não o
+  lista (está desactualizado);
+- o arranque pelo hub encaminhou o jogo pelo cliente oficial
+  (`"via":"steam"`, sessão com `origin:"official"`), e a sessão foi medida
+  pelo processo real;
+- **as duas causas do "não acontece nada" ficaram provadas**: (1) o cliente
+  da Steam em execução levava `LD_AUDIT` a apontar para um contornador de
+  licenças instalado na máquina — arrancava, mas ignorava todos os pedidos de
+  arranque; (2) com o cliente limpo, o jogo arrancou pelo cliente oficial e
+  **crashou** — o registo do Proton mostra `d3d11: failed to create factory`
+  e `Proton: Upgrading prefix from GE-Proton11-6 to 11.0-100 / Prefix has an
+  invalid version?!`: o prefixo do jogo foi criado por um Proton de terceiros
+  (GE-Proton) e o cliente oficial usa o Proton 11.0.
+
+### Fora do escopo desta fase (deliberadamente)
+
+O que é do ambiente do utilizador, e por isso não se resolve no launcher:
+fechar o cliente alterado e reinstalar o Proton que criou o prefixo (ou deixar
+o prefixo actualizar) são acções dona do cliente da Steam; e o teste do
+R.E.P.O. continua a faltar — a conta em sessão (**Yua**) não tem o jogo na
+biblioteca (a página do jogo no cliente mostra apenas INSTALAR para os jogos
+que tem).

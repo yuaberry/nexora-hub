@@ -10,6 +10,7 @@
 import { existsSync, readdirSync, type Dirent } from 'node:fs';
 import { accessSync, constants } from 'node:fs';
 import { basename, join } from 'node:path';
+import { spawn } from 'node:child_process';
 import { app, globalShortcut, ipcMain } from 'electron';
 import { LocalGameRunner, resolveLaunchPlan, type LaunchContext } from '@nexora/runner';
 import { DEFAULT_API_BASE_URL } from './config.js';
@@ -20,6 +21,7 @@ import { setWidgetSession } from './widget.js';
 import { findGameMode } from './optimizer.js';
 import { installDesktopShortcut } from './shortcuts.js';
 import { openExternal } from './window.js';
+import { findSteamClient, runningClientInjection, steamClientEnv, steamRunUrl } from './steam-client.js';
 import type {
   AppInfoView,
   DesktopGameView,
@@ -295,6 +297,59 @@ export function registerIpc(dependencies: IpcDependencies): void {
       return { ok: false, reasonKey: 'not-installed' };
     }
 
+    // Caminho oficial: um jogo que veio de uma loja com cliente abre pelo
+    // cliente. O Proton (com os shaders já compilados), a sobreposição e a
+    // verificação de licença são dele — correr o `.exe` pelo Wine do sistema
+    // era o que fazia os jogos "não acontecer nada" (D3D12 sem DXVK, e a API
+    // da Steam por inicializar). O launcher pede ao cliente e **mede** a
+    // sessão observando o processo real.
+    const clienteOficial = game.steamAppId !== null ? findSteamClient() : null;
+    if (game.steamAppId !== null && clienteOficial !== null) {
+      // Um cliente alterado por outra ferramenta arranca mas não abre jogos:
+      // o pedido perder-se-ia sem explicação. Recusar com o motivo é o honesto.
+      const injuncao = runningClientInjection();
+      if (injuncao !== null) {
+        return { ok: false, reasonKey: 'steam-altered' };
+      }
+      const observada = await runner.observe({
+        gameId: game.externalKey,
+        // O nome do executável do jogo: o processo real (no Proton, a linha
+        // de comandos contém o caminho do `.exe`).
+        processMatch: basename(game.executablePath),
+      });
+      if (!observada.ok) {
+        return { ok: false, reasonKey: observada.reasonKey };
+      }
+      // O cliente oficial arranca com o URL do jogo: **directamente**, não
+      // pelo que o sistema tenha registado no ambiente de trabalho (que pode
+      // ser outro programa qualquer a fazer-se passar pelo cliente), e com
+      // ambiente limpo — sem as variáveis que injudam bibliotecas noutros
+      // processos.
+      spawn(clienteOficial, [steamRunUrl(game.steamAppId)], {
+        detached: true,
+        stdio: 'ignore',
+        env: steamClientEnv(clienteOficial),
+      }).unref();
+
+      // A sessão observada não é fechada pelo `stop`: o que é do cliente da
+      // Steam é do cliente. O tempo medido é o do processo real.
+      const sessionEnd = runner.wait(observada.session.sessionId);
+      const emCurso = { title: game.title, startedAt: observada.session.startedAt };
+      setCurrentGame(emCurso);
+      setWidgetSession(emCurso);
+      if (typeof launchToken === 'string' && launchToken !== '') {
+        startSessionPresence(launchToken, game.externalKey, sessionEnd ?? Promise.resolve(null));
+      }
+      void (sessionEnd ?? Promise.resolve(null)).then((summary) => {
+        setCurrentGame(null);
+        setWidgetSession(null);
+        if (summary !== null && !summary.crashed) {
+          library.addPlayedSeconds(game.externalKey, summary.durationSeconds, summary.endedAt ?? new Date().toISOString());
+        }
+      });
+      return { ok: true, sessionId: observada.session.sessionId, gameId: observada.session.gameId, startedAt: observada.session.startedAt, via: 'steam' };
+    }
+
     // O plano de arranque decide a camada (nativo ou Wine/Proton) — e sem
     // Wine no sistema, a recusa é explícita, não um processo que morre.
     const plan = resolveLaunchPlan(
@@ -343,12 +398,12 @@ export function registerIpc(dependencies: IpcDependencies): void {
 
     const sessionEnd = runner.wait(outcome.session.sessionId);
     if (typeof launchToken === 'string' && launchToken !== '') {
-      startSessionPresence(launchToken, game.externalKey, sessionEnd);
+      startSessionPresence(launchToken, game.externalKey, sessionEnd ?? Promise.resolve(null));
     }
 
     // O tempo jogado é gravado quando a sessão termina — incluindo o código
     // de saída, para que um crash não seja confundido com uma sessão normal.
-    void sessionEnd.then((summary) => {
+    void (sessionEnd ?? Promise.resolve(null)).then((summary) => {
       // O jogo acabou: o overlay perde o jogo em curso e o atalho sai.
       setCurrentGame(null);
       setWidgetSession(null);
@@ -363,6 +418,7 @@ export function registerIpc(dependencies: IpcDependencies): void {
       sessionId: outcome.session.sessionId,
       gameId: outcome.session.gameId,
       startedAt: outcome.session.startedAt,
+      via: 'runner',
     };
   });
 
@@ -435,6 +491,7 @@ export function registerIpc(dependencies: IpcDependencies): void {
       startedAt: session.startedAt,
       durationSeconds: session.durationSeconds,
       crashed: session.crashed,
+      origin: session.origin,
     })),
   );
 

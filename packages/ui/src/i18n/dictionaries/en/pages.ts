@@ -37,6 +37,11 @@ export const pages = {
   'runner.launch.error': 'The game could not be started.',
   'runner.launch.missing': 'Executable not found.',
   'runner.session.started': 'Session started.',
+  'runner.session.openingSteam': 'Opening in the Steam client — the session starts once the game appears.',
+  'runner.session.via.steam': 'Running through the Steam client.',
+  'runner.session.via.runner': 'Running through the launcher.',
+  'runner.session.notSeen': 'The game never appeared: the Steam client may not have opened it.',
+  'runner.session.steamAltered': 'The Steam client is running with a third-party tool that stops it from opening games. Close the Steam client and press Play again — the launcher opens it clean.',
   'runner.session.ended': 'Session ended.',
 
   'error.notFound.title': 'Page not found',

@@ -1,11 +1,33 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Button, EmptyState, useInterface } from '@nexora/ui';
+import { Button, EmptyState, type Translator, useInterface } from '@nexora/ui';
 import { useLibrary, ErrorNote } from '../state/desktop.js';
 import { apiRequest, ApiError } from '../lib/api.js';
 import { searchLocalLibrary } from '../lib/catalog.js';
 import { formatPlayTime } from '../lib/format.js';
 import { GameCapsule } from '../components/GameCapsule.js';
-import type { CollectionView } from '../../shared/preload-api.js';
+import type { CollectionView, LaunchResultView } from '../../shared/preload-api.js';
+
+/** A mensagem de um arranque que correu bem — chaves explícitas. */
+function launchOk(result: Extract<LaunchResultView, { ok: true }>, t: Translator): string {
+  return result.via === 'steam' ? t('runner.session.openingSteam') : t('runner.session.started');
+}
+
+/** A mensagem de um arranque recusado — chaves explícitas, nunca dinâmicas. */
+function launchRefused(result: Extract<LaunchResultView, { ok: false }>, t: Translator): string {
+  switch (result.reasonKey) {
+    case 'not-seen':
+      return t('runner.session.notSeen');
+    case 'steam-altered':
+      return t('runner.session.steamAltered');
+    case 'missing-executable':
+      return t('details.executable.missing');
+    case 'not-installed':
+      return t('details.notInstalled');
+    default:
+      return t('runner.launch.error');
+  }
+}
+
 
 /**
  * Biblioteca — todos os jogos, com a pesquisa do cabeçalho.
@@ -22,7 +44,7 @@ export function LibraryPage({
 }: {
   readonly search: string;
   readonly onOpenGame: (gameId: string) => void;
-  readonly onPlay: (gameId: string) => void;
+  readonly onPlay: (gameId: string) => Promise<LaunchResultView>;
   readonly onToggleFavorite: (gameId: string) => void;
 }): ReactNode {
   const { t, locale } = useInterface();
@@ -299,7 +321,14 @@ export function LibraryPage({
               favorite={game.favorite}
               playLabel={t('common.action.play')}
               onSelect={onOpenGame}
-              onPlay={onPlay}
+              onPlay={(gameId) => {
+                // Clicar em Jogar tem de dizer o que aconteceu: sem isto, o
+                // jogador carrega e não acontece nada — que é precisamente a
+                // queixa que esta fase resolve.
+                void onPlay(gameId).then((result) => {
+                  setImportMessage(result.ok ? launchOk(result, t) : launchRefused(result, t));
+                });
+              }}
               onToggleFavorite={onToggleFavorite}
             />
           ))}

@@ -87,7 +87,9 @@ describe('importSteamLibrary', () => {
     writeFileSync(join(root, 'steamapps', 'appmanifest_9999999.acf'), '"AppState"\n{\n\t"appid" "9999999"\n\t"name" "Partido"\n');
     const report = importSteamLibrary(library, [root]);
     expect(report.titles).toEqual([]);
-    expect(report.skipped).toBe(1);
+    // Dois ficheiros sem jogo: o partido e o que ficou sem manifesto (o
+    // `libraryfolders.vdf` ainda lista o 367520, apagado do disco).
+    expect(report.skipped).toBe(2);
     expect(library.list()).toHaveLength(0);
   });
 

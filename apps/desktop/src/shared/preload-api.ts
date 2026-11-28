@@ -106,11 +106,24 @@ export interface DiskUsageView {
 
 /** Resultado de um pedido de arranque. */
 export type LaunchResultView =
-  | { readonly ok: true; readonly sessionId: string; readonly gameId: string; readonly startedAt: string }
+  | {
+      readonly ok: true;
+      readonly sessionId: string;
+      readonly gameId: string;
+      readonly startedAt: string;
+      /**
+       * Como o jogo foi aberto.
+       *
+       * `steam` = o cliente oficial abriu-o (o Proton, a sobreposição e a
+       * licença são dele; o launcher só mede a sessão). `runner` = o launcher
+       * arrancou o executável do utilizador.
+       */
+      readonly via: 'runner' | 'steam';
+    }
   | { readonly ok: false; readonly reasonKey: LaunchRefusalKey };
 
 /** Motivos de recusa de arranque — chaves de tradução, não texto solto. */
-export type LaunchRefusalKey = 'missing-executable' | 'already-running' | 'not-found' | 'no-runner' | 'not-installed';
+export type LaunchRefusalKey = 'missing-executable' | 'already-running' | 'not-found' | 'no-runner' | 'not-installed' | 'not-seen' | 'steam-altered';
 
 /** O que o widget de sessão mostra. */
 export interface WidgetData {
@@ -145,6 +158,8 @@ export interface SessionSummaryView {
   readonly startedAt: string;
   readonly durationSeconds: number;
   readonly crashed: boolean;
+  /** Quem abriu o jogo (`official` = o cliente da loja; o launcher só mede). */
+  readonly origin: 'local' | 'official';
 }
 
 /** Resultado de uma importação de pasta. */

@@ -34,9 +34,32 @@ export interface LaunchRequest {
   readonly processMatch?: string;
 }
 
+/**
+ * Pedido de observação — o jogo corre noutro processo.
+ *
+ * É o caminho **oficial**: o launcher pede ao cliente da loja que abra o jogo
+ * (`steam://rungameid/<id>`) e limita-se a observar o processo real que
+ * aparece na tabela. A sessão é medida por esse processo — tempo real, sem
+ * fingir — mas o launcher não o possui: não o pode fechar, e a interface diz
+ * que o jogo corre pelo cliente oficial.
+ */
+export interface ObserveRequest {
+  readonly gameId: string;
+  /** Texto que identifica o processo do jogo (o nome do executável). */
+  readonly processMatch: string;
+  /**
+   * Quanto tempo esperar que o jogo apareça antes de desistir (ms).
+   *
+   * O cliente da loja pode demorar a arrancar (actualizações, o próprio
+   * cliente). A espera é declarada — e quando passa, a sessão acaba com o
+   * motivo honesto, em vez de ficar presa a sessão fantasma.
+   */
+  readonly waitMs?: number;
+}
+
 /** Motivo de recusa de arranque (chave de tradução + texto). */
 export interface LaunchRefusal {
-  readonly reasonKey: 'missing-executable' | 'no-runner' | 'already-running';
+  readonly reasonKey: 'missing-executable' | 'no-runner' | 'already-running' | 'not-seen';
   readonly reason: string;
 }
 
@@ -45,14 +68,23 @@ export type LaunchOutcome =
   | { readonly ok: true; readonly session: RunningSession }
   | { readonly ok: false } & LaunchRefusal;
 
+/** Quem abriu o jogo. */
+export type SessionOrigin =
+  /** O launcher arrancou o executável (é dono do processo). */
+  | 'local'
+  /** O cliente oficial da loja abriu o jogo (o launcher só observa). */
+  | 'official';
+
 /** Uma sessão em curso. */
 export interface RunningSession {
   readonly sessionId: string;
   readonly gameId: string;
-  /** PID do processo filho. */
+  /** PID do processo observado (0 enquanto o jogo não apareceu). */
   readonly processId: number;
   /** ISO-8601 UTC do arranque. */
   readonly startedAt: string;
+  /** Quem abriu o jogo — decide o que o launcher pode fazer com ele. */
+  readonly origin: SessionOrigin;
 }
 
 /** Resumo de uma sessão (em curso ou terminada). */
@@ -61,6 +93,8 @@ export interface SessionSummary {
   readonly gameId: string;
   readonly processId: number;
   readonly startedAt: string;
+  /** Quem abriu o jogo. */
+  readonly origin: SessionOrigin;
   /** ISO-8601 UTC do fim, ou `null` enquanto corre. */
   readonly endedAt: string | null;
   /** Duração em segundos (arredondada por cima enquanto corre). */
@@ -75,6 +109,14 @@ export interface SessionSummary {
 export interface GameRunner {
   /** Arranca o executável e devolve a sessão em curso. */
   readonly launch: (request: LaunchRequest) => Promise<LaunchOutcome>;
+  /**
+   * Observa o processo de um jogo que outro programa abriu.
+   *
+   * Uma sessão observada não é fechada pelo `stop`: o processo não é do
+   * launcher. Parar uma sessão observada pága a **medição**, e a interface
+   * diz que o jogo continua a correr pelo cliente oficial.
+   */
+  readonly observe: (request: ObserveRequest) => Promise<LaunchOutcome>;
   /** Termina uma sessão (mata o processo) e devolve o resumo. */
   readonly stop: (sessionId: string) => SessionSummary | null;
   /** Resumo de uma sessão, ou `null` se não existir. */

@@ -11,7 +11,7 @@
  * A interface recebe o relatório com o motivo — honesto, não ausente.
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -76,6 +76,103 @@ function readText(path: string): string | null {
 }
 
 /**
+ * O texto do ficheiro das bibliotecas da Steam, onde ele estiver.
+ *
+ * O sítio normal é `steamapps/libraryfolders.vdf` — mas há instalações
+ * (mais antigas, e a desta máquina) que o escrevem em `config/`, e há
+ * clientes que não o escrevem de todo. Um ficheiro em falta **não** pode
+ * significar "não há jogos": sem ele, a importação lê os manifestos do
+ * próprio `steamapps`, que são a fonte da verdade do que está instalado.
+ */
+function libraryFoldersText(root: string): { readonly text: string | null } {
+  return {
+    text: readText(join(root, 'steamapps', 'libraryfolders.vdf')) ?? readText(join(root, 'config', 'libraryfolders.vdf')),
+  };
+}
+
+/**
+ * Os AppIDs instalados numa pasta `steamapps` (pelos manifestos).
+ *
+ * Esta é a leitura que não pode faltar: um `libraryfolders.vdf` desactualizado
+ * — ou um cliente que não o escreva — esconderia jogos que estão instalados,
+ * e a queixa "instalei o jogo e não aparece" nasce exactamente aí. Os
+ * manifestos são escritos pela loja a cada instalação, e são por isso a
+ * fonte mais fresca do que existe no disco.
+ */
+function installedAppIds(steamapps: string): readonly string[] {
+  let entries: readonly string[];
+  try {
+    entries = readdirSync(steamapps);
+  } catch {
+    return [];
+  }
+  return entries
+    .filter((name) => name.startsWith('appmanifest_') && name.endsWith('.acf'))
+    .map((name) => name.slice('appmanifest_'.length, -'.acf'.length))
+    .filter((id) => /^\d+$/.test(id));
+}
+
+/** Caminho real (o symlink `~/.steam/steam` conta como o destino). */
+function realPath(path: string): string {
+  try {
+    return realpathSync(path);
+  } catch {
+    return path;
+  }
+}
+
+/** As bibliotecas de uma raiz: as do ficheiro (se houver) e as do disco, unidas. */
+function librariesOfRoot(root: string, foldersText: string | null): readonly { readonly path: string; readonly appIds: readonly string[] }[] {
+  const uniao = new Map<string, Set<string>>();
+  if (foldersText !== null) {
+    try {
+      for (const entry of parseSteamLibraryFolders(foldersText)) {
+        // A chave é o caminho real: o ficheiro pode dar um caminho e a raiz
+        // ser um atalho para o mesmo sítio — sem resolver, a mesma biblioteca
+        // entra duas vezes na união.
+        const chave = realPath(entry.path);
+        const actual = uniao.get(chave) ?? new Set<string>();
+        for (const appId of entry.appIds) {
+          actual.add(appId);
+        }
+        uniao.set(chave, actual);
+      }
+    } catch {
+      // ficheiro ilegível: os manifestos do disco chegam
+    }
+  }
+  // Sempre o que está no disco desta raiz (ver `installedAppIds`).
+  const chaveRaiz = realPath(root);
+  const actual = uniao.get(chaveRaiz) ?? new Set<string>();
+  for (const appId of installedAppIds(join(root, 'steamapps'))) {
+    actual.add(appId);
+  }
+  uniao.set(chaveRaiz, actual);
+  return [...uniao.entries()].map(([path, appIds]) => ({ path, appIds: [...appIds] }));
+}
+
+/**
+ * As raízes sem repetição, pelo caminho real.
+ *
+ * `~/.steam/steam` é um atalho para `~/.local/share/Steam`: sem resolver o
+ * caminho, a mesma biblioteca é lida duas vezes e o relatório lista o mesmo
+ * jogo duas vezes — um número que não é o número.
+ */
+function dedupeRoots(roots: readonly string[]): readonly string[] {
+  const seen = new Set<string>();
+  const unicas: string[] = [];
+  for (const root of roots) {
+    const real = realPath(root);
+    if (seen.has(real)) {
+      continue;
+    }
+    seen.add(real);
+    unicas.push(real);
+  }
+  return unicas;
+}
+
+/**
  * Importa a biblioteca da Steam.
  *
  * Por cada jogo: o título real do manifesto, o executável detectado na pasta
@@ -90,18 +187,11 @@ export function importSteamLibrary(
   const titles: string[] = [];
   let skipped = 0;
 
-  for (const root of roots) {
-    const foldersPath = join(root, 'steamapps', 'libraryfolders.vdf');
-    const foldersText = readText(foldersPath);
-    if (foldersText === null) {
-      continue;
-    }
-    let libraries;
-    try {
-      libraries = parseSteamLibraryFolders(foldersText);
-    } catch {
-      continue;
-    }
+  for (const root of dedupeRoots(roots)) {
+    // As bibliotecas desta raiz: o ficheiro das bibliotecas e os manifestos
+    // do disco, unidos — um jogo instalado nunca pode faltar por o ficheiro
+    // estar desactualizado.
+    const libraries = librariesOfRoot(root, libraryFoldersText(root).text);
 
     for (const entry of libraries) {
       // A mesma biblioteca aparece em várias raízes (o `~/.steam/steam` é

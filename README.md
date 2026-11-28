@@ -7,7 +7,7 @@
 **Linux · Windows** · Desktop nativo (Electron) + API + Web
 
 [![Versão](https://img.shields.io/badge/versão-0.5.0-7c5cff)](https://github.com/yuaberry/nexora-hub/releases)
-[![Testes](https://img.shields.io/badge/testes-844%20verdes-2ea44f)](#qualidade)
+[![Testes](https://img.shields.io/badge/testes-849%20verdes-2ea44f)](#qualidade)
 [![TypeScript](https://img.shields.io/badge/TypeScript-estrito%20sem%20any-3178c6)](https://www.typescriptlang.org/)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-0078d6)](#instalação)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-8b8b8b)](#licença)
@@ -96,6 +96,22 @@ código de saída, tempo gravado).
   novos, todos diferentes); a capa que escolheste **nunca** é mexida
 - **Personalizável** — escolhe outra entre as imagens da Steam ou um ficheiro
   teu, e volta à automática quando quiseres
+
+### ▶️ Arranque correcto dos jogos
+- **Jogos da Steam abrem pelo cliente oficial** — o launcher pede ao cliente
+  (com ambiente limpo, sem injectores de terceiros) e **mede a sessão**
+  observando o processo real: o Proton, a sobreposição e a licença são do
+  cliente, e o tempo jogado continua a ser medido de verdade
+- **Sem Wine pelo meio** — um `.exe` já não é lançado pelo Wine do sistema
+  (era o que fazia os jogos "não acontecer nada" ou crashar)
+- **O cliente alterado é detectado** — se o cliente da Steam estiver a correr
+  com uma ferramenta de terceiros injudada, o launcher diz-o em vez de mandar
+  um pedido que se perde
+- **A importação oficial vê tudo** — lê o `libraryfolders.vdf` de todos os
+  sítios **e** os manifestos do disco: um jogo instalado nunca falta por o
+  ficheiro da loja estar desactualizado
+- **Clicar em Jogar diz sempre o que aconteceu** — na Biblioteca, no Início e
+  nos detalhes do jogo
 
 ### 🏆 Cosméticos
 - **Selos comprados com pontos reais** — a mesma moeda das conquistas e das
@@ -331,7 +347,7 @@ Contribuição: convenções, honestidade e escopo em
 
 | | |
 | --- | --- |
-| **Testes** | **844 verdes** (integração PostgreSQL real incluída) |
+| **Testes** | **849 verdes** (integração PostgreSQL real incluída) |
 | **Typecheck** | estrito, sem `any`, limpo em todos os projectos |
 | **Bugs** | corrigidos com teste — cada lote fecha com prova de execução real (último: capas da loja que não carregavam no Electron, logo cortado em moldura retrato, import perdido que silenciava o cache) |
 | **Build** | Linux + Windows empacotados a cada versão |

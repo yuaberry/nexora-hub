@@ -24,7 +24,7 @@ import { PluginsPage } from './pages/PluginsPage.js';
 import { BigPicturePage } from './pages/BigPicturePage.js';
 import { AuthProvider } from './state/auth.js';
 import { useLibrary, useRunner } from './state/desktop.js';
-import type { DesktopGameView } from '../shared/preload-api.js';
+import type { DesktopGameView, LaunchResultView } from '../shared/preload-api.js';
 
 /**
  * Aplicação do launcher.
@@ -139,10 +139,9 @@ function Shell({
     async (gameId: string) => {
       const target = (library.value ?? []).find((game) => game.externalKey === gameId);
       if (target === undefined) {
-        return;
+        return { ok: false as const, reasonKey: 'not-found' as const };
       }
-      const result = await library.launch(target.id);
-      void result;
+      return library.launch(target.id);
     },
     [library],
   );
@@ -276,7 +275,7 @@ function routeTitle(route: Route, t: Translator): string {
 function useLibraryForSearch(): {
   readonly value: readonly DesktopGameView[] | null;
   readonly toggleFavorite: (id: string) => Promise<void>;
-  readonly launch: (id: string) => Promise<{ ok: boolean; reasonKey?: string }>;
+  readonly launch: (id: string) => Promise<LaunchResultView>;
 } {
   const library = useLibrary();
   const runner = useRunner();

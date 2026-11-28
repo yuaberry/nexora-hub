@@ -37,6 +37,11 @@ export const pages = {
   'runner.launch.error': 'Não foi possível iniciar o jogo.',
   'runner.launch.missing': 'Executável não encontrado.',
   'runner.session.started': 'Sessão iniciada.',
+  'runner.session.openingSteam': 'A abrir no cliente da Steam — a sessão começa quando o jogo aparecer.',
+  'runner.session.via.steam': 'Corre pelo cliente da Steam.',
+  'runner.session.via.runner': 'Corre pelo launcher.',
+  'runner.session.notSeen': 'O jogo não apareceu: o cliente da Steam pode não o ter aberto.',
+  'runner.session.steamAltered': 'O cliente da Steam está a correr com uma ferramenta de terceiros que o impede de abrir jogos. Fecha o cliente da Steam e carrega em Jogar outra vez — o launcher abre-o limpo.',
   'runner.session.ended': 'Sessão terminada.',
 
   'error.notFound.title': 'Página não encontrada',

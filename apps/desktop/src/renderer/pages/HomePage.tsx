@@ -5,7 +5,28 @@ import { formatPlayTime } from '../lib/format.js';
 import { accessToken } from '../lib/api.js';
 import { GameShelf } from '../components/GameShelf.js';
 import { coverUrl } from '../lib/media.js';
-import type { DesktopGameView } from '../../shared/preload-api.js';
+import type { DesktopGameView, LaunchResultView } from '../../shared/preload-api.js';
+
+/** A mensagem de um arranque que correu bem — chaves explícitas. */
+function launchOk(result: Extract<LaunchResultView, { ok: true }>, t: Translator): string {
+  return result.via === 'steam' ? t('runner.session.openingSteam') : t('runner.session.started');
+}
+
+/** A mensagem de um arranque recusado — chaves explícitas, nunca dinâmicas. */
+function launchRefused(result: Extract<LaunchResultView, { ok: false }>, t: Translator): string {
+  switch (result.reasonKey) {
+    case 'not-seen':
+      return t('runner.session.notSeen');
+    case 'steam-altered':
+      return t('runner.session.steamAltered');
+    case 'missing-executable':
+      return t('details.executable.missing');
+    case 'not-installed':
+      return t('details.notInstalled');
+    default:
+      return t('runner.launch.error');
+  }
+}
 
 /**
  * Início — a montra do launcher.
@@ -21,7 +42,7 @@ import type { DesktopGameView } from '../../shared/preload-api.js';
 
 /** As acções do runner de que a Home precisa. */
 interface RunnerActions {
-  readonly launch: (id: string, token?: string) => Promise<{ readonly ok: boolean; readonly reasonKey?: string }>;
+  readonly launch: (id: string, token?: string) => Promise<LaunchResultView>;
 }
 
 export function HomePage({
@@ -155,11 +176,7 @@ async function onPlayFeatured(
   t: Translator,
 ): Promise<void> {
   const result = await runner.launch(game.id, accessToken() ?? undefined);
-  setMessage(
-    result.ok
-      ? t('runner.session.started')
-      : t(result.reasonKey === 'missing-executable' ? 'details.executable.missing' : 'runner.launch.error'),
-  );
+  setMessage(result.ok ? launchOk(result, t) : launchRefused(result, t));
 }
 
 
